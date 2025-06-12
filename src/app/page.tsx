@@ -1,9 +1,13 @@
+
+'use client'; // Add this if not already present at the top for useState/useEffect
+
 import { MainHeader } from '@/components/layout/main-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, BarChartBig, Users, Briefcase, Brain, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState, useEffect } from 'react'; // Import useState and useEffect
 
 const features = [
   {
@@ -63,6 +67,12 @@ const pricingTiers = [
 ];
 
 export default function LandingPage() {
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
       <MainHeader />
@@ -199,7 +209,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t bg-background">
         <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} OrgCentral Simplified. All rights reserved.</p>
+          <p>&copy; {currentYear || new Date().getFullYear()} OrgCentral Simplified. All rights reserved.</p>
         </div>
       </footer>
     </div>
