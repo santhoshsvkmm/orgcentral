@@ -1,85 +1,85 @@
+
 pipeline {
-    agent any // Specifies that Jenkins can use any available agent to run the pipeline
+    agent any // You can specify a Docker agent if your Jenkins environment is set up for it: agent { docker { image 'node:20-alpine' } }
 
     environment {
-        // Define environment variables for your pipeline
-        // EXAMPLE_REGISTRY = "your-docker-registry.com" // e.g., gcr.io/your-project-id
-        // EXAMPLE_IMAGE_NAME = "orgcentral-simplified"
-        // EXAMPLE_DOCKER_CREDENTIALS_ID = "your-docker-registry-credentials-id" // Jenkins credential ID
+        // Define any environment variables needed for your build
+        // Example: GOOGLE_API_KEY = credentials('your-google-api-key-credential-id')
+        // Ensure this credential ID is set up in Jenkins
+        // For sensitive data, always use Jenkins credentials
+        REGISTRY = "your-docker-registry" // Replace with your Docker registry URL (e.g., your-docker-hub-username/your-repo-name)
+        IMAGE_NAME = "orgcentral-simplified"
+        // BUILD_NUMBER will be provided by Jenkins
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from your Source Code Management (SCM)
-                // This step is often configured in the Jenkins job UI or uses a default SCM plugin behavior
-                // For a direct git checkout:
-                // git url: 'https://your-git-repository.com/your-app.git', branch: 'main'
+                // Checkout your source code from SCM (e.g., Git)
+                // Example: git 'https://your-repo-url.git'
                 echo 'Checking out code...'
-                // If Jenkins handles checkout via SCM configuration, this step might just confirm.
+                // Placeholder: Replace with your actual SCM checkout command
+                sh 'git version' // Example command
             }
         }
 
-        stage('Lint & Type Check') {
+        stage('Install Dependencies') {
             steps {
-                // Use a node image to ensure consistency, or ensure Node.js is on the agent
-                // Example: sh 'docker run --rm -v $(pwd):/app -w /app node:20-alpine sh -c "npm install && npm run lint && npm run typecheck"'
-                echo 'Running linters and type checkers...'
-                sh 'npm install' // Installs devDependencies needed for linting/typechecking
+                echo 'Installing npm dependencies...'
+                // It's good practice to use a clean workspace or ensure node_modules is not checked in
+                sh 'npm ci' // 'ci' is generally preferred for CI environments for reproducible builds
+            }
+        }
+
+        stage('Lint and Test') {
+            steps {
+                echo 'Running linters and tests...'
                 sh 'npm run lint'
-                sh 'npm run typecheck'
+                // sh 'npm run test' // Uncomment if you have a test script
+            }
+        }
+
+        stage('Build Next.js App') {
+            steps {
+                echo 'Building Next.js application...'
+                // Ensure environment variables required at build time are available
+                // Example: if you need GOOGLE_API_KEY during build:
+                // sh 'GOOGLE_API_KEY=${GOOGLE_API_KEY} npm run build'
+                sh 'npm run build'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    def imageName = "orgcentral-simplified" // Or use env.EXAMPLE_IMAGE_NAME
-                    def imageTag = "${env.BUILD_NUMBER ?: 'latest'}"
-                    // def fullImageName = "${env.REGISTRY ? env.REGISTRY + '/' : ''}${imageName}:${imageTag}"
-                    // Using a simpler name for now if no registry is configured
-                    def fullImageNameWithBuildNumber = "${imageName}:${imageTag}"
-                    def fullImageNameLatest = "${imageName}:latest"
-
-                    echo "Building Docker image: ${fullImageNameWithBuildNumber} and ${fullImageNameLatest}"
-                    sh "docker build -t ${fullImageNameWithBuildNumber} -t ${fullImageNameLatest} ."
-                }
+                echo "Building Docker image ${IMAGE_NAME}:${env.BUILD_NUMBER}..."
+                // If your registry requires login, you might need a withCredentials block here
+                // Example for Docker Hub:
+                // withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                //     sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                // }
+                sh "docker build -t ${IMAGE_NAME}:${env.BUILD_NUMBER} ."
+                sh "docker tag ${IMAGE_NAME}:${env.BUILD_NUMBER} ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                sh "docker tag ${IMAGE_NAME}:${env.BUILD_NUMBER} ${REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
 
-        // Optional: Stage to push image to a Docker registry
-        /*
         stage('Push Docker Image') {
-            // 'when' condition can be used to run this stage only for specific branches, e.g., main
-            // when { branch 'main' }
             steps {
-                script {
-                    def imageName = env.EXAMPLE_IMAGE_NAME
-                    def imageTag = env.BUILD_NUMBER
-                    def registry = env.EXAMPLE_REGISTRY
-                    def fullImageName = "${registry}/${imageName}:${imageTag}"
-                    def latestImageName = "${registry}/${imageName}:latest"
-
-                    // Ensure DOCKER_CREDENTIALS_ID is set up in Jenkins and in environment block
-                    // docker.withRegistry("https://${registry}", DOCKER_CREDENTIALS_ID) {
-                    //     sh "docker push ${fullImageName}"
-                    //     sh "docker push ${latestImageName}" // Optionally push a 'latest' tag
-                    // }
-                    echo "Pushing Docker image ${fullImageName} and ${latestImageName}..."
-                    echo "Implement actual 'docker push' commands here if a registry is configured."
-                }
+                echo "Pushing Docker image ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER} and :latest..."
+                // Ensure Docker is logged in if your registry is private (see previous stage example)
+                sh "docker push ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                sh "docker push ${REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
-        */
 
         stage('Deploy') {
-            // This stage is highly dependent on your deployment target (e.g., Kubernetes, ECS, Cloud Run, simple Docker host)
             steps {
                 echo 'Deploying application...'
-                // Placeholder: Replace with your actual deployment commands
-                // Example for a simple Docker host via SSH:
-                // sh "ssh user@your-server.com 'docker pull my-image:latest && docker stop my-app-container || true && docker rm my-app-container || true && docker run -d --name my-app-container -p 3000:3000 my-image:latest'"
-                echo "Deployment steps need to be customized for your environment."
+                // This stage is highly dependent on your deployment environment
+                // Example: Kubectl apply, SSH to a server and docker-compose up, etc.
+                // sh 'kubectl apply -f k8s-deployment.yaml'
+                // sh 'ssh user@your-server "cd /path/to/app && docker-compose pull && docker-compose up -d"'
+                echo "Deployment steps would go here for image ${REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
     }
@@ -87,16 +87,41 @@ pipeline {
     post {
         always {
             echo 'Pipeline finished.'
-            // Clean up workspace, send notifications, etc.
-            // cleanWs() // Deletes the workspace from the Jenkins agent if desired
+            // Clean up workspace or Docker images if necessary
+            // Example: sh 'docker rmi ${IMAGE_NAME}:${env.BUILD_NUMBER}' // If you don't need the tagged build locally on the agent
+            // sh 'docker rmi ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}'
+            // sh 'docker rmi ${REGISTRY}/${IMAGE_NAME}:latest'
+            cleanWs() // Jenkins directive to clean up the workspace
         }
         success {
             echo 'Pipeline succeeded!'
-            // Add notification steps here (e.g., email, Slack)
+            // Optionally send a success notification
+            // mail to: 'dev-team@example.com',
+            //      subject: "SUCCESS: Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+            //      body: "Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} completed successfully. View console: ${env.BUILD_URL}console"
         }
         failure {
-            echo 'Pipeline failed.'
-            // Add notification steps here
+            echo 'Pipeline failed!'
+            emailext (
+                subject: "FAILURE: Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                body: """<p>Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} failed.</p>
+                         <p>Check console output: <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a></p>
+                         <p>Changes:</p>
+                         <verbatim>${currentBuild.changeSets.collect { it.msg + ' (' + it.author + ')' }.join('\\n')}</verbatim>""",
+                to: 'your-email@example.com, another-email@example.com', // Replace with your recipient list
+                mimeType: 'text/html'
+            )
+        }
+        aborted {
+            echo 'Pipeline was aborted.'
+            // Optionally send a notification for aborted builds
+             emailext (
+                subject: "ABORTED: Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                body: """<p>Pipeline ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} was aborted.</p>
+                         <p>Check console output: <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a></p>""",
+                to: 'your-email@example.com', // Replace with your recipient list
+                mimeType: 'text/html'
+            )
         }
     }
 }
