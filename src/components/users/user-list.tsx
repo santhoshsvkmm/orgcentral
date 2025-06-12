@@ -12,21 +12,20 @@ import { UserForm } from "./user-form"; // Import UserForm
 
 // Mock data - replace with actual data fetching
 const initialUsers = [
-  { id: "u1", name: "Alice Johnson", email: "alice@example.com", role: "Admin", avatar: "https://placehold.co/40x40.png?text=AJ" },
-  { id: "u2", name: "Bob Smith", email: "bob@example.com", role: "Project Manager", avatar: "https://placehold.co/40x40.png?text=BS" },
-  { id: "u3", name: "Carol White", email: "carol@example.com", role: "Developer", avatar: "https://placehold.co/40x40.png?text=CW" },
-  { id: "u4", name: "David Brown", email: "david@example.com", role: "Designer", avatar: "https://placehold.co/40x40.png?text=DB" },
+  { id: "1", name: "Alice Wonderland", email: "alice@example.com", role: "Admin", avatar: "/avatars/alice.png" },
+ { id: "2", name: "Bob The Builder", email: "bob@example.com", role: "Project Manager", avatar: "/avatars/bob.png" },
+  { id: "3", name: "Charlie Brown", email: "charlie@example.com", role: "Member", avatar: "/avatars/charlie.png" },
+  { id: "4", name: "Diana Prince", email: "diana@example.com", role: "Member", avatar: "/avatars/diana.png" },
+ { id: "5", name: "Eve Adams", email: "eve@example.com", role: "Editor", avatar: "/avatars/eve.png" },
+ { id: "6", name: "Frank Carter", email: "frank@example.com", role: "Viewer", avatar: "/avatars/frank.png" },
+ { id: "7", name: "Grace Hopper", email: "grace@example.com", role: "Contributor", avatar: "/avatars/grace.png" },
+ { id: "8", name: "Heidi Lamar", email: "heidi@example.com", role: "HR Manager", avatar: "/avatars/heidi.png" },
+ { id: "9", name: "Ivan Petrov", email: "ivan@example.com", role: "Project Lead", avatar: "/avatars/ivan.png" },
+ { id: "10", name: "Judy Bloom", email: "judy@example.com", role: "Member", avatar: "/avatars/judy.png" },
 ];
-
-type User = typeof initialUsers[0];
-
+type User = { id: string; name: string; email: string; role: string; avatar: string };
 export function UserList() {
-  const [users, setUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    // Simulate data fetching
-    setUsers(initialUsers);
-  }, []);
+  const [users, setUsers] = useState<User[]>(initialUsers);
 
   const getRoleBadgeVariant = (role: string): "default" | "secondary" | "outline" => {
     if (role.toLowerCase() === 'admin') return 'default';
