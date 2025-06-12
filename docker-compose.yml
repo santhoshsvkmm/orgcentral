@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Map host port 3000 to container port 3000
+    # You can pass environment variables here for local testing
+    # environment:
+    #   - GOOGLE_API_KEY=your_google_api_key_for_local_docker_run
+    # If you use a .env file and want Docker Compose to use it (ensure .env is in .dockerignore for image builds)
+    # env_file:
+    #   - .env
+    restart: unless-stopped
