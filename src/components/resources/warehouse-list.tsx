@@ -3,15 +3,16 @@
 
 import type { Warehouse } from '@/types/warehouse';
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit, MoreHorizontal, Trash2, PlusCircle, PackageSearch } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, PlusCircle, PackageSearch, ShoppingCart } from "lucide-react"; // Added ShoppingCart
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/date-utils";
 import { WarehouseForm } from './warehouse-form';
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import React from "react";
+import Link from "next/link"; // Added Link
 
 interface WarehouseListProps {
   warehouses: Warehouse[];
@@ -58,18 +59,6 @@ export function WarehouseList({ warehouses, projectId, onUpdateWarehouse, onDele
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex items-center justify-end">
-          <WarehouseForm
-            mode="edit"
-            projectId={projectId}
-            warehouseData={row}
-            onSave={onUpdateWarehouse}
-            triggerButton={
-              <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-                <Edit className="h-4 w-4" />
-                <span className="sr-only">Edit Warehouse</span>
-              </Button>
-            }
-          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 p-0">
@@ -79,10 +68,27 @@ export function WarehouseList({ warehouses, projectId, onUpdateWarehouse, onDele
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <WarehouseForm
+                mode="edit"
+                projectId={projectId}
+                warehouseData={row}
+                onSave={onUpdateWarehouse}
+                triggerButton={
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="flex items-center w-full">
+                    <Edit className="mr-2 h-4 w-4" />Edit Details
+                  </DropdownMenuItem>
+                }
+              />
+              <DropdownMenuItem asChild>
+                <Link href={`/projects/${projectId}/resources/warehouses/${row.id}/procurement-plan`}>
+                  <ShoppingCart className="mr-2 h-4 w-4" /> Material Procurement Plan
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive focus:bg-destructive/10 w-full flex items-center">
-                    <Trash2 className="mr-2 h-4 w-4" />Delete
+                    <Trash2 className="mr-2 h-4 w-4" />Delete Warehouse
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
