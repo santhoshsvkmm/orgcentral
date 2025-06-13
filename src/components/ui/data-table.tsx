@@ -187,16 +187,16 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((row, index) => (
-                <TableRow key={`row-${index}-${JSON.stringify(row)}`}> {/* Improved key for potential duplicate data */}
-                  {columns.map((column) => (
-                    <TableCell 
+                <TableRow key={`row-${index}-${JSON.stringify(row)}`}>{/*
+                  */columns.map((column) => (/*
+                  */<TableCell
                         key={String(column.accessorKey)}
                         className={cn((String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`)}
-                    >
-                        {column.cell({ row })}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                    >{/*
+                    */column.cell({ row })/*
+                  */}</TableCell>/*
+                */))/*
+              */}</TableRow>
               ))
             ) : (
               <TableRow>
