@@ -7,12 +7,12 @@ import { usePathname } from 'next/navigation';
 import { PageTitle } from '@/components/page-title';
 import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
 import { cn } from '@/lib/utils';
-import { Landmark, PieChart, PiggyBank, ReceiptLong, FileText as FileTextIcon, WalletCards, ScrollText } from 'lucide-react';
+import { Landmark, PieChart, PiggyBank, Receipt, FileText as FileTextIcon, WalletCards, ScrollText } from 'lucide-react';
 
 const financialNavItems = [
   { href: '/financials', label: 'Overview', icon: PieChart, exact: true },
   { href: '/financials/budgets', label: 'Budgets', icon: PiggyBank },
-  { href: '/financials/expenses', label: 'Expenses', icon: ReceiptLong },
+  { href: '/financials/expenses', label: 'Expenses', icon: Receipt },
   { href: '/financials/invoicing', label: 'Invoicing', icon: FileTextIcon },
   { href: '/financials/payroll', label: 'Payroll', icon: WalletCards },
   { href: '/financials/statements', label: 'Statements', icon: ScrollText },
