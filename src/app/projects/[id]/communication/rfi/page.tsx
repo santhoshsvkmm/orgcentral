@@ -63,17 +63,17 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
   const projectId = params.id;
 
   const [projectName, setProjectName] = useState<string>('');
-  const [allRfis, setAllRfis] = useState<RFI[]>([]); // Stores all RFIs for the project
+  const [allRfis, setAllRfis] = useState<RFI[]>([]); 
   const [loadingProjectName, setLoadingProjectName] = useState(true);
   const { toast } = useToast();
 
-  // Filter states
   const [filterRfiId, setFilterRfiId] = useState('');
   const [filterStatus, setFilterStatus] = useState<RfiStatus | ''>('');
   const [filterPriority, setFilterPriority] = useState<RFI['priority'] | ''>('');
   const [filterRaisedBy, setFilterRaisedBy] = useState('');
   const [filterDateStart, setFilterDateStart] = useState('');
   const [filterDateEnd, setFilterDateEnd] = useState('');
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
 
   useEffect(() => {
@@ -88,16 +88,25 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     fetchProjectDetails();
   }, [projectId]);
 
+  useEffect(() => {
+    const active = !!filterRfiId || !!filterStatus || !!filterPriority || !!filterRaisedBy || !!filterDateStart || !!filterDateEnd;
+    setHasActiveFilters(active);
+    // Persist filter state for DataTable's noResultsMessage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('rfiFiltersActive', active.toString());
+    }
+  }, [filterRfiId, filterStatus, filterPriority, filterRaisedBy, filterDateStart, filterDateEnd]);
+
   const filteredRfis = useMemo(() => {
     let RfiResults = allRfis;
 
     if (filterRfiId) {
-      RfiResults = RfiResults.filter(rfi => rfi.rfiNumber.toLowerCase().includes(filterRfiId.toLowerCase()));
+      RfiResults = RfiResults.filter(rfi => rfi.rfiNumber.toLowerCase().includes(filterRfiId.toLowerCase()) || rfi.title.toLowerCase().includes(filterRfiId.toLowerCase()));
     }
-    if (filterStatus) { // filterStatus is '' for "all"
+    if (filterStatus) { 
       RfiResults = RfiResults.filter(rfi => rfi.status === filterStatus);
     }
-    if (filterPriority) { // filterPriority is '' for "all"
+    if (filterPriority) { 
       RfiResults = RfiResults.filter(rfi => rfi.priority === filterPriority);
     }
     if (filterRaisedBy) {
@@ -134,6 +143,9 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     setFilterRaisedBy('');
     setFilterDateStart('');
     setFilterDateEnd('');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('rfiFiltersActive', 'false');
+    }
     toast({ title: "Filters Cleared", description: "Showing all RFIs for this project." });
   };
 
@@ -147,12 +159,7 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
       updatedAt: new Date().toISOString(),
     };
     setAllRfis(prevRfis => [rfiWithGeneratedNumber, ...prevRfis]);
-    const rfiIndexGlobal = initialMockRfisData.findIndex(r => r.projectId === projectId);
-    if (rfiIndexGlobal !== -1) { 
-        initialMockRfisData.unshift(rfiWithGeneratedNumber);
-    } else {
-        initialMockRfisData.push(rfiWithGeneratedNumber);
-    }
+    initialMockRfisData.unshift(rfiWithGeneratedNumber); // Update global mock store
   };
 
   const handleUpdateRfi = (updatedRfi: RFI) => {
@@ -206,19 +213,15 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="filterRfiId">RFI ID/Number</Label>
-              <Input id="filterRfiId" placeholder="Search RFI No..." value={filterRfiId} onChange={e => setFilterRfiId(e.target.value)} />
+              <Label htmlFor="filterRfiId">RFI No. / Title</Label>
+              <Input id="filterRfiId" placeholder="Search No. or Title..." value={filterRfiId} onChange={e => setFilterRfiId(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="filterStatus">Status</Label>
               <Select 
                 value={filterStatus === '' ? ALL_STATUSES_VALUE : filterStatus} 
                 onValueChange={(value) => {
-                  if (value === ALL_STATUSES_VALUE) {
-                    setFilterStatus('');
-                  } else {
-                    setFilterStatus(value as RfiStatus);
-                  }
+                  setFilterStatus(value === ALL_STATUSES_VALUE ? '' : value as RfiStatus);
                 }}
               >
                 <SelectTrigger id="filterStatus"><SelectValue placeholder="All Statuses" /></SelectTrigger>
@@ -233,11 +236,7 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
               <Select 
                 value={filterPriority === '' ? ALL_PRIORITIES_VALUE : filterPriority} 
                 onValueChange={(value) => {
-                  if (value === ALL_PRIORITIES_VALUE) {
-                    setFilterPriority('');
-                  } else {
-                    setFilterPriority(value as RFI['priority']);
-                  }
+                  setFilterPriority(value === ALL_PRIORITIES_VALUE ? '' : value as RFI['priority']);
                 }}
               >
                 <SelectTrigger id="filterPriority"><SelectValue placeholder="All Priorities" /></SelectTrigger>
