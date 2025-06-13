@@ -49,13 +49,14 @@ interface ProjectMenubarProps {
 export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
   return (
     <Menubar className="mb-6 rounded-md border bg-card shadow-sm">
- <MenubarMenu>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}`}>
- <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
- </Link>
- </MenubarItem>
- </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger asChild className="cursor-pointer">
+          <Link href={`/projects/${projectId}`}>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Dashboard
+          </Link>
+        </MenubarTrigger>
+      </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
           <DraftingCompass className="mr-2 h-4 w-4" /> Planning
@@ -100,37 +101,37 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
             </Link>
           </MenubarItem>
           <MenubarSeparator />
- <MenubarMenu>
- <MenubarTrigger className="flex items-center">
- <FolderKanbanIcon className="mr-2 h-4 w-4" /> Drawings
- </MenubarTrigger>
- <MenubarContent>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=architectural`}>Architectural</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=structural`}>Structural</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=mechanical`}>Mechanical</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=electrical`}>Electrical</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=plumbing`}>Plumbing</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=shop-drawing`}>Shop Drawing</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=as-built`}>As-Built</Link>
- </MenubarItem>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
- </MenubarItem>
- </MenubarContent>
- </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger className="flex items-center">
+              <FolderKanbanIcon className="mr-2 h-4 w-4" /> Drawings
+            </MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=architectural`}>Architectural</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=structural`}>Structural</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=mechanical`}>Mechanical</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=electrical`}>Electrical</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=plumbing`}>Plumbing</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=shop-drawing`}>Shop Drawing</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=as-built`}>As-Built</Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
