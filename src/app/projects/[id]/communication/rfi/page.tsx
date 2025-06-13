@@ -55,6 +55,9 @@ const initialMockRfisData: RFI[] = [
 const rfiStatuses: RfiStatus[] = ["Open", "In Progress", "Needs Clarification", "Closed"];
 const rfiPriorities: RFI['priority'][] = ["Low", "Medium", "High"];
 
+const ALL_STATUSES_VALUE = "__ALL_STATUSES__";
+const ALL_PRIORITIES_VALUE = "__ALL_PRIORITIES__";
+
 export default function ProjectRfiListPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const projectId = params.id;
@@ -91,10 +94,10 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     if (filterRfiId) {
       RfiResults = RfiResults.filter(rfi => rfi.rfiNumber.toLowerCase().includes(filterRfiId.toLowerCase()));
     }
-    if (filterStatus) {
+    if (filterStatus) { // filterStatus is '' for "all"
       RfiResults = RfiResults.filter(rfi => rfi.status === filterStatus);
     }
-    if (filterPriority) {
+    if (filterPriority) { // filterPriority is '' for "all"
       RfiResults = RfiResults.filter(rfi => rfi.priority === filterPriority);
     }
     if (filterRaisedBy) {
@@ -112,12 +115,12 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     } else if (startDate && isValid(startDate)) {
       RfiResults = RfiResults.filter(rfi => {
         const createdAt = parseISO(rfi.createdAt);
-        return isValid(createdAt) && (isAfter(createdAt, startDate) || isWithinInterval(createdAt, { start: startDate, end: startDate}) ); // isSameDay equivalent
+        return isValid(createdAt) && (isAfter(createdAt, startDate) || isWithinInterval(createdAt, { start: startDate, end: startDate}) ); 
       });
     } else if (endDate && isValid(endDate)) {
       RfiResults = RfiResults.filter(rfi => {
         const createdAt = parseISO(rfi.createdAt);
-        return isValid(createdAt) && (isBefore(createdAt, endDate) || isWithinInterval(createdAt, { start: endDate, end: endDate})); // isSameDay equivalent
+        return isValid(createdAt) && (isBefore(createdAt, endDate) || isWithinInterval(createdAt, { start: endDate, end: endDate})); 
       });
     }
 
@@ -144,9 +147,8 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
       updatedAt: new Date().toISOString(),
     };
     setAllRfis(prevRfis => [rfiWithGeneratedNumber, ...prevRfis]);
-    // Also update the global mock data if needed for other components to reflect change immediately
     const rfiIndexGlobal = initialMockRfisData.findIndex(r => r.projectId === projectId);
-    if (rfiIndexGlobal !== -1) { // This logic is a bit flawed for global mock, but ok for demo
+    if (rfiIndexGlobal !== -1) { 
         initialMockRfisData.unshift(rfiWithGeneratedNumber);
     } else {
         initialMockRfisData.push(rfiWithGeneratedNumber);
@@ -157,14 +159,12 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     setAllRfis(prevRfis =>
       prevRfis.map(rfi => (rfi.id === updatedRfi.id ? { ...rfi, ...updatedRfi, updatedAt: new Date().toISOString() } : rfi))
     );
-     // Update global mock
     const index = initialMockRfisData.findIndex(rfi => rfi.id === updatedRfi.id);
     if (index !== -1) initialMockRfisData[index] = { ...initialMockRfisData[index], ...updatedRfi, updatedAt: new Date().toISOString()};
   };
 
   const handleDeleteRfi = (rfiId: string) => {
     setAllRfis(prevRfis => prevRfis.filter(rfi => rfi.id !== rfiId));
-     // Update global mock
     const index = initialMockRfisData.findIndex(rfi => rfi.id === rfiId);
     if (index !== -1) initialMockRfisData.splice(index,1);
      toast({
@@ -177,8 +177,8 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     return (
       <>
         <PageTitle title="Loading RFIs..." description="Fetching Requests for Information for the project." />
-        <Skeleton className="h-48 w-full mb-6" /> {/* Filter Card Skeleton */}
-        <Skeleton className="h-64 w-full" /> {/* RFI List Skeleton */}
+        <Skeleton className="h-48 w-full mb-6" /> 
+        <Skeleton className="h-64 w-full" /> 
       </>
     );
   }
@@ -211,20 +211,38 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
             </div>
             <div>
               <Label htmlFor="filterStatus">Status</Label>
-              <Select value={filterStatus} onValueChange={(value: RfiStatus | '') => setFilterStatus(value)}>
+              <Select 
+                value={filterStatus === '' ? ALL_STATUSES_VALUE : filterStatus} 
+                onValueChange={(value) => {
+                  if (value === ALL_STATUSES_VALUE) {
+                    setFilterStatus('');
+                  } else {
+                    setFilterStatus(value as RfiStatus);
+                  }
+                }}
+              >
                 <SelectTrigger id="filterStatus"><SelectValue placeholder="All Statuses" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Statuses</SelectItem>
+                  <SelectItem value={ALL_STATUSES_VALUE}>All Statuses</SelectItem>
                   {rfiStatuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label htmlFor="filterPriority">Priority</Label>
-              <Select value={filterPriority} onValueChange={(value: RFI['priority'] | '') => setFilterPriority(value)}>
+              <Select 
+                value={filterPriority === '' ? ALL_PRIORITIES_VALUE : filterPriority} 
+                onValueChange={(value) => {
+                  if (value === ALL_PRIORITIES_VALUE) {
+                    setFilterPriority('');
+                  } else {
+                    setFilterPriority(value as RFI['priority']);
+                  }
+                }}
+              >
                 <SelectTrigger id="filterPriority"><SelectValue placeholder="All Priorities" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Priorities</SelectItem>
+                  <SelectItem value={ALL_PRIORITIES_VALUE}>All Priorities</SelectItem>
                   {rfiPriorities.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -260,3 +278,4 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     </>
   );
 }
+
