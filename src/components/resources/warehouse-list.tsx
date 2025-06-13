@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit, MoreHorizontal, Trash2, PlusCircle, PackageSearch, ShoppingCart, ScanLine } from "lucide-react"; // Added ScanLine
+import { Edit, MoreHorizontal, Trash2, PlusCircle, PackageSearch } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/date-utils";
 import { WarehouseForm } from './warehouse-form';
@@ -34,7 +34,11 @@ export function WarehouseList({ warehouses, projectId, onUpdateWarehouse, onDele
       accessorKey: "name",
       header: "Name",
       enableSorting: true,
-      cell: ({ row }) => <span className="font-medium">{row.name}</span>,
+      cell: ({ row }) => (
+        <Link href={`/projects/${projectId}/resources/warehouses/${row.id}`} className="font-medium hover:underline text-primary">
+          {row.name}
+        </Link>
+      ),
     },
     {
       accessorKey: "location",
@@ -79,16 +83,6 @@ export function WarehouseList({ warehouses, projectId, onUpdateWarehouse, onDele
                   </DropdownMenuItem>
                 }
               />
-              <DropdownMenuItem asChild>
-                <Link href={`/projects/${projectId}/resources/warehouses/${row.id}/procurement-plan`}>
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Material Procurement
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href={`/projects/${projectId}/resources/warehouses/${row.id}/pos`}>
-                  <ScanLine className="mr-2 h-4 w-4" /> Material POS System
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -125,7 +119,7 @@ export function WarehouseList({ warehouses, projectId, onUpdateWarehouse, onDele
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Warehouses</CardTitle>
-          <CardDescription>Manage warehouses for this project.</CardDescription>
+          <CardDescription>Manage warehouses for this project. Click on a warehouse name to view details and access POS/Procurement.</CardDescription>
         </div>
         <WarehouseForm
             mode="create"
