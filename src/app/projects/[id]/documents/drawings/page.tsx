@@ -285,12 +285,4 @@ export default function DrawingsPage() {
       </div>
     </div>
   );
-};
-
-// export default DrawingsPage; // This line was causing a build error, removing it for now.
-// The default export should be handled by Next.js file system routing.
-// If this page is intended to be directly routable, the export default should be present.
-// For now, assuming Next.js handles it via `app/projects/[id]/documents/drawings/page.tsx` path.
-// Re-adding based on typical Next.js app router structure
-export default DrawingsPage;
-
+}
