@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { motion } from "framer-motion";
 
 
 const metrics = [
@@ -67,6 +68,31 @@ const chartConfig = {
   }
 } satisfies ChartConfig;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.5, ease: "easeOut", delay: 0.3 } 
+  },
+};
+
 
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState<string>("all");
@@ -84,20 +110,32 @@ export default function DashboardPage() {
   return (
     <>
       <PageTitle title="Dashboard" description="Overview of your organization's key metrics and activities." />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <motion.div 
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {metrics.map((metric) => (
-          <Card key={metric.title} className="shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
-              {metric.icon}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metric.value}</div>
-            </CardContent>
-          </Card>
+          <motion.div key={metric.title} variants={itemVariants}>
+            <Card className="shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
+                {metric.icon}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metric.value}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
-      </div>
-      <div className="mt-8 grid gap-6 md:grid-cols-3">
+      </motion.div>
+      <motion.div 
+        className="mt-8 grid gap-6 md:grid-cols-3"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <Card className="shadow-sm hover:shadow-md transition-shadow md:col-span-2">
           <CardHeader className="flex flex-row items-start justify-between gap-2">
             <div>
@@ -123,7 +161,7 @@ export default function DashboardPage() {
                   margin={{
                     top: 5,
                     right: 10,
-                    left: -20, // Adjusted for YAxis labels
+                    left: -20, 
                     bottom: 5,
                   }}
                 >
@@ -194,8 +232,13 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
-       <div className="mt-8 grid gap-4 md:grid-cols-2">
+      </motion.div>
+       <motion.div 
+        className="mt-8 grid gap-4 md:grid-cols-2"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+       >
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle>Team Performance</CardTitle>
@@ -218,7 +261,7 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </>
   );
 }
