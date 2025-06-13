@@ -2,7 +2,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, MessageSquare, FileQuestion } from "lucide-react";
+import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks } from "lucide-react";
 import { TaskList } from "@/components/projects/task-list";
 import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
 import { useState, useEffect, use, useMemo } from "react";
 import type { Project } from "@/components/projects/project-form";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
+import { ProjectMenubar } from "@/components/projects/project-menubar"; // Import the new menubar
 import { analyzeProjectIssues, AnalyzeProjectIssuesInput, AnalyzeProjectIssuesOutput, CriticalIssue } from "@/ai/flows/analyze-project-issues-flow";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,8 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link";
-
 
 // Mock fetch function - replace with actual data fetching
 async function getProjectById(id: string): Promise<Project | null> {
@@ -229,71 +220,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         }
       />
 
-      <Menubar className="mb-6 rounded-md border bg-card shadow-sm">
-        <MenubarMenu>
-          <MenubarTrigger>Planning</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem asChild>
-              <Link href={`/projects/${project.id}/planning/gantt`}>Gantt Chart</Link>
-            </MenubarItem>
-            <MenubarItem onClick={() => console.log('View Milestones')}>Milestones</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem onClick={() => console.log('Resource Allocation')}>Resource Allocation</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>Documents</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem onClick={() => console.log('Project Brief')}>Project Brief</MenubarItem>
-            <MenubarItem onClick={() => console.log('Specifications')}>Specifications</MenubarItem>
-            <MenubarItem onClick={() => console.log('Meeting Notes')}>Meeting Notes</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-         <MenubarMenu>
-          <MenubarTrigger>Resources</MenubarTrigger>
-           <MenubarContent>
-            <MenubarItem onClick={() => console.log('Team Members')}>Team Members</MenubarItem>
-            <MenubarItem onClick={() => console.log('Equipment List')}>Equipment</MenubarItem>
-            <MenubarItem onClick={() => console.log('Software Licenses')}>Software</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-         <MenubarMenu>
-          <MenubarTrigger>Financial</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem onClick={() => console.log('Budget Overview')}>Budget</MenubarItem>
-            <MenubarItem onClick={() => console.log('Expense Tracking')}>Expenses</MenubarItem>
-            <MenubarItem onClick={() => console.log('Invoices')}>Invoices</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>Contracts</MenubarTrigger>
-           <MenubarContent>
-            <MenubarItem onClick={() => console.log('Client Agreement')}>Client Agreement</MenubarItem>
-            <MenubarItem onClick={() => console.log('Vendor Contracts')}>Vendor Contracts</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>Quotation</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem onClick={() => console.log('View Quotation')}>View Quotation</MenubarItem>
-            <MenubarItem onClick={() => console.log('Generate New Quote')}>Generate New</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-            <MenubarTrigger>
-                 <MessageSquare className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
-                Communication
-            </MenubarTrigger>
-            <MenubarContent>
-                <MenubarItem asChild>
-                    <Link href={`/projects/${project.id}/communication/rfi`}>
-                        <FileQuestion className="mr-2 h-4 w-4" /> RFIs
-                    </Link>
-                </MenubarItem>
-                {/* Other communication items can go here */}
-            </MenubarContent>
-        </MenubarMenu>
-      </Menubar>
+      <ProjectMenubar projectId={projectId} />
 
       <Card className="mb-8 shadow-md">
         <CardHeader>
