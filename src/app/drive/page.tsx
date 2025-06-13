@@ -4,7 +4,8 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FolderPlus, Folder as FolderIcon, FileText as FileIcon, HardDrive } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Added Input
+import { FolderPlus, Folder as FolderIcon, FileText as FileIcon, HardDrive, Search } from "lucide-react"; // Added Search
 import { useState, useMemo } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -63,11 +64,11 @@ const formatBytes = (bytes: number, decimals = 2) => {
 export default function DrivePage() {
   const [currentPath, setCurrentPath] = useState<string[]>([]); // Array of folder names for breadcrumbs
   const [items, setItems] = useState<FileSystemItem[]>(initialFileSystem);
+  const [filterText, setFilterText] = useState<string>(''); // State for filter text
 
   const totalSpaceGB = 15; // 15 GB total storage
   const totalSpaceBytes = totalSpaceGB * 1024 * 1024 * 1024;
 
-  // Calculate used space from mock data for a more dynamic prototype
   const usedSpaceBytes = useMemo(() => {
     let totalBytes = 0;
     function calculateUsedSpaceRecursive(currentItems: FileSystemItem[]) {
@@ -79,17 +80,25 @@ export default function DrivePage() {
         }
       });
     }
-    calculateUsedSpaceRecursive(initialFileSystem); // Calculate from the root of the mock data
+    calculateUsedSpaceRecursive(initialFileSystem); 
     return totalBytes;
-  }, []); // No dependencies, as initialFileSystem is static for this calculation
+  }, []); 
 
   const usedSpacePercentage = (usedSpaceBytes / totalSpaceBytes) * 100;
 
-
   const handleCreateFolder = () => {
-    // Non-functional placeholder for now
     alert("Create Folder functionality would be implemented here.");
   };
+
+  // Filtered items based on filterText
+  const filteredDisplayItems = useMemo(() => {
+    if (!filterText.trim()) {
+      return items; // 'items' currently holds initialFileSystem or current folder content (if navigation was implemented)
+    }
+    return items.filter(item =>
+      item.name.toLowerCase().includes(filterText.toLowerCase())
+    );
+  }, [items, filterText]);
 
   const renderItem = (item: FileSystemItem) => (
     <div key={item.id} className="flex items-center p-3 border-b hover:bg-muted/50 cursor-pointer rounded-md transition-colors">
@@ -97,7 +106,6 @@ export default function DrivePage() {
       <span className="flex-1 font-medium">{item.name}</span>
       {item.type === 'file' && item.size && <span className="text-sm text-muted-foreground mr-4">{item.size}</span>}
       {item.lastModified && <span className="text-sm text-muted-foreground hidden md:inline-block">{new Date(item.lastModified).toLocaleDateString()}</span>}
-      {/* Placeholder for actions (more options, delete, rename etc.) */}
     </div>
   );
 
@@ -135,7 +143,6 @@ export default function DrivePage() {
         <CardHeader>
           <CardTitle>My Drive</CardTitle>
           <CardDescription>
-            {/* Breadcrumbs would go here: Root / {currentPath.join(' / ')} */}
             Current Path: Root {currentPath.length > 0 ? `/ ${currentPath.join(' / ')}` : ''}
           </CardDescription>
         </CardHeader>
@@ -147,17 +154,28 @@ export default function DrivePage() {
             </p>
           </div>
 
+          <div className="mb-4 relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Filter files and folders by name..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="w-full pl-10"
+            />
+          </div>
+
           <div className="border rounded-lg">
             <div className="flex items-center p-3 border-b bg-muted/50 font-semibold text-sm">
               <span className="flex-1 ml-8">Name</span>
               <span className="mr-4 hidden md:inline-block">Size</span>
               <span className="hidden md:inline-block">Last Modified</span>
             </div>
-            {items.length > 0 ? (
-              items.map(item => renderItem(item))
+            {filteredDisplayItems.length > 0 ? (
+              filteredDisplayItems.map(item => renderItem(item))
             ) : (
               <div className="p-6 text-center text-muted-foreground">
-                This folder is empty.
+                {filterText ? "No items match your filter." : "This folder is empty."}
               </div>
             )}
           </div>
