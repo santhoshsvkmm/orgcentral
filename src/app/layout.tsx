@@ -4,6 +4,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import { PageLoader } from '@/components/layout/page-loader';
+import { JotaiProvider } from '@/components/jotai-provider'; // Added import
+
 export const metadata: Metadata = {
   title: 'OrgCentral Simplified',
   description: 'Simplified Organizational Management Tool',
@@ -28,9 +30,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-          {children}
-          <PageLoader />
-          <Toaster />
+          <JotaiProvider>
+            {children}
+            <PageLoader />
+            <Toaster />
+          </JotaiProvider>
         </ThemeProvider>
       </body>
     </html>
