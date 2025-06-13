@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { PageTitle } from '@/components/page-title';
 import { cn } from '@/lib/utils';
-import { Bell, Palette, Briefcase } from 'lucide-react'; // Added Palette
+import { Bell, Palette, Briefcase, Image as ImageIcon } from 'lucide-react'; // Added ImageIcon
 
 const settingsNavItems = [
   { href: '/dashboard/settings', label: 'Notifications', icon: Bell },
   { href: '/dashboard/settings/appearance', label: 'Appearance', icon: Palette },
   { href: '/dashboard/settings/scheduling', label: 'Scheduling', icon: Briefcase },
+  { href: '/dashboard/settings/branding', label: 'Branding', icon: ImageIcon },
 ];
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
