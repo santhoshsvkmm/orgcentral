@@ -17,29 +17,31 @@ import {
   ClipboardList, 
   CloudSun, 
   Activity,
-  DraftingCompass, // For Planning
-  GanttChartSquare, // For Gantt
-  UsersRound, // For Resource Allocation
-  FolderKanban, // For Documents
-  FileText, // For Project Brief, etc.
-  ListOrdered, // For Specifications
-  Package, // For Resources
-  Users, // For Team Members
-  Construction, // For Equipment
-  Laptop, // For Software
-  Warehouse, // For Warehouse Management
-  Landmark, // For Financial
-  PiggyBank, // For Budget
-  Receipt, // For Expenses
-  FileSpreadsheet, // For Invoices
-  Handshake, // For Contracts
-  FileCheck2, // For Client Agreement
-  FileSignature, // For Vendor Contracts
-  FileDigit, // For Quotation
-  FolderKanbanIcon, // For Drawings (using a different icon for distinction)
-  LayoutDashboard, // Added comma here
-  FileSearch, // For View Quotation
-  FilePlus2 // For Generate New Quote
+  DraftingCompass, 
+  GanttChartSquare, 
+  UsersRound, 
+  FolderKanban, 
+  FileText, 
+  ListOrdered, 
+  Package, 
+  Users, 
+  Construction, 
+  Laptop, 
+  Warehouse, 
+  Landmark, 
+  PiggyBank, 
+  Receipt, 
+  FileSpreadsheet, 
+  Handshake, 
+  FileCheck2, 
+  FileSignature, 
+  FileDigit, 
+  FolderKanbanIcon, 
+  LayoutDashboard,
+  FileSearch, 
+  FilePlus2,
+  SquareKanban, // For Kanban Board
+  LayoutGrid // For Micro Planning trigger
 } from "lucide-react";
 
 interface ProjectMenubarProps {
@@ -64,7 +66,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
         <MenubarContent>
           <MenubarItem asChild>
             <Link href={`/projects/${projectId}/planning/gantt`}>
-              <GanttChartSquare className="mr-2 h-4 w-4" /> Gantt Chart
+              <GanttChartSquare className="mr-2 h-4 w-4" /> Gantt Chart (Overall)
             </Link>
           </MenubarItem>
           <MenubarItem asChild>
@@ -72,6 +74,24 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
               <Target className="mr-2 h-4 w-4" /> Milestones
             </Link>
           </MenubarItem>
+          <MenubarSeparator />
+          <MenubarMenu>
+            <MenubarTrigger className="flex items-center">
+              <LayoutGrid className="mr-2 h-4 w-4" /> Micro Planning
+            </MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/planning/micro-planning/kanban`}>
+                  <SquareKanban className="mr-2 h-4 w-4" /> Kanban Board
+                </Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/planning/micro-planning/gantt`}>
+                  <GanttChartSquare className="mr-2 h-4 w-4" /> Gantt Chart (Sprint)
+                </Link>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
           <MenubarSeparator />
           <MenubarItem asChild>
             <Link href={`/projects/${projectId}/planning/resource-allocation`}>
