@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Image as ImageIcon, Edit3, UploadCloud, FileText, Download } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon, Edit3, UploadCloud, FileText, Download, MessageSquarePlus } from 'lucide-react'; // Added MessageSquarePlus
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -169,7 +169,7 @@ export default function DrawingsPage() {
     <div className="container mx-auto py-8">
       <PageTitle
         title={`${currentDrawingTypeLabel}: ${projectName}`}
-        description={`Manage ${currentDrawingTypeLabel.toLowerCase()} for this project. Includes viewers and potential editing capabilities.`}
+        description={`Manage, view, annotate, and potentially edit ${currentDrawingTypeLabel.toLowerCase()} for this project.`}
         actions={
           <Button variant="outline" asChild>
             <Link href={`/projects/${projectId}`}>
@@ -184,31 +184,31 @@ export default function DrawingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <ImageIcon className="mr-2 h-5 w-5 text-primary" />
-            2D Drawing Space
+            2D Drawing Space & Annotation
           </CardTitle>
           <CardDescription>
-            This area is designated for viewing, managing, and potentially editing 2D drawings (e.g., blueprints, schematics).
+            This area is designated for viewing, managing, annotating, and potentially editing 2D drawings (e.g., blueprints, schematics).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 border-l-4 border-teal-500 bg-teal-50 rounded-md">
             <p className="font-semibold text-teal-700">Note on 2D Drawing Capabilities:</p>
             <p className="text-sm text-teal-600 mt-1">
-              For advanced 2D drawing viewing and editing (e.g., DXF, DWG files, or creating markups), integration with specialized JavaScript libraries such as <strong>Fabric.js</strong>, <strong>Konva.js</strong>, or connection to dedicated CAD APIs/services would be necessary.
+              For advanced 2D drawing viewing, annotation, and editing (e.g., DXF, DWG files, or creating markups), integration with specialized JavaScript libraries such as <strong>Fabric.js</strong>, <strong>Konva.js</strong>, or connection to dedicated CAD APIs/services would be necessary.
             </p>
           </div>
           
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed" data-ai-hint="2d drawing editor canvas">
+          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed" data-ai-hint="2d drawing editor annotation canvas">
             <div className="flex items-center justify-center mb-4">
                 <ImageIcon className="h-16 w-16 text-muted-foreground" />
-                <Edit3 className="h-10 w-10 text-muted-foreground opacity-70 relative -ml-4 -mt-4" />
+                <MessageSquarePlus className="h-10 w-10 text-muted-foreground opacity-70 relative -ml-6 -mt-6" />
             </div>
-            <p className="text-xl font-semibold text-foreground">2D Drawing Viewer & Editor Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1 text-center">An interactive canvas for viewing, marking up, or editing 2D drawings would appear here.</p>
+            <p className="text-xl font-semibold text-foreground">2D Drawing Viewer, Editor & Annotator Placeholder</p>
+            <p className="text-sm text-muted-foreground mt-1 text-center">An interactive canvas for viewing, marking up, editing, and annotating 2D drawings would appear here.</p>
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">
-            Future enhancements could include layer management, measurement tools, collaborative annotations, and version comparison.
+            Future enhancements could include layer management, measurement tools, collaborative annotations, version comparison, and robust annotation tools.
           </p>
         </CardContent>
       </Card>
