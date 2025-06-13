@@ -39,6 +39,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { GripHorizontal, CheckSquare, XSquare } from 'lucide-react';
 
 // Define application modules and their specific permissions
 const appModulesAndPermissions = {
@@ -53,7 +54,6 @@ const appModulesAndPermissions = {
   fileStorage: { label: 'File Storage', actions: { view: 'View Files', upload: 'Upload Files', manage: 'Manage Files & Folders' } },
   auditLogs: { label: 'Audit Logs', actions: { view: 'View Audit Logs' } },
   settings: { label: 'Application Settings', actions: { manageAppearance: 'Manage Appearance', manageNotifications: 'Manage Notifications', manageBranding: 'Manage Branding' } },
-  // Add other modules like Subcontractors, Consultants, Clients if needed
   subcontractors: { label: 'Subcontractors', actions: { view: 'View Subcontractors', manage: 'Manage Subcontractors'} },
   consultants: { label: 'Consultants', actions: { view: 'View Consultants', manage: 'Manage Consultants'} },
   clients: { label: 'Clients', actions: { view: 'View Clients', manage: 'Manage Clients'} },
@@ -127,12 +127,11 @@ export function RoleManagement() {
   const openDialogForEdit = (role: Role) => {
     setEditingRole(role);
     setRoleName(role.name);
-    // Deep copy permissions to avoid modifying original state directly
     const initialPerms = JSON.parse(JSON.stringify(generateInitialPermissions()));
     for (const moduleKey in role.permissions) {
-        if (initialPerms[moduleKey as ModuleKey]) { // Check if module exists in our appModules definition
+        if (initialPerms[moduleKey as ModuleKey]) { 
             for (const actionKey in role.permissions[moduleKey as ModuleKey]) {
-                if ((initialPerms[moduleKey as ModuleKey] as any).hasOwnProperty(actionKey)) { // Check if action exists
+                if ((initialPerms[moduleKey as ModuleKey] as any).hasOwnProperty(actionKey)) { 
                     (initialPerms[moduleKey as ModuleKey] as any)[actionKey as string] = (role.permissions[moduleKey as ModuleKey] as any)![actionKey as string];
                 }
             }
@@ -144,7 +143,7 @@ export function RoleManagement() {
 
   const handlePermissionChange = (moduleKey: ModuleKey, actionKey: ActionKey<ModuleKey>, checked: boolean) => {
     setCurrentPermissions(prev => {
-      const newPermissions = JSON.parse(JSON.stringify(prev)); // Deep copy
+      const newPermissions = JSON.parse(JSON.stringify(prev)); 
       if (!newPermissions[moduleKey]) {
         newPermissions[moduleKey] = {};
       }
@@ -152,6 +151,43 @@ export function RoleManagement() {
       return newPermissions;
     });
   };
+
+  const handleGlobalSelectAll = () => {
+    if (editingRole?.name === 'Admin') return;
+    setCurrentPermissions(generateInitialPermissions(true));
+  };
+
+  const handleGlobalDeselectAll = () => {
+    if (editingRole?.name === 'Admin') return;
+    setCurrentPermissions(generateInitialPermissions(false));
+  };
+
+  const handleModuleSelectAll = (moduleKeyToUpdate: ModuleKey) => {
+    if (editingRole?.name === 'Admin') return;
+    setCurrentPermissions(prev => {
+        const newPermissions = JSON.parse(JSON.stringify(prev));
+        if (newPermissions[moduleKeyToUpdate] && appModulesAndPermissions[moduleKeyToUpdate]) {
+            for (const actionKey in appModulesAndPermissions[moduleKeyToUpdate].actions) {
+                (newPermissions[moduleKeyToUpdate] as any)[actionKey] = true;
+            }
+        }
+        return newPermissions;
+    });
+  };
+
+  const handleModuleDeselectAll = (moduleKeyToUpdate: ModuleKey) => {
+    if (editingRole?.name === 'Admin') return;
+    setCurrentPermissions(prev => {
+        const newPermissions = JSON.parse(JSON.stringify(prev));
+        if (newPermissions[moduleKeyToUpdate] && appModulesAndPermissions[moduleKeyToUpdate]) {
+            for (const actionKey in appModulesAndPermissions[moduleKeyToUpdate].actions) {
+                (newPermissions[moduleKeyToUpdate] as any)[actionKey] = false;
+            }
+        }
+        return newPermissions;
+    });
+  };
+
 
   const handleSaveRole = (event: FormEvent) => {
     event.preventDefault();
@@ -161,11 +197,9 @@ export function RoleManagement() {
     }
 
     if (editingRole) {
-      // Update existing role
       setRoles(roles.map(r => r.id === editingRole.id ? { ...r, name: roleName.trim(), permissions: currentPermissions } : r));
       toast({ title: "Role Updated", description: `Role "${roleName.trim()}" has been updated.` });
     } else {
-      // Add new role
       const newRole: Role = {
         id: `role-${Date.now()}-${Math.random().toString(16).slice(2,8)}`,
         name: roleName.trim(),
@@ -259,12 +293,32 @@ export function RoleManagement() {
               <Separator />
 
               <div>
-                <h3 className="text-lg font-medium mb-2">Permissions</h3>
+                <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-lg font-medium">Permissions</h3>
+                    <div className="space-x-2">
+                        <Button type="button" variant="outline" size="sm" onClick={handleGlobalSelectAll} disabled={editingRole?.name === 'Admin'}>
+                           <CheckSquare className="mr-2 h-3 w-3"/> Select All
+                        </Button>
+                        <Button type="button" variant="outline" size="sm" onClick={handleGlobalDeselectAll} disabled={editingRole?.name === 'Admin'}>
+                           <XSquare className="mr-2 h-3 w-3"/> Deselect All
+                        </Button>
+                    </div>
+                </div>
                 <ScrollArea className="h-[50vh] pr-3 border rounded-md p-4">
                   <div className="space-y-6">
                     {Object.entries(appModulesAndPermissions).map(([moduleKey, moduleDef]) => (
                       <div key={moduleKey}>
-                        <h4 className="font-semibold text-md mb-3 pb-1 border-b">{moduleDef.label}</h4>
+                        <div className="flex justify-between items-center mb-3 pb-1 border-b">
+                            <h4 className="font-semibold text-md">{moduleDef.label}</h4>
+                            <div className="space-x-1">
+                                <Button type="button" variant="ghost" size="xs" onClick={() => handleModuleSelectAll(moduleKey as ModuleKey)} disabled={editingRole?.name === 'Admin'} className="text-xs p-1 h-auto">
+                                   <CheckSquare className="mr-1 h-3 w-3"/> All
+                                </Button>
+                                <Button type="button" variant="ghost" size="xs" onClick={() => handleModuleDeselectAll(moduleKey as ModuleKey)} disabled={editingRole?.name === 'Admin'} className="text-xs p-1 h-auto">
+                                    <XSquare className="mr-1 h-3 w-3"/> None
+                                </Button>
+                            </div>
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                           {Object.entries(moduleDef.actions).map(([actionKey, actionLabel]) => (
                             <div key={`${moduleKey}-${actionKey}`} className="flex items-center space-x-2">
