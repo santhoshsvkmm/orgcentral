@@ -15,11 +15,12 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search as SearchIcon, Bell, Languages } from 'lucide-react';
+import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search as SearchIcon, Bell, Languages, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
@@ -32,16 +33,118 @@ import {
   DropdownMenuSeparator as DropdownMenuSeparatorNotifications,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
+
+
+interface MockChatMessage {
+  id: string;
+  sender: 'currentUser' | 'contact';
+  text: string;
+  timestamp: string;
+}
+
+interface MockChatContact {
+  id: string;
+  name: string;
+  status: 'Online' | 'Offline' | 'Away';
+  avatarText: string; // Changed from avatar to avatarText
+  avatarImage?: string; // Optional image URL
+  dataAiHint: string;
+  messages: MockChatMessage[];
+}
+
+const initialMockContacts: MockChatContact[] = [
+  {
+    id: 'user-alice',
+    name: "Alice Wonderland",
+    status: "Online",
+    avatarText: "AW",
+    avatarImage: "https://placehold.co/40x40.png?text=AW",
+    dataAiHint: "user avatar",
+    messages: [
+      { id: 'm1-1', sender: 'contact', text: 'Hey! How is the project going?', timestamp: '10:00 AM' },
+      { id: 'm1-2', sender: 'currentUser', text: 'Pretty good, making progress on the UI. Thanks for asking!', timestamp: '10:01 AM' },
+      { id: 'm1-3', sender: 'contact', text: 'Great to hear! Let me know if you need any design assets.', timestamp: '10:02 AM' },
+    ]
+  },
+  {
+    id: 'user-bob',
+    name: "Bob The Builder",
+    status: "Offline",
+    avatarText: "BB",
+    avatarImage: "https://placehold.co/40x40.png?text=BB",
+    dataAiHint: "user avatar",
+    messages: [
+      { id: 'm2-1', sender: 'currentUser', text: 'Hi Bob, do you have a moment to discuss the API integration?', timestamp: 'Yesterday' },
+      { id: 'm2-2', sender: 'contact', text: 'Sure, I will be online tomorrow morning.', timestamp: 'Yesterday' },
+    ]
+  },
+  {
+    id: 'user-charlie',
+    name: "Charlie Brown",
+    status: "Away",
+    avatarText: "CB",
+    avatarImage: "https://placehold.co/40x40.png?text=CB",
+    dataAiHint: "user avatar",
+    messages: [
+       { id: 'm3-1', sender: 'contact', text: 'Just wanted to follow up on the user testing feedback.', timestamp: 'Mon 9:30 AM' },
+    ]
+  },
+   {
+    id: 'user-diana',
+    name: "Diana Prince",
+    status: "Online",
+    avatarText: "DP",
+    avatarImage: "https://placehold.co/40x40.png?text=DP",
+    dataAiHint: "user avatar",
+    messages: []
+  }
+];
 
 
 export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
   const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+  const [contacts, setContacts] = useState<MockChatContact[]>(initialMockContacts);
+  const [selectedChatUser, setSelectedChatUser] = useState<MockChatContact | null>(null);
+  const [chatInputValue, setChatInputValue] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   const handleGlobalSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Global search submitted for:", globalSearchTerm);
     alert(`Global search for "${globalSearchTerm}" would be initiated here, searching across projects, tasks, users, etc.`);
   };
+
+  const handleSelectChatUser = (user: MockChatContact) => {
+    setSelectedChatUser(user);
+  };
+
+  const handleSendMessage = () => {
+    if (!selectedChatUser || !chatInputValue.trim()) return;
+    const newMessage: MockChatMessage = {
+      id: `msg-${Date.now()}`,
+      sender: 'currentUser',
+      text: chatInputValue.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    
+    const updatedContacts = contacts.map(contact => 
+      contact.id === selectedChatUser.id 
+        ? { ...contact, messages: [...contact.messages, newMessage] }
+        : contact
+    );
+    setContacts(updatedContacts);
+    
+    // Also update the selectedChatUser state to reflect the new message immediately
+    setSelectedChatUser(prevUser => prevUser ? { ...prevUser, messages: [...prevUser.messages, newMessage] } : null);
+    
+    setChatInputValue('');
+  };
+  
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -154,7 +257,7 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Sheet>
+             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                   <MessageSquare className="h-5 w-5" />
@@ -165,51 +268,117 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
                   <span className="sr-only">Open Chat</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="sm:max-w-md p-0 flex flex-col">
-                <SheetHeader className="p-6 pb-4 border-b">
-                  <SheetTitle>Chat & Collaboration</SheetTitle>
-                  <SheetDescription>
-                    Connect with your team in real-time.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="p-4">
-                  <div className="relative">
-                    <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search contacts..." className="pl-8" />
-                  </div>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {[
-                    { name: "Alice W.", status: "Online", avatar: "AW", dataAiHint:"user avatar" },
-                    { name: "Bob B.", status: "Offline", avatar: "BB", dataAiHint:"user avatar" },
-                    { name: "Charlie C.", status: "Away", avatar: "CC", dataAiHint:"user avatar" },
-                  ].map(user => (
-                    <div key={user.name} className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer">
-                      <Avatar className="h-9 w-9 border">
-                        <AvatarImage src={`https://placehold.co/40x40.png?text=${user.avatar}`} alt={user.name} data-ai-hint={user.dataAiHint} />
-                        <AvatarFallback>{user.avatar}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-sm">{user.name}</p>
-                        <p className={`text-xs ${user.status === 'Online' ? 'text-green-500' : 'text-muted-foreground'}`}>{user.status}</p>
+              <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
+                {!selectedChatUser ? (
+                  <>
+                    <SheetHeader className="p-4 pb-2 border-b">
+                      <SheetTitle>Chat & Collaboration</SheetTitle>
+                      <SheetDescription>Connect with your team in real-time.</SheetDescription>
+                    </SheetHeader>
+                    <div className="p-4">
+                      <div className="relative">
+                        <SearchIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search contacts..." className="pl-8" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                       </div>
                     </div>
-                  ))}
-                </div>
-                <Separator />
-                <div className="p-4 space-y-3 flex-grow-0">
-                    <div className="text-center text-sm text-muted-foreground p-4 border border-dashed rounded-md min-h-[150px] flex flex-col justify-center items-center">
-                        <MessageSquare className="h-10 w-10 text-muted-foreground mb-2" />
-                        <p className="font-semibold">Select a contact to start chatting.</p>
-                        <p className="text-xs">Full chat, video/audio calls, and screen sharing features would be implemented here.</p>
+                    <div className="flex-1 overflow-y-auto p-4 pt-0 space-y-2">
+                      {filteredContacts.map(user => (
+                        <div 
+                          key={user.id} 
+                          className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer"
+                          onClick={() => handleSelectChatUser(user)}
+                        >
+                          <Avatar className="h-9 w-9 border">
+                            <AvatarImage src={user.avatarImage} alt={user.name} data-ai-hint={user.dataAiHint} />
+                            <AvatarFallback>{user.avatarText}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">{user.name}</p>
+                            <p className={`text-xs ${user.status === 'Online' ? 'text-green-500' : 'text-muted-foreground'}`}>{user.status}</p>
+                          </div>
+                        </div>
+                      ))}
+                       {filteredContacts.length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-4">No contacts found.</p>
+                      )}
                     </div>
-                    <div className="flex justify-around pt-2">
-                        <Button variant="outline" size="icon" disabled><Video className="h-5 w-5"/></Button>
-                        <Button variant="outline" size="icon" disabled><Phone className="h-5 w-5"/></Button>
-                        <Button variant="outline" size="icon" disabled><ScreenShare className="h-5 w-5"/></Button>
+                    <Separator />
+                     <div className="p-4 space-y-3">
+                        <div className="text-center text-sm text-muted-foreground p-4 border border-dashed rounded-md min-h-[100px] flex flex-col justify-center items-center">
+                            <MessageSquare className="h-8 w-8 text-muted-foreground mb-2" />
+                            <p className="font-semibold">Select a contact to start chatting.</p>
+                        </div>
+                        <div className="flex justify-around pt-2">
+                            <Button variant="outline" size="icon" disabled><Video className="h-5 w-5"/></Button>
+                            <Button variant="outline" size="icon" disabled><Phone className="h-5 w-5"/></Button>
+                            <Button variant="outline" size="icon" disabled><ScreenShare className="h-5 w-5"/></Button>
+                        </div>
                     </div>
-                </div>
-                <SheetFooter className="p-4 border-t">
+                  </>
+                ) : (
+                  <>
+                    <SheetHeader className="p-3 border-b flex flex-row items-center gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedChatUser(null)}>
+                        <ArrowLeft className="h-5 w-5" />
+                      </Button>
+                      <Avatar className="h-9 w-9 border">
+                        <AvatarImage src={selectedChatUser.avatarImage} alt={selectedChatUser.name} data-ai-hint={selectedChatUser.dataAiHint} />
+                        <AvatarFallback>{selectedChatUser.avatarText}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <SheetTitle className="text-base">{selectedChatUser.name}</SheetTitle>
+                        <p className={`text-xs ${selectedChatUser.status === 'Online' ? 'text-green-500' : 'text-muted-foreground'}`}>
+                          {selectedChatUser.status}
+                        </p>
+                      </div>
+                      <div className="ml-auto flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" disabled><Video className="h-5 w-5"/></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" disabled><Phone className="h-5 w-5"/></Button>
+                      </div>
+                    </SheetHeader>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/20">
+                      {selectedChatUser.messages.map(msg => (
+                        <div key={msg.id} className={cn("flex items-end gap-2", msg.sender === 'currentUser' ? "justify-end" : "justify-start")}>
+                          {msg.sender === 'contact' && (
+                            <Avatar className="h-7 w-7 border self-start">
+                                <AvatarImage src={selectedChatUser.avatarImage} alt={selectedChatUser.name} data-ai-hint={selectedChatUser.dataAiHint}/>
+                                <AvatarFallback>{selectedChatUser.avatarText}</AvatarFallback>
+                            </Avatar>
+                          )}
+                          <div className={cn("max-w-[70%] p-2.5 rounded-lg shadow-sm", 
+                            msg.sender === 'currentUser' ? "bg-primary text-primary-foreground rounded-br-none" : "bg-card text-card-foreground rounded-bl-none"
+                          )}>
+                            <p className="text-sm">{msg.text}</p>
+                            <p className={cn("text-xs mt-1", msg.sender === 'currentUser' ? "text-primary-foreground/70 text-right" : "text-muted-foreground text-left")}>{msg.timestamp}</p>
+                          </div>
+                           {msg.sender === 'currentUser' && (
+                             <Avatar className="h-7 w-7 border self-start">
+                                <AvatarImage src="https://placehold.co/40x40.png?text=ME" alt="Current User" data-ai-hint="user avatar"/>
+                                <AvatarFallback>ME</AvatarFallback>
+                            </Avatar>
+                          )}
+                        </div>
+                      ))}
+                       {selectedChatUser.messages.length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-10">No messages yet. Say hello!</p>
+                      )}
+                    </div>
+                    <div className="p-3 border-t bg-background">
+                      <div className="flex items-start gap-2">
+                        <Textarea 
+                          placeholder="Type a message..." 
+                          value={chatInputValue}
+                          onChange={(e) => setChatInputValue(e.target.value)}
+                          rows={1}
+                          className="flex-1 resize-none min-h-[40px] max-h-[120px]"
+                          onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage();}}}
+                        />
+                        <Button onClick={handleSendMessage} disabled={!chatInputValue.trim()}>Send</Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+                <SheetFooter className="p-3 border-t mt-auto">
                   <SheetClose asChild>
                     <Button type="button" variant="outline" className="w-full">Close Panel</Button>
                   </SheetClose>
@@ -231,3 +400,4 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
     </SidebarProvider>
   );
 }
+
