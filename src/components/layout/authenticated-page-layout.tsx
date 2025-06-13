@@ -87,8 +87,26 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
             </form>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggleButton />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Languages className="h-5 w-5" />
+                  <span className="sr-only">Select language</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+                <DropdownMenuSeparatorNotifications />
+                <DropdownMenuItem onSelect={() => console.log('Language selected: English')}>English</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => console.log('Language selected: Español')}>Español</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => console.log('Language selected: Français')}>Français</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => console.log('Language selected: Deutsch')}>Deutsch</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
