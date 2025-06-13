@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Added Select
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   itemsPerPage?: number;
-  itemsPerPageOptions?: number[]; // New prop
+  itemsPerPageOptions?: number[];
   searchableColumns?: (keyof TData)[];
   globalFilterPlaceholder?: string;
   noResultsMessage?: string;
@@ -53,8 +53,8 @@ export function DataTable<TData, TValue>({
   const [globalFilter, setGlobalFilter] = React.useState('');
 
   React.useEffect(() => {
-    setCurrentItemsPerPage(initialItemsPerPage); // Update if prop changes
-    setCurrentPage(1); // Reset to first page when itemsPerPage prop changes
+    setCurrentItemsPerPage(initialItemsPerPage);
+    setCurrentPage(1); 
   }, [initialItemsPerPage]);
 
   const filteredData = React.useMemo(() => {
@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
 
   const handleItemsPerPageChange = (value: string) => {
     setCurrentItemsPerPage(Number(value));
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);
   };
 
   return (
@@ -160,43 +160,25 @@ export function DataTable<TData, TValue>({
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead 
-                    key={String(column.accessorKey)} 
-                    style={{ width: column.size || 'auto' }}
-                    className={cn(
-                        column.enableSorting ? "cursor-pointer group" : "",
-                        (String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`
-                    )}
-                    onClick={() => column.enableSorting && handleSort(column.accessorKey)}
-                >
-                  <div className={cn("flex items-center", 
-                    (String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && 
-                    (actionColumnAlignment === 'center' ? 'justify-center' : actionColumnAlignment === 'right' ? 'justify-end' : '')
-                  )}>
-                    {typeof column.header === 'function' 
-                        ? column.header({ column: { toggleSorting: (isDesc) => handleSort(column.accessorKey), getIsSorted: () => sortConfig?.key === column.accessorKey ? sortConfig.direction : false } }) 
-                        : column.header}
-                    {column.enableSorting && getSortDirectionIcon(column.accessorKey)}
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
+            <TableRow>{columns.map((column) => <TableHead 
+                key={String(column.accessorKey)} 
+                style={{ width: column.size || 'auto' }}
+                className={cn(
+                    column.enableSorting ? "cursor-pointer group" : "",
+                    (String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`
+                )}
+                onClick={() => column.enableSorting && handleSort(column.accessorKey)}
+            ><div className={cn("flex items-center", 
+                (String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && 
+                (actionColumnAlignment === 'center' ? 'justify-center' : actionColumnAlignment === 'right' ? 'justify-end' : '')
+              )}>{typeof column.header === 'function' 
+                    ? column.header({ column: { toggleSorting: (isDesc) => handleSort(column.accessorKey), getIsSorted: () => sortConfig?.key === column.accessorKey ? sortConfig.direction : false } }) 
+                    : column.header}{column.enableSorting && getSortDirectionIcon(column.accessorKey)}</div></TableHead>)}</TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((row, index) => (
-                <TableRow key={`row-${index}-${JSON.stringify(row)}`}>{/*
-                  */columns.map((column) => (/*
-                  */<TableCell
-                        key={String(column.accessorKey)}
-                        className={cn((String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`)}
-                    >{/*
-                    */column.cell({ row })/*
-                  */}</TableCell>/*
-                */))/*
-              */}</TableRow>
+                <TableRow key={`row-${index}-${JSON.stringify(row)}`}>{columns.map((column) => <TableCell key={String(column.accessorKey)} className={cn((String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`)}>{column.cell({ row })}</TableCell>)}</TableRow>
               ))
             ) : (
               <TableRow>
@@ -208,7 +190,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {totalPages > 0 && ( // Only show pagination if there are pages
+      {totalPages > 0 && (
         <div className="flex items-center justify-end space-x-2 py-4">
           <span className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
@@ -236,4 +218,3 @@ export function DataTable<TData, TValue>({
 }
 
 DataTable.displayName = "DataTable";
-
