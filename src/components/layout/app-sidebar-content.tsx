@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart, UsersRound } from 'lucide-react';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +11,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/projects', label: 'Projects', icon: Briefcase },
   { href: '/users', label: 'User Management', icon: Users },
+  { href: '/hr', label: 'HR Management', icon: UsersRound },
   { href: '/subcontractors', label: 'Subcontractors', icon: HardHat },
   { href: '/consultants', label: 'Consultants', icon: Users },
   { href: '/clients', label: 'Clients', icon: Handshake },
