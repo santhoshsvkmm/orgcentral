@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Edit, MoreHorizontal, Trash2, Eye, CalendarCheck2 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -49,8 +49,8 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
       header: "Name",
       enableSorting: true,
       cell: ({ row }) => (
-        <Link href={`/projects/${row.id}`} className="hover:underline font-medium">
-          {row.name}
+        <Link href={`/projects/${row.original.id}`} className="hover:underline font-medium">
+          {row.original.name}
         </Link>
       ),
     },
@@ -58,25 +58,25 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
       accessorKey: "status",
       header: "Status",
       enableSorting: true,
-      cell: ({ row }) => <Badge variant={getStatusVariant(row.status)}>{row.status}</Badge>,
+      cell: ({ row }) => <Badge variant={getStatusVariant(row.original.status)}>{row.original.status}</Badge>,
     },
     {
       accessorKey: "startDate",
       header: "Start Date",
       enableSorting: true,
-      cell: ({ row }) => formatDate(row.startDate, 'yyyy-MM-dd'),
+      cell: ({ row }) => formatDate(row.original.startDate, 'yyyy-MM-dd'),
     },
     {
       accessorKey: "dueDate",
       header: "Due Date",
       enableSorting: true,
-      cell: ({ row }) => formatDate(row.dueDate, 'yyyy-MM-dd'),
+      cell: ({ row }) => formatDate(row.original.dueDate, 'yyyy-MM-dd'),
     },
     {
       accessorKey: "teamSize",
       header: "Team Size",
       enableSorting: true,
-      cell: ({ row }) => row.teamSize || 'N/A',
+      cell: ({ row }) => row.original.teamSize || 'N/A',
     },
     {
       accessorKey: "actions",
@@ -85,10 +85,10 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
         <div className="flex items-center justify-end">
           <ProjectForm
             mode="edit"
-            projectData={row}
+            projectData={row.original}
             onSave={onUpdateProject}
             triggerButton={
-              <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+              <Button variant="ghost" size="icon" className="h-8 w-8 p-0" id={`edit-project-${row.original.id}-trigger`}>
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit Project</span>
               </Button>
@@ -104,28 +104,25 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem asChild>
-                <Link href={`/projects/${row.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
+                <Link href={`/projects/${row.original.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault(); // Prevent DropdownMenu from closing
-                  // Manually trigger ProjectForm dialog if needed, or ensure ProjectForm handles its own open state
-                  // This might require ProjectForm to be structured to open via a prop or internal state on trigger click
-                  // For now, assuming ProjectForm's triggerButton handles opening its dialog.
-                  // We simulate a click on the edit button that's now part of the ProjectForm trigger
-                  // This is a bit of a workaround; ideally, ProjectForm would expose an `onOpen` or `open` prop.
-                  const editButton = document.getElementById(`edit-project-${row.id}-trigger`);
-                  if (editButton) editButton.click();
-                }}
-                // The Edit button is now part of the ProjectForm trigger, so this explicit one isn't as useful here
-                // unless ProjectForm is refactored to be controlled.
-                // For simplicity, the direct Edit button outside the dropdown is preferred if a modal is always used.
-                // If keeping in dropdown, ProjectForm needs to be controlled or the DropdownMenuItem needs to stop propagation correctly
-                // and manage the dialog opening.
-              >
-                {/* <Edit className="mr-2 h-4 w-4" />Edit (via Dropdown) */}
-                {/* This is now handled by the direct Edit button above */}
-              </DropdownMenuItem>
+              {/* The direct edit button above is preferred for clarity, 
+                  but if an edit option is needed *within* the dropdown, ProjectForm needs to be controllable 
+                  or DropdownMenuItem needs to manage the dialog opening.
+                  To keep it simple, we are relying on the direct Edit button for now.
+              */}
+              {/* 
+              <ProjectForm
+                mode="edit"
+                projectData={row.original}
+                onSave={onUpdateProject}
+                triggerButton={
+                   <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="flex items-center w-full">
+                     <Edit className="mr-2 h-4 w-4" />Edit (from dropdown)
+                   </DropdownMenuItem>
+                }
+              />
+              */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem
@@ -139,12 +136,12 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the project "{row.name}".
+                      This action cannot be undone. This will permanently delete the project "{row.original.name}".
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(row)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                    <AlertDialogAction onClick={() => handleDelete(row.original)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
