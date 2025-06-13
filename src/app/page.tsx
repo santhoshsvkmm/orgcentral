@@ -494,7 +494,14 @@ export default function LandingPage() {
               </p>
             </motion.div>
             {[
-              { title: 'Solutions', links: [{label: 'Project Management', href: '#features'}, {label: 'AI for Construction', href: '#features'}, {label: 'Pricing', href: '#pricing'}, {label: 'Request Demo', href: '/register'}] },
+              { title: 'Explore', links: [
+                  {label: 'Detailed Features', href: '/features-detailed'}, 
+                  {label: 'AI in Construction', href: '/ai-in-construction'}, 
+                  {label: 'Project Command Center', href: '/solutions/project-command-center'}, 
+                  {label: 'Pricing', href: '#pricing'}, 
+                  {label: 'Request Demo', href: '/register'}
+                ] 
+              },
               { title: 'Company', links: [{label: 'About Us', href: '#'}, {label: 'Contact Sales', href: '#contact-us'}, {label: 'Careers', href: '#'}] },
               { title: 'Resources', links: [{label: 'Case Studies', href: '#'}, {label: 'Help Center', href: '#'}, {label: 'API Documentation', href: '#'}] }
             ].map((column, colIndex) => (
@@ -538,5 +545,6 @@ export default function LandingPage() {
     </div>
   );
 }
+    
 
     
