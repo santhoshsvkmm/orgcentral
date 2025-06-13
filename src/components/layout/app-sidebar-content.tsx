@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart, UsersRound, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart, UsersRound, TrendingUp, MessagesSquare } from 'lucide-react';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/drive', label: 'File Storage', icon: Folder },
   { href: '/financials', label: 'Financials', icon: Landmark },
   { href: '/reports', label: 'Reports', icon: PieChart },
+  { href: '/communication', label: 'Communication', icon: MessagesSquare },
 ];
 
 export function AppSidebarContent() {
