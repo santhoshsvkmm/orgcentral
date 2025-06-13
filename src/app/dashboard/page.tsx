@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon } from "lucide-react";
+import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert } from "lucide-react";
 import { PageTitle } from "@/components/page-title";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -242,23 +242,35 @@ export default function DashboardPage() {
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle>Team Performance</CardTitle>
+            <CardDescription>Overview of team workload and efficiency.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">Placeholder for team performance metrics.</p>
-            <div className="mt-4 h-48 w-full bg-muted rounded-md flex items-center justify-center" data-ai-hint="team workload chart">
-              <span className="text-sm text-muted-foreground">Team Performance Chart</span>
-            </div>
+            <ChartContainer config={{}} className="h-[200px] w-full" data-ai-hint="team performance chart">
+              <ResponsiveContainer width="100%" height="100%">
+                <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed">
+                  <BarChart2 className="h-10 w-10 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Team Performance Chart</span>
+                  <span className="text-xs text-muted-foreground">(Data and chart to be implemented)</span>
+                </div>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle>Budget Allocation</CardTitle>
+            <CardDescription>Breakdown of budget distribution.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">Placeholder for budget allocation chart.</p>
-            <div className="mt-4 h-48 w-full bg-muted rounded-md flex items-center justify-center" data-ai-hint="budget distribution pie">
-              <span className="text-sm text-muted-foreground">Budget Allocation Chart</span>
-            </div>
+             <ChartContainer config={{}} className="h-[200px] w-full" data-ai-hint="budget allocation chart">
+              <ResponsiveContainer width="100%" height="100%">
+                 <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed">
+                  <PieChartIconLucide className="h-10 w-10 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">Budget Allocation Chart</span>
+                  <span className="text-xs text-muted-foreground">(Data and chart to be implemented)</span>
+                </div>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
       </motion.div>
