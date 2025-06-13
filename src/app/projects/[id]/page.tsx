@@ -2,13 +2,13 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign } from "lucide-react"; // Added more icons
 import { TaskList } from "@/components/projects/task-list";
 import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
-import { useState, useEffect, use } from "react"; // Added 'use'
+import { useState, useEffect, use, useMemo } from "react"; // Added useMemo
 import type { Project } from "@/components/projects/project-form";
 import {
   Menubar,
@@ -16,12 +16,26 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
-  MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { analyzeProjectIssues, AnalyzeProjectIssuesInput, AnalyzeProjectIssuesOutput, CriticalIssue } from "@/ai/flows/analyze-project-issues-flow";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ChartContainer,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  ChartConfig,
+} from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Mock fetch function - replace with actual data fetching
 async function getProjectById(id: string): Promise<Project | null> {
@@ -44,6 +58,41 @@ const mockTasksForAI = [
   { id: "t6", name: "Security Audit", assignee: "Frank Castle", status: "Pending", dueDate: "2024-12-10"},
 ];
 
+// Mock data for project-specific metrics
+const projectSpecificMetrics = [
+  { title: "Total Tasks", value: "6", icon: <ListChecks className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project tasks" },
+  { title: "Completed Tasks", value: "1", icon: <CheckCircle className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project done" },
+  { title: "In Progress Tasks", value: "2", icon: <Orbit className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project progress" },
+  { title: "Delayed Tasks", value: "1", icon: <AlertCircleLucide className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project overdue" }, // Using AlertCircleLucide for consistency
+  { title: "Upcoming Tasks", value: "2", icon: <CalendarClock className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project schedule" },
+  { title: "Critical Tasks", value: "0", icon: <ShieldAlert className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project priority" },
+];
+
+// Mock data for project-specific chart
+const projectAllChartDataPoints = [
+  { name: "Week 1", planned: 10, actual: 8, budget: 15 },
+  { name: "Week 2", planned: 20, actual: 18, budget: 25 },
+  { name: "Week 3", planned: 30, actual: 30, budget: 35 },
+  { name: "Week 4", planned: 40, actual: 38, budget: 45 },
+  { name: "Week 5", planned: 50, actual: 45, budget: 55 },
+  { name: "Week 6", planned: 60, actual: 58, budget: 60 },
+];
+
+const projectChartConfig = {
+  planned: {
+    label: "Planned Progress",
+    color: "hsl(var(--chart-1))",
+  },
+  actual: {
+    label: "Actual Progress",
+    color: "hsl(var(--chart-2))",
+  },
+  budget: {
+    label: "Budget Spent (%)",
+    color: "hsl(var(--chart-3))",
+  }
+} satisfies ChartConfig;
+
 
 export default function ProjectDetailsPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
@@ -53,6 +102,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
   const [loading, setLoading] = useState(true);
   const [isAIAnalyzing, setIsAIAnalyzing] = useState(false);
   const [aiAnalysisResults, setAIAnalysisResults] = useState<AnalyzeProjectIssuesOutput | null>(null);
+  const [chartTimeRange, setChartTimeRange] = useState<string>("all");
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -63,6 +113,17 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
     };
     fetchProject();
   }, [projectId]);
+
+  const filteredProjectChartData = useMemo(() => {
+    if (chartTimeRange === "last3") {
+      return projectAllChartDataPoints.slice(-3);
+    }
+    if (chartTimeRange === "last6") { // Assuming we might want to show all if less than 6
+      return projectAllChartDataPoints.slice(-6);
+    }
+    return projectAllChartDataPoints;
+  }, [chartTimeRange]);
+
 
   const handleAIAnalysis = async () => {
     if (!project) return;
@@ -98,7 +159,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
   const getSeverityBadgeVariant = (severity: CriticalIssue['severity']): "default" | "destructive" | "secondary" | "outline" => {
     switch (severity) {
       case 'High': return 'destructive';
-      case 'Medium': return 'default'; // Using 'default' (primary color) for medium
+      case 'Medium': return 'default'; 
       case 'Low': return 'outline';
       default: return 'outline';
     }
@@ -106,7 +167,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
    const getSeverityIcon = (severity: CriticalIssue['severity']) => {
     switch (severity) {
       case 'High': return <AlertTriangle className="h-4 w-4 mr-1 text-destructive" />;
-      case 'Medium': return <Clock className="h-4 w-4 mr-1 text-primary" />; // Example icon
+      case 'Medium': return <Clock className="h-4 w-4 mr-1 text-primary" />; 
       case 'Low': return <CheckCircle className="h-4 w-4 mr-1 text-muted-foreground" />;
       default: return null;
     }
@@ -122,6 +183,14 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
             <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
             <CardContent><Skeleton className="h-24 w-full" /></CardContent>
         </Card>
+        {/* Skeletons for new metrics and chart */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
+        </div>
+        <Card className="mb-8 shadow-md">
+            <CardHeader><Skeleton className="h-8 w-1/3" /></CardHeader>
+            <CardContent><Skeleton className="h-48 w-full" /></CardContent>
+        </Card>
         <Card className="shadow-sm mt-8">
             <CardHeader><Skeleton className="h-8 w-1/3" /></CardHeader>
             <CardContent><Skeleton className="h-48 w-full" /></CardContent>
@@ -136,7 +205,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
     );
   }
   
-  const companyNonWorkingDays = ["2024-07-04", "2024-12-25", "2025-01-01"]; // Example, fetch from settings
+  const companyNonWorkingDays = ["2024-07-04", "2024-12-25", "2025-01-01"]; 
   const workingDays = calculateWorkingDays(project.startDate, project.dueDate, companyNonWorkingDays);
 
   return (
@@ -175,7 +244,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
             <MenubarItem onClick={() => console.log('Meeting Notes')}>Meeting Notes</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
-        <MenubarMenu>
+         <MenubarMenu>
           <MenubarTrigger>Resources</MenubarTrigger>
            <MenubarContent>
             <MenubarItem onClick={() => console.log('Team Members')}>Team Members</MenubarItem>
@@ -263,6 +332,67 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
           </div>
         </CardContent>
       </Card>
+
+      {/* Project Specific Metrics Section */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Project Task Overview</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {projectSpecificMetrics.map((metric) => (
+            <Card key={metric.title} className="shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
+                {metric.icon}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metric.value}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Project Progress Chart Section */}
+      <Card className="mb-8 shadow-md">
+        <CardHeader className="flex flex-row items-start justify-between gap-2">
+          <div>
+            <CardTitle>Project Progress</CardTitle>
+            <CardDescription>Planned vs. Actual progress for this project.</CardDescription>
+          </div>
+          <Select value={chartTimeRange} onValueChange={setChartTimeRange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select time range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Data</SelectItem>
+              <SelectItem value="last6">Last 6 Weeks</SelectItem>
+              <SelectItem value="last3">Last 3 Weeks</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={projectChartConfig} className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={filteredProjectChartData}
+                margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" tickLine={false} axisLine={false} dy={10} />
+                <YAxis tickLine={false} axisLine={false} dx={-10} />
+                <RechartsTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="line" hideLabel />} 
+                />
+                <Legend content={<ChartLegendContent />} />
+                <Line dataKey="planned" type="monotone" stroke="var(--color-planned)" strokeWidth={2} dot={true} />
+                <Line dataKey="actual" type="monotone" stroke="var(--color-actual)" strokeWidth={2} dot={true} />
+                <Line dataKey="budget" type="monotone" stroke="var(--color-budget)" strokeWidth={2} dot={true} name="Budget Spent (%)" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
 
       {isAIAnalyzing && !aiAnalysisResults && (
         <Card className="mb-8 shadow-md">
