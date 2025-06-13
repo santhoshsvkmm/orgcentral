@@ -1,38 +1,33 @@
 
 'use client';
 
-import { PageTitle } from "@/components/page-title";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Landmark } from "lucide-react";
+import { PieChart as PieChartIcon } from "lucide-react"; // Renamed to avoid conflict
 
-export default function FinancialsPage() {
+export default function FinancialsOverviewPage() {
   return (
     <>
-      <PageTitle
-        title="Financials"
-        description="Manage and overview your organization's financial data, budgets, expenses, and invoicing."
-      />
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-foreground flex items-center">
+          <PieChartIcon className="mr-2 h-5 w-5 text-primary" />
+          Financial Overview
+        </h2>
+      </div>
       <Card className="shadow-md">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Landmark className="mr-2 h-5 w-5 text-primary" />
-            Financial Management Overview
-          </CardTitle>
+          <CardTitle>Overall Financial Health</CardTitle>
           <CardDescription>
-            This section will provide tools and insights into your organization's financial health.
+            Dashboard for key financial metrics, summaries, and quick insights.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed" data-ai-hint="financial charts placeholder">
-            <Landmark className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-semibold text-foreground">Financials Placeholder</p>
+          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed" data-ai-hint="financial dashboard placeholder">
+            <PieChartIcon className="h-16 w-16 text-muted-foreground mb-4" />
+            <p className="text-xl font-semibold text-foreground">Financial Overview Placeholder</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Features like budgeting, expense tracking, invoicing, and financial reports will be available here.
+              Key financial charts, ratios, and summaries will be displayed here.
             </p>
           </div>
-           <p className="text-sm text-muted-foreground">
-            Future sub-sections could include: Budgets, Expenses, Invoices, Financial Statements.
-          </p>
         </CardContent>
       </Card>
     </>
