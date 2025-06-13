@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit, MoreHorizontal, Trash2, PlusCircle, PackageSearch, ShoppingCart } from "lucide-react"; // Added ShoppingCart
+import { Edit, MoreHorizontal, Trash2, PlusCircle, PackageSearch, ShoppingCart, ScanLine } from "lucide-react"; // Added ScanLine
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/date-utils";
 import { WarehouseForm } from './warehouse-form';
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import React from "react";
-import Link from "next/link"; // Added Link
+import Link from "next/link";
 
 interface WarehouseListProps {
   warehouses: Warehouse[];
@@ -81,7 +81,12 @@ export function WarehouseList({ warehouses, projectId, onUpdateWarehouse, onDele
               />
               <DropdownMenuItem asChild>
                 <Link href={`/projects/${projectId}/resources/warehouses/${row.id}/procurement-plan`}>
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Material Procurement Plan
+                  <ShoppingCart className="mr-2 h-4 w-4" /> Material Procurement
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/projects/${projectId}/resources/warehouses/${row.id}/pos`}>
+                  <ScanLine className="mr-2 h-4 w-4" /> Material POS System
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
