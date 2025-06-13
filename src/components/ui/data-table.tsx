@@ -12,39 +12,50 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Added Select
 import { ArrowUpDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface ColumnDef<TData, TValue = any> {
-  accessorKey: keyof TData | string; // Use string for custom/display columns like 'actions'
+  accessorKey: keyof TData | string; 
   header: string | (({ column }: { column: { toggleSorting: (isDesc: boolean) => void; getIsSorted: () => false | 'asc' | 'desc' } }) => React.ReactNode);
   cell: (({ row }: { row: TData }) => React.ReactNode);
   enableSorting?: boolean;
-  size?: string; // e.g. "100px", "auto", "20%"
+  size?: string; 
 }
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   itemsPerPage?: number;
+  itemsPerPageOptions?: number[]; // New prop
   searchableColumns?: (keyof TData)[];
   globalFilterPlaceholder?: string;
   noResultsMessage?: string;
   actionColumnAlignment?: 'left' | 'center' | 'right';
 }
 
+const DEFAULT_ITEMS_PER_PAGE_OPTIONS = [10, 20, 30, 40, 50];
+
 export function DataTable<TData, TValue>({
   columns,
   data,
-  itemsPerPage = 10,
+  itemsPerPage: initialItemsPerPage = 10,
+  itemsPerPageOptions = DEFAULT_ITEMS_PER_PAGE_OPTIONS,
   searchableColumns,
   globalFilterPlaceholder = 'Search...',
   noResultsMessage = 'No results found.',
   actionColumnAlignment = 'right',
 }: DataTableProps<TData, TValue>) {
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentItemsPerPage, setCurrentItemsPerPage] = React.useState(initialItemsPerPage);
   const [sortConfig, setSortConfig] = React.useState<{ key: keyof TData | string; direction: 'asc' | 'desc' } | null>(null);
   const [globalFilter, setGlobalFilter] = React.useState('');
+
+  React.useEffect(() => {
+    setCurrentItemsPerPage(initialItemsPerPage); // Update if prop changes
+    setCurrentPage(1); // Reset to first page when itemsPerPage prop changes
+  }, [initialItemsPerPage]);
 
   const filteredData = React.useMemo(() => {
     let filtered = [...data];
@@ -75,16 +86,15 @@ export function DataTable<TData, TValue>({
         if (typeof valA === 'string' && typeof valB === 'string') {
           return valA.localeCompare(valB) * (sortConfig.direction === 'asc' ? 1 : -1);
         }
-        // Fallback for other types (e.g., dates as strings)
         return String(valA).localeCompare(String(valB)) * (sortConfig.direction === 'asc' ? 1 : -1);
       });
     }
     return sortableItems;
   }, [filteredData, sortConfig]);
 
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / currentItemsPerPage);
+  const startIndex = (currentPage - 1) * currentItemsPerPage;
+  const paginatedData = sortedData.slice(startIndex, startIndex + currentItemsPerPage);
 
   const handleSort = (key: keyof TData | string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -92,7 +102,7 @@ export function DataTable<TData, TValue>({
       direction = 'desc';
     }
     setSortConfig({ key, direction });
-    setCurrentPage(1); // Reset to first page on sort
+    setCurrentPage(1); 
   };
   
   const getSortDirectionIcon = (key: keyof TData | string) => {
@@ -106,24 +116,47 @@ export function DataTable<TData, TValue>({
     );
   };
 
+  const handleItemsPerPageChange = (value: string) => {
+    setCurrentItemsPerPage(Number(value));
+    setCurrentPage(1); // Reset to first page
+  };
+
   return (
     <div className="space-y-4">
-      {searchableColumns && searchableColumns.length > 0 && (
-        <div className="flex items-center">
-          <div className="relative flex-grow">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {searchableColumns && searchableColumns.length > 0 && (
+          <div className="relative flex-grow sm:flex-grow-0 sm:w-auto">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={globalFilterPlaceholder}
               value={globalFilter}
               onChange={(event) => {
                 setGlobalFilter(event.target.value);
-                setCurrentPage(1); // Reset to first page on filter change
+                setCurrentPage(1);
               }}
-              className="w-full max-w-sm pl-10 h-10"
+              className="w-full sm:max-w-xs pl-10 h-10"
             />
           </div>
+        )}
+        <div className="flex items-center space-x-2 ml-auto">
+          <p className="text-sm text-muted-foreground">Rows per page:</p>
+          <Select
+            value={String(currentItemsPerPage)}
+            onValueChange={handleItemsPerPageChange}
+          >
+            <SelectTrigger className="w-[70px] h-9 text-sm">
+              <SelectValue placeholder={currentItemsPerPage} />
+            </SelectTrigger>
+            <SelectContent>
+              {itemsPerPageOptions.map(option => (
+                <SelectItem key={option} value={String(option)} className="text-sm">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      )}
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -154,7 +187,7 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((row, index) => (
-                <TableRow key={`row-${index}`}>
+                <TableRow key={`row-${index}-${JSON.stringify(row)}`}> {/* Improved key for potential duplicate data */}
                   {columns.map((column) => (
                     <TableCell 
                         key={String(column.accessorKey)}
@@ -175,7 +208,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {totalPages > 1 && (
+      {totalPages > 0 && ( // Only show pagination if there are pages
         <div className="flex items-center justify-end space-x-2 py-4">
           <span className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
@@ -203,3 +236,4 @@ export function DataTable<TData, TValue>({
 }
 
 DataTable.displayName = "DataTable";
+
