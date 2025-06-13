@@ -36,6 +36,8 @@ import {
   FileCheck2, // For Client Agreement
   FileSignature, // For Vendor Contracts
   FileDigit, // For Quotation
+  FolderKanbanIcon, // For Drawings (using a different icon for distinction)
+  LayoutDashboard, // Added comma here
   FileSearch, // For View Quotation
   FilePlus2 // For Generate New Quote
 } from "lucide-react";
@@ -47,6 +49,13 @@ interface ProjectMenubarProps {
 export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
   return (
     <Menubar className="mb-6 rounded-md border bg-card shadow-sm">
+ <MenubarMenu>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}`}>
+ <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+ </Link>
+ </MenubarItem>
+ </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
           <DraftingCompass className="mr-2 h-4 w-4" /> Planning
@@ -63,8 +72,10 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
             </Link>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem onClick={() => console.log('Resource Allocation for project', projectId)}>
-            <UsersRound className="mr-2 h-4 w-4" /> Resource Allocation
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/planning/resource-allocation`}>
+              <UsersRound className="mr-2 h-4 w-4" /> Resource Allocation
+            </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
@@ -73,30 +84,74 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <FolderKanban className="mr-2 h-4 w-4" /> Documents
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => console.log('Project Brief for project', projectId)}>
-            <FileText className="mr-2 h-4 w-4" /> Project Brief
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/documents/project-brief`}>
+              <FileText className="mr-2 h-4 w-4" /> Project Brief
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Specifications for project', projectId)}>
-            <ListOrdered className="mr-2 h-4 w-4" /> Specifications
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/documents/specifications`}>
+              <ListOrdered className="mr-2 h-4 w-4" /> Specifications
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Meeting Notes for project', projectId)}>
-            <ClipboardList className="mr-2 h-4 w-4" /> Meeting Notes
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/documents/meeting-notes`}>
+              <ClipboardList className="mr-2 h-4 w-4" /> Meeting Notes
+            </Link>
           </MenubarItem>
+          <MenubarSeparator />
+ <MenubarMenu>
+ <MenubarTrigger className="flex items-center">
+ <FolderKanbanIcon className="mr-2 h-4 w-4" /> Drawings
+ </MenubarTrigger>
+ <MenubarContent>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=architectural`}>Architectural</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=structural`}>Structural</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=mechanical`}>Mechanical</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=electrical`}>Electrical</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=plumbing`}>Plumbing</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=shop-drawing`}>Shop Drawing</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=as-built`}>As-Built</Link>
+ </MenubarItem>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
+ </MenubarItem>
+ </MenubarContent>
+ </MenubarMenu>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>
+        <MenubarTrigger className="flex items-center">
           <Package className="mr-2 h-4 w-4" /> Resources
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => console.log('Team Members for project', projectId)}>
-            <Users className="mr-2 h-4 w-4" /> Team Members
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/resources/team-members`}>
+              <Users className="mr-2 h-4 w-4" /> Team Members
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Equipment List for project', projectId)}>
-            <Construction className="mr-2 h-4 w-4" /> Equipment
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/resources/equipment`}>
+              <Construction className="mr-2 h-4 w-4" /> Equipment
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Software Licenses for project', projectId)}>
-            <Laptop className="mr-2 h-4 w-4" /> Software
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/resources/software`}>
+              <Laptop className="mr-2 h-4 w-4" /> Software
+            </Link>
           </MenubarItem>
            <MenubarSeparator />
           <MenubarItem asChild>
@@ -111,14 +166,20 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <Landmark className="mr-2 h-4 w-4" /> Financial
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => console.log('Budget Overview for project', projectId)}>
-            <PiggyBank className="mr-2 h-4 w-4" /> Budget
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/financial/budget`}>
+              <PiggyBank className="mr-2 h-4 w-4" /> Budget
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Expense Tracking for project', projectId)}>
-            <Receipt className="mr-2 h-4 w-4" /> Expenses
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/financial/expenses`}>
+              <Receipt className="mr-2 h-4 w-4" /> Expenses
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Invoices for project', projectId)}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" /> Invoices
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/financial/invoices`}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Invoices
+            </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
@@ -127,11 +188,15 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <Handshake className="mr-2 h-4 w-4" /> Contracts
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => console.log('Client Agreement for project', projectId)}>
-            <FileCheck2 className="mr-2 h-4 w-4" /> Client Agreement
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/contracts/client-agreement`}>
+              <FileCheck2 className="mr-2 h-4 w-4" /> Client Agreement
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Vendor Contracts for project', projectId)}>
-            <FileSignature className="mr-2 h-4 w-4" /> Vendor Contracts
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/contracts/vendor-contracts`}>
+              <FileSignature className="mr-2 h-4 w-4" /> Vendor Contracts
+            </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
@@ -140,11 +205,15 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <FileDigit className="mr-2 h-4 w-4" /> Quotation
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => console.log('View Quotation for project', projectId)}>
-            <FileSearch className="mr-2 h-4 w-4" /> View Quotation
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/quotation/view`}>
+              <FileSearch className="mr-2 h-4 w-4" /> View Quotation
+            </Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('Generate New Quote for project', projectId)}>
-            <FilePlus2 className="mr-2 h-4 w-4" /> Generate New
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/quotation/generate`}>
+              <FilePlus2 className="mr-2 h-4 w-4" /> Generate New
+            </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
