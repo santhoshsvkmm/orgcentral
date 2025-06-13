@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link"; // Added Link
+import Link from "next/link"; 
 
 // Mock fetch function - replace with actual data fetching
 async function getProjectById(id: string): Promise<Project | null> {
@@ -230,7 +230,9 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         <MenubarMenu>
           <MenubarTrigger>Planning</MenubarTrigger>
           <MenubarContent>
-            <MenubarItem onClick={() => console.log('View Gantt Chart')}>Gantt Chart</MenubarItem>
+            <MenubarItem asChild>
+              <Link href={`/projects/${project.id}/planning/gantt`}>Gantt Chart</Link>
+            </MenubarItem>
             <MenubarItem onClick={() => console.log('View Milestones')}>Milestones</MenubarItem>
             <MenubarSeparator />
             <MenubarItem onClick={() => console.log('Resource Allocation')}>Resource Allocation</MenubarItem>
