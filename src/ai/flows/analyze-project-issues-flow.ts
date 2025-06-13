@@ -22,7 +22,7 @@ const TaskSchema = z.object({
 export type Task = z.infer<typeof TaskSchema>;
 
 
-export const AnalyzeProjectIssuesInputSchema = z.object({
+const AnalyzeProjectIssuesInputSchema = z.object({
   projectName: z.string().describe('The name of the project.'),
   projectDescription: z.string().optional().describe('The description of the project.'),
   projectStatus: z.string().describe('The current status of the project (e.g., In Progress, Planning, On Hold).'),
@@ -40,7 +40,7 @@ const CriticalIssueSchema = z.object({
 });
 export type CriticalIssue = z.infer<typeof CriticalIssueSchema>;
 
-export const AnalyzeProjectIssuesOutputSchema = z.object({
+const AnalyzeProjectIssuesOutputSchema = z.object({
   criticalIssues: z.array(CriticalIssueSchema).describe('An array of identified critical issues.'),
   summary: z.string().optional().describe('A brief overall summary of the project health based on the analysis.'),
 });
