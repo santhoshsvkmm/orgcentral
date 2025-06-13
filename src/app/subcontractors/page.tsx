@@ -20,8 +20,8 @@ const initialMockSubcontractors: Subcontractor[] = [
     trade: "Electrical",
     address: "123 Volt Ave, ElectriCity, EC 54321",
     mappedProjects: [
-      { id: "map-1-1", projectId: "1", projectName: "Alpha Launch", projectSpecificEmail: "alpha.sparky@example.com", projectSpecificPassword: "password123", suppliedServices: ["Labour", "Material"] },
-      { id: "map-1-2", projectId: "2", projectName: "Beta Platform", projectSpecificEmail: "beta.sparky@example.com", suppliedServices: ["Labour"] },
+      { id: "map-1-1", projectId: "1", projectName: "Alpha Launch", projectSpecificEmail: "alpha.sparky@example.com", suppliedServices: ["Labour", "Material"], invitationStatus: "Accepted", invitationSentAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+      { id: "map-1-2", projectId: "2", projectName: "Beta Platform", projectSpecificEmail: "beta.sparky@example.com", suppliedServices: ["Labour"], invitationStatus: "Pending", invitationSentAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
     ],
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
@@ -35,7 +35,7 @@ const initialMockSubcontractors: Subcontractor[] = [
     trade: "Plumbing",
     address: "456 Drain St, Water Town, WT 67890",
     mappedProjects: [
-      { id: "map-2-1", projectId: "1", projectName: "Alpha Launch", projectSpecificEmail: "alpha.plumb@example.com", suppliedServices: ["Material", "Equipment"] },
+      { id: "map-2-1", projectId: "1", projectName: "Alpha Launch", projectSpecificEmail: "alpha.plumb@example.com", suppliedServices: ["Material", "Equipment"], invitationStatus: "Not Sent" },
     ],
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -45,11 +45,17 @@ const initialMockSubcontractors: Subcontractor[] = [
 export default function SubcontractorsPage() {
   const [subcontractors, setSubcontractors] = useState<Subcontractor[]>(initialMockSubcontractors);
 
-  const handleAddSubcontractor = (newSubcontractor: Omit<Subcontractor, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddSubcontractor = (newSubcontractorData: Omit<Subcontractor, 'id' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
     const subcontractorWithId: Subcontractor = {
-      ...newSubcontractor,
+      ...newSubcontractorData,
       id: `sub-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+      // Ensure new project mappings have default invitation status
+      mappedProjects: newSubcontractorData.mappedProjects.map(mp => ({
+        ...mp,
+        id: mp.id.startsWith('map-temp-') ? `map-${Date.now()}-${Math.random().toString(16).slice(2,6)}` : mp.id, // Assign real ID
+        invitationStatus: mp.invitationStatus || "Not Sent",
+      })),
       createdAt: now,
       updatedAt: now,
     };
@@ -58,7 +64,18 @@ export default function SubcontractorsPage() {
 
   const handleUpdateSubcontractor = (updatedSubcontractor: Subcontractor) => {
     setSubcontractors(prev =>
-      prev.map(s => (s.id === updatedSubcontractor.id ? { ...updatedSubcontractor, updatedAt: new Date().toISOString() } : s))
+      prev.map(s => (s.id === updatedSubcontractor.id 
+        ? { 
+            ...updatedSubcontractor, 
+            // Ensure mapped projects retain their IDs or get new ones if temporary
+            mappedProjects: updatedSubcontractor.mappedProjects.map(mp => ({
+                ...mp,
+                id: mp.id.startsWith('map-temp-') ? `map-${Date.now()}-${Math.random().toString(16).slice(2,6)}` : mp.id,
+                invitationStatus: mp.invitationStatus || "Not Sent", // Ensure status exists
+            })),
+            updatedAt: new Date().toISOString() 
+          } 
+        : s))
     );
   };
 
@@ -70,7 +87,7 @@ export default function SubcontractorsPage() {
     <>
       <PageTitle
         title="Subcontractor Management"
-        description="Oversee and manage all subcontractors and their project involvements."
+        description="Oversee and manage all subcontractors, their project involvements, and invitations."
         actions={
           <SubcontractorForm
             mode="create"

@@ -1,13 +1,15 @@
 
 export type SuppliedService = "Material" | "Labour" | "Equipment";
+export type InvitationStatus = "Not Sent" | "Pending" | "Accepted" | "Declined";
 
 export interface SubcontractorProjectMapping {
   id: string; // Unique ID for the mapping itself
   projectId: string;
   projectName: string;
   projectSpecificEmail: string;
-  projectSpecificPassword?: string; // Password for this project-specific access
   suppliedServices: SuppliedService[];
+  invitationStatus: InvitationStatus;
+  invitationSentAt?: string; // ISO date string
 }
 
 export interface Subcontractor {

@@ -9,9 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useState, type FormEvent, useEffect } from "react";
-import type { Subcontractor, SubcontractorProjectMapping, SuppliedService } from "@/types/subcontractor";
-import { PlusCircle, Trash2, AlertTriangle } from "lucide-react";
+import type { Subcontractor, SubcontractorProjectMapping, SuppliedService, InvitationStatus } from "@/types/subcontractor";
+import { PlusCircle, Trash2, Send, AlertTriangle, CheckCircleIcon, ClockIcon, BanIcon, InfoIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge";
+import { formatDate } from "@/lib/date-utils";
 
 interface SubcontractorFormProps {
   triggerButton: React.ReactNode;
@@ -63,8 +65,8 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
         projectId: '',
         projectName: '',
         projectSpecificEmail: '',
-        projectSpecificPassword: '',
         suppliedServices: [],
+        invitationStatus: "Not Sent",
       },
     ]);
   };
@@ -92,6 +94,36 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
     setMappedProjects(newMappedProjects);
   };
 
+  const handleSendInvitation = (index: number) => {
+    const newMappedProjects = [...mappedProjects];
+    const projectMapping = newMappedProjects[index];
+
+    if (!projectMapping.projectName.trim()) {
+        toast({ title: "Project Name Required", description: "Please enter a project name before sending an invitation.", variant: "destructive"});
+        return;
+    }
+    if (!projectMapping.projectSpecificEmail.trim() || !/\S+@\S+\.\S+/.test(projectMapping.projectSpecificEmail)) {
+        toast({ title: "Valid Project Email Required", description: `Please enter a valid email for project "${projectMapping.projectName}" to send an invitation.`, variant: "destructive"});
+        return;
+    }
+
+    projectMapping.invitationStatus = "Pending";
+    projectMapping.invitationSentAt = new Date().toISOString();
+    setMappedProjects(newMappedProjects);
+    toast({ title: "Invitation Sent (Mock)", description: `An invitation email would be sent to ${projectMapping.projectSpecificEmail} for project "${projectMapping.projectName}".` });
+  };
+
+  const getInvitationStatusBadge = (status: InvitationStatus) => {
+    switch (status) {
+      case "Not Sent": return <Badge variant="outline" className="border-dashed"><InfoIcon className="h-3 w-3 mr-1" />{status}</Badge>;
+      case "Pending": return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-700 border-yellow-500/50"><ClockIcon className="h-3 w-3 mr-1" />{status}</Badge>;
+      case "Accepted": return <Badge variant="secondary" className="bg-green-500/20 text-green-700 border-green-500/50"><CheckCircleIcon className="h-3 w-3 mr-1" />{status}</Badge>;
+      case "Declined": return <Badge variant="destructive"><BanIcon className="h-3 w-3 mr-1" />{status}</Badge>;
+      default: return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     if (!name.trim() || !contactPerson.trim() || !email.trim() || !trade.trim()) {
@@ -99,24 +131,21 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
       return;
     }
 
-    // Basic email validation
     if (!/\S+@\S+\.\S+/.test(email)) {
         toast({ title: "Invalid Email", description: "Please enter a valid general email address.", variant: "destructive"});
         return;
     }
     
-    // Validate project specific emails if any
     for (const project of mappedProjects) {
         if (project.projectSpecificEmail && !/\S+@\S+\.\S+/.test(project.projectSpecificEmail)) {
             toast({ title: "Invalid Project Email", description: `Please enter a valid email for project: ${project.projectName || 'Unnamed Project'}.`, variant: "destructive"});
             return;
         }
-         if (!project.projectName.trim() && (project.projectSpecificEmail || project.projectSpecificPassword || project.suppliedServices.length > 0)) {
-            toast({ title: "Missing Project Name", description: `Please provide a name for the project mapping with email/password/services.`, variant: "destructive"});
+         if (!project.projectName.trim() && (project.projectSpecificEmail || project.suppliedServices.length > 0 || project.invitationStatus !== "Not Sent")) {
+            toast({ title: "Missing Project Name", description: `Please provide a name for the project mapping with email/services/invitation details.`, variant: "destructive"});
             return;
         }
     }
-
 
     const payload = {
       name: name.trim(),
@@ -125,7 +154,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
       phone: phone.trim(),
       trade: trade.trim(),
       address: address.trim(),
-      mappedProjects: mappedProjects.filter(p => p.projectName.trim() !== ''), // Only save mappings with a project name
+      mappedProjects: mappedProjects.filter(p => p.projectName.trim() !== ''), 
     };
 
     if (mode === 'create') {
@@ -141,7 +170,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-      <DialogContent className="sm:max-w-2xl"> {/* Increased width */}
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-headline">{mode === 'create' ? 'Add New Subcontractor' : 'Edit Subcontractor'}</DialogTitle>
           <DialogDescription>
@@ -182,7 +211,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
 
             {/* Project Mappings */}
             <div>
-              <h3 className="text-lg font-medium mb-3">Project Mappings</h3>
+              <h3 className="text-lg font-medium mb-3">Project Mappings & Invitations</h3>
               {mappedProjects.map((project, index) => (
                 <div key={project.id || `project-${index}`} className="p-4 border rounded-md mb-4 space-y-3 bg-muted/30">
                   <div className="flex justify-between items-center">
@@ -201,15 +230,17 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
                       <Input id={`projId-${index}`} value={project.projectId} onChange={(e) => handleProjectMappingChange(index, 'projectId', e.target.value)} placeholder="Internal Project ID" />
                     </div>
                     <div>
-                      <Label htmlFor={`projEmail-${index}`}>Project Specific Email</Label>
+                      <Label htmlFor={`projEmail-${index}`}>Project Specific Email (for invitation)</Label>
                       <Input id={`projEmail-${index}`} type="email" value={project.projectSpecificEmail} onChange={(e) => handleProjectMappingChange(index, 'projectSpecificEmail', e.target.value)} />
                     </div>
-                    <div>
-                      <Label htmlFor={`projPass-${index}`}>Project Specific Password</Label>
-                      <Input id={`projPass-${index}`} type="password" value={project.projectSpecificPassword || ''} onChange={(e) => handleProjectMappingChange(index, 'projectSpecificPassword', e.target.value)} />
-                       <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                        <AlertTriangle className="h-3 w-3 mr-1 text-yellow-500" /> Store hashed passwords in a real app.
-                      </p>
+                     <div>
+                        <Label>Invitation Status</Label>
+                        <div className="flex items-center mt-1.5">
+                          {getInvitationStatusBadge(project.invitationStatus)}
+                          {project.invitationSentAt && project.invitationStatus === 'Pending' && (
+                            <span className="text-xs text-muted-foreground ml-2">(Sent: {formatDate(project.invitationSentAt, 'MMM d, HH:mm')})</span>
+                          )}
+                        </div>
                     </div>
                   </div>
                   <div>
@@ -227,11 +258,29 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
                       ))}
                     </div>
                   </div>
+                  <div className="mt-3 pt-3 border-t border-border/50">
+                     <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleSendInvitation(index)}
+                        disabled={project.invitationStatus === 'Accepted'}
+                        className="w-full md:w-auto"
+                      >
+                        <Send className="h-4 w-4 mr-2" /> 
+                        {project.invitationStatus === "Pending" ? "Resend Invitation" : "Send Invitation"}
+                      </Button>
+                      {project.invitationStatus === 'Accepted' && <p className="text-xs text-green-600 mt-1">Invitation accepted.</p>}
+                  </div>
                 </div>
               ))}
               <Button type="button" variant="outline" onClick={handleAddProjectMapping} className="mt-2">
                 <PlusCircle className="h-4 w-4 mr-2" /> Add Project Mapping
               </Button>
+            </div>
+             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700">
+                <AlertTriangle className="h-4 w-4 inline mr-1 mb-0.5" />
+                <strong>Reminder:</strong> The "Send Invitation" feature is a frontend prototype. In a real application, this would trigger backend processes to send actual emails and manage invitation lifecycles.
             </div>
           </div>
           <DialogFooter className="pt-6 border-t mt-4">
