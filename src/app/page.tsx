@@ -4,7 +4,10 @@
 import { MainHeader } from '@/components/layout/main-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, BarChartBig, Users, Briefcase, Brain, ShieldCheck } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { CheckCircle, BarChartBig, Users, Briefcase, Brain, ShieldCheck, Layers, Wand2, Mail, Phone, MapPin, Twitter, Facebook, Linkedin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react'; // Import useState and useEffect
@@ -34,6 +37,27 @@ const features = [
     description: 'Leverage AI to get smart role suggestions based on job descriptions.',
     dataAiHint: 'artificial intelligence'
   },
+];
+
+const whyChooseUsItems = [
+  {
+    icon: <Layers className="h-10 w-10 text-primary" />,
+    title: 'Unified Platform',
+    description: 'Bring all your organizational tools and data into one seamless experience.',
+    dataAiHint: 'integrated system'
+  },
+  {
+    icon: <Wand2 className="h-10 w-10 text-primary" />,
+    title: 'Intelligent Automation',
+    description: 'Leverage AI to automate routine tasks and gain deeper insights.',
+    dataAiHint: 'smart technology'
+  },
+  {
+    icon: <ShieldCheck className="h-10 w-10 text-primary" />,
+    title: 'Scalable & Secure',
+    description: 'Built to grow with your organization, ensuring data safety and reliability.',
+    dataAiHint: 'secure platform'
+  }
 ];
 
 const pricingTiers = [
@@ -123,9 +147,42 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Why Choose Us Section */}
+        <section id="why-choose-us" className="py-16 sm:py-24 bg-slate-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl font-headline">Why Choose OrgCentral?</h2>
+              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                Discover the advantages that make OrgCentral the ideal solution for your organizational needs.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {whyChooseUsItems.map((item) => (
+                <div key={item.title} className="flex flex-col items-center text-center p-6 bg-card rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2 font-headline">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.description}</p>
+                </div>
+              ))}
+            </div>
+             <div className="mt-12 text-center">
+                 <Image 
+                  src="https://placehold.co/800x450.png" 
+                  alt="OrgCentral in action" 
+                  width={800} 
+                  height={450} 
+                  className="w-full max-w-3xl mx-auto h-auto object-cover rounded-lg shadow-xl"
+                  data-ai-hint="team collaboration screen" 
+                />
+            </div>
+          </div>
+        </section>
         
         {/* Placeholder Image Section */}
-        <section className="py-16 sm:py-24 bg-slate-50">
+        <section className="py-16 sm:py-24 bg-background">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
@@ -154,7 +211,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="py-16 sm:py-24 bg-background">
+        <section id="pricing" className="py-16 sm:py-24 bg-slate-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl font-headline">Simple, Transparent Pricing</h2>
@@ -204,12 +261,125 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Contact Us Section */}
+        <section id="contact-us" className="py-16 sm:py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl font-headline">Get in Touch</h2>
+              <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
+                Have questions or need assistance? We&apos;re here to help. Reach out to us!
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-10 items-start">
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-foreground font-headline">Contact Information</h3>
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-6 w-6 text-primary mt-1 shrink-0" />
+                  <div>
+                    <h4 className="font-medium text-foreground">Our Office</h4>
+                    <p className="text-muted-foreground">123 Innovation Drive, Tech City, TX 75001</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Mail className="h-6 w-6 text-primary mt-1 shrink-0" />
+                  <div>
+                    <h4 className="font-medium text-foreground">Email Us</h4>
+                    <p className="text-muted-foreground hover:text-primary"><Link href="mailto:support@orgcentral.com">support@orgcentral.com</Link></p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Phone className="h-6 w-6 text-primary mt-1 shrink-0" />
+                  <div>
+                    <h4 className="font-medium text-foreground">Call Us</h4>
+                    <p className="text-muted-foreground hover:text-primary"><Link href="tel:+15551234567">(555) 123-4567</Link></p>
+                  </div>
+                </div>
+                 <div className="mt-6 h-64 w-full bg-muted rounded-lg overflow-hidden shadow-md" data-ai-hint="map location">
+                    <Image src="https://placehold.co/600x400.png" alt="Map location" width={600} height={400} className="w-full h-full object-cover" />
+                </div>
+              </div>
+              <Card className="shadow-xl">
+                <CardHeader>
+                  <CardTitle className="font-headline">Send Us a Message</CardTitle>
+                  <CardDescription>We&apos;ll get back to you as soon as possible.</CardDescription>
+                </CardHeader>
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="contact-name">Full Name</Label>
+                      <Input id="contact-name" placeholder="John Doe" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="contact-email">Email</Label>
+                      <Input id="contact-email" type="email" placeholder="john.doe@example.com" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="contact-message">Message</Label>
+                      <Textarea id="contact-message" placeholder="Your message..." className="min-h-[120px]" />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90">Send Message</Button>
+                  </CardFooter>
+                </form>
+              </Card>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t bg-background">
-        <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-          <p>&copy; {currentYear || new Date().getFullYear()} OrgCentral Simplified. All rights reserved.</p>
+      {/* Enhanced Footer */}
+      <footer className="border-t bg-gray-50 text-gray-700">
+        <div className="container mx-auto px-4 py-12 sm:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-8">
+            <div className="col-span-2 lg:col-span-2">
+              <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary mb-2">
+                <Briefcase className="h-7 w-7" /> {/* Using Briefcase as placeholder logo icon */}
+                <span>OrgCentral Simplified</span>
+              </Link>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Empowering organizations with simplified project and user management, powered by AI.
+              </p>
+            </div>
+            <div>
+              <h5 className="font-semibold mb-3 text-foreground">Product</h5>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#features" className="hover:text-primary hover:underline">Features</Link></li>
+                <li><Link href="#pricing" className="hover:text-primary hover:underline">Pricing</Link></li>
+                <li><Link href="/register" className="hover:text-primary hover:underline">Request Demo</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold mb-3 text-foreground">Company</h5>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#" className="hover:text-primary hover:underline">About Us</Link></li>
+                <li><Link href="#contact-us" className="hover:text-primary hover:underline">Contact</Link></li>
+                <li><Link href="#" className="hover:text-primary hover:underline">Careers</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-semibold mb-3 text-foreground">Resources</h5>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="#" className="hover:text-primary hover:underline">Blog</Link></li>
+                <li><Link href="#" className="hover:text-primary hover:underline">Help Center</Link></li>
+                <li><Link href="#" className="hover:text-primary hover:underline">API Documentation</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t pt-8 flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
+            <p>&copy; {currentYear || new Date().getFullYear()} OrgCentral Simplified. All rights reserved.</p>
+            <div className="flex space-x-4 mt-4 sm:mt-0">
+              <Link href="#" className="hover:text-primary"><Twitter className="h-5 w-5" /></Link>
+              <Link href="#" className="hover:text-primary"><Facebook className="h-5 w-5" /></Link>
+              <Link href="#" className="hover:text-primary"><Linkedin className="h-5 w-5" /></Link>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <Link href="#" className="hover:text-primary hover:underline">Privacy Policy</Link>
+              <span className="mx-2">|</span>
+              <Link href="#" className="hover:text-primary hover:underline">Terms of Service</Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
