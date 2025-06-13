@@ -8,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Image as ImageIcon, Edit3, UploadCloud, FileText, Download, MessageSquarePlus } from 'lucide-react'; // Added MessageSquarePlus
+import { ArrowLeft, Image as ImageIconLucide, Edit3, UploadCloud, FileText, Download, MessageSquarePlus } from 'lucide-react'; // Renamed Image to ImageIconLucide
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image'; // Imported Next.js Image
 
 interface DrawingVersion {
   version: string;
@@ -183,7 +184,7 @@ export default function DrawingsPage() {
       <Card className="mb-8 shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <ImageIcon className="mr-2 h-5 w-5 text-primary" />
+            <ImageIconLucide className="mr-2 h-5 w-5 text-primary" />
             2D Drawing Space & Annotation
           </CardTitle>
           <CardDescription>
@@ -198,13 +199,15 @@ export default function DrawingsPage() {
             </p>
           </div>
           
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed" data-ai-hint="2d drawing editor annotation canvas">
-            <div className="flex items-center justify-center mb-4">
-                <ImageIcon className="h-16 w-16 text-muted-foreground" />
-                <MessageSquarePlus className="h-10 w-10 text-muted-foreground opacity-70 relative -ml-6 -mt-6" />
-            </div>
-            <p className="text-xl font-semibold text-foreground">2D Drawing Viewer, Editor & Annotator Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1 text-center">An interactive canvas for viewing, marking up, editing, and annotating 2D drawings would appear here.</p>
+          <div className="mt-6 p-0 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed overflow-hidden">
+            <Image 
+              src="https://images.unsplash.com/photo-1581092917144-438ab4916134?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" 
+              alt="2D drawing canvas placeholder" 
+              width={1200} 
+              height={800} 
+              className="w-full h-full object-cover"
+              data-ai-hint="blueprints drawing"
+            />
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">

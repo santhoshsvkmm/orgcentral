@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Box as BoxIcon, Edit3, MessageSquarePlus } from 'lucide-react'; // Added MessageSquarePlus for annotation idea
+import Image from 'next/image';
 
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
@@ -60,13 +61,15 @@ export default function ModelViewerPage({ params: paramsPromise }: { params: Pro
             </p>
           </div>
           
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed" data-ai-hint="3d model editor annotation placeholder">
-            <div className="flex items-center justify-center mb-4">
-                <BoxIcon className="h-16 w-16 text-muted-foreground" />
-                <MessageSquarePlus className="h-10 w-10 text-muted-foreground opacity-70 relative -ml-6 -mt-6" /> 
-            </div>
-            <p className="text-xl font-semibold text-foreground">3D Model Viewer, Editor & Annotator Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1 text-center">An interactive 3D model canvas for viewing, editing, and collaborative annotation would appear here.</p>
+          <div className="mt-6 p-0 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed overflow-hidden" >
+            <Image 
+              src="https://images.unsplash.com/photo-1633010443869-b80087736112?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" 
+              alt="3D architectural model placeholder" 
+              width={1200} 
+              height={800} 
+              className="w-full h-full object-cover"
+              data-ai-hint="3d model architecture"
+            />
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">

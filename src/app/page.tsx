@@ -241,12 +241,12 @@ export default function LandingPage() {
                 transition={{ duration: 0.5 }}
               >
                  <Image 
-                  src="https://placehold.co/800x450.png" 
-                  alt="OrgCentral in action" 
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                  alt="Team collaboration screen" 
                   width={800} 
                   height={450} 
                   className="w-full max-w-3xl mx-auto h-auto object-cover rounded-lg shadow-xl"
-                  data-ai-hint="team collaboration screen" 
+                  data-ai-hint="team collaboration" 
                 />
             </motion.div>
           </div>
@@ -286,12 +286,12 @@ export default function LandingPage() {
                 transition={{ duration: 0.6 }}
               >
                 <Image 
-                  src="https://placehold.co/600x400.png" 
-                  alt="Platform dashboard" 
-                  width={600} 
-                  height={400} 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                  alt="Platform dashboard interface" 
+                  width={800} 
+                  height={450} 
                   className="w-full h-auto object-cover"
-                  data-ai-hint="dashboard interface" 
+                  data-ai-hint="dashboard charts" 
                 />
               </motion.div>
             </div>
@@ -415,7 +415,16 @@ export default function LandingPage() {
                   </div>
                 </div>
                  <div className="mt-6 h-64 w-full bg-muted rounded-lg overflow-hidden shadow-md" data-ai-hint="map location">
-                    <Image src="https://placehold.co/600x400.png" alt="Map location" width={600} height={400} className="w-full h-full object-cover" />
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3354.437798998414!2d-96.79899698481716!3d32.78197288097123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864e9922a278a29b%3A0x21f083f9b1d877b6!2s123%20Innovation%20Dr%2C%20Dallas%2C%20TX%2075201%2C%20USA!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                      width="100%"
+                      height="100%"
+                      style={{ border:0 }}
+                      allowFullScreen={true}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Office Location - 123 Innovation Drive, Tech City, TX 75001"
+                    ></iframe>
                 </div>
               </motion.div>
               <motion.div
@@ -525,6 +534,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
-
-    
