@@ -2,7 +2,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign, FileQuestion } from "lucide-react"; // Added FileQuestion for RFI
+import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign, FileQuestion, MessageSquare } from "lucide-react"; // Added MessageSquare
 import { TaskList } from "@/components/projects/task-list";
 import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,9 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { analyzeProjectIssues, AnalyzeProjectIssuesInput, AnalyzeProjectIssuesOutput, CriticalIssue } from "@/ai/flows/analyze-project-issues-flow";
@@ -277,11 +280,24 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-           <MenubarTrigger asChild>
-            <Link href={`/projects/${project.id}/rfi`} className="flex items-center">
-                <FileQuestion className="mr-1 h-4 w-4 group-hover:text-accent-foreground" /> RFI
-            </Link>
+          <MenubarTrigger>
+            <MessageSquare className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
+            Communication
           </MenubarTrigger>
+          <MenubarContent>
+            <MenubarSub>
+              <MenubarSubTrigger>
+                <FileQuestion className="mr-2 h-4 w-4" /> RFIs
+              </MenubarSubTrigger>
+              <MenubarSubContent>
+                <MenubarItem asChild>
+                  <Link href={`/projects/${project.id}/rfi`}>View All RFIs</Link>
+                </MenubarItem>
+                {/* Optionally add "Create New RFI" if a direct create page/dialog is desired from here */}
+              </MenubarSubContent>
+            </MenubarSub>
+            {/* Other communication items can go here, e.g., Meeting Minutes, Client Portal */}
+          </MenubarContent>
         </MenubarMenu>
       </Menubar>
 
