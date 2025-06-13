@@ -1,8 +1,14 @@
 
-import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
 import type { ReactNode } from 'react';
 
 export default function RfiLayout({ children }: { children: ReactNode }) {
-  // This layout can be expanded later if RFI pages need a specific sub-layout
-  return <AuthenticatedPageLayout>{children}</AuthenticatedPageLayout>;
+  // This layout no longer uses AuthenticatedPageLayout to remove the main app sidebar
+  // and top navigation for a more focused RFI experience within a project.
+  // We add a <main> tag with padding to replicate the content area styling.
+  return (
+    <main className="flex-1 p-4 sm:p-6 bg-background text-foreground min-h-screen">
+      {children}
+    </main>
+  );
 }
+
