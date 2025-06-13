@@ -10,7 +10,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { FileQuestion, MessageSquare, Target } from "lucide-react"; // Added Target
+import { FileQuestion, MessageSquare, Target, ClipboardList, CloudSun, Activity } from "lucide-react";
 
 interface ProjectMenubarProps {
   projectId: string;
@@ -84,6 +84,29 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
             </Link>
           </MenubarItem>
           {/* Other communication items can go here */}
+        </MenubarContent>
+      </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger>
+            <ClipboardList className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
+            Reports
+        </MenubarTrigger>
+        <MenubarContent>
+            <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/reports/task-reports`}>
+                    <ClipboardList className="mr-2 h-4 w-4" /> Task Reports
+                </Link>
+            </MenubarItem>
+            <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/reports/weather-reports`}>
+                    <CloudSun className="mr-2 h-4 w-4" /> Weather Reports
+                </Link>
+            </MenubarItem>
+            <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/reports/daily-monitoring`}>
+                    <Activity className="mr-2 h-4 w-4" /> Daily Monitoring
+                </Link>
+            </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
     </Menubar>
