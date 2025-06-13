@@ -7,9 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea'; // Added Textarea
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Save } from 'lucide-react';
+import { Save, Briefcase } from 'lucide-react';
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -19,17 +20,17 @@ export default function SettingsPage() {
     emailProjectUpdates: false,
     pushDesktop: true,
   });
-  const [theme, setTheme] = useState('system'); // 'light', 'dark', 'system'
+  const [theme, setTheme] = useState('system'); 
   const [language, setLanguage] = useState('en');
-  const [fontSize, setFontSize] = useState('medium'); // 'small', 'medium', 'large'
+  const [fontSize, setFontSize] = useState('medium'); 
+  const [nonWorkingDays, setNonWorkingDays] = useState(''); // New state for non-working days
 
   const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSaveChanges = () => {
-    // In a real app, you would persist these settings (e.g., to localStorage or a backend)
-    console.log("Settings saved:", { notifications, theme, language, fontSize });
+    console.log("Settings saved:", { notifications, theme, language, fontSize, nonWorkingDays });
     toast({
       title: "Settings Saved",
       description: "Your preferences have been updated.",
@@ -144,6 +145,31 @@ export default function SettingsPage() {
                   <SelectItem value="large">Large</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+                <Briefcase className="mr-2 h-5 w-5 text-primary" />
+                Scheduling Settings
+            </CardTitle>
+            <CardDescription>Configure non-working days for project planning.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="nonWorkingDays">Company Non-Working Days</Label>
+              <Textarea
+                id="nonWorkingDays"
+                value={nonWorkingDays}
+                onChange={(e) => setNonWorkingDays(e.target.value)}
+                placeholder="Enter dates in YYYY-MM-DD format, separated by commas (e.g., 2024-12-25, 2025-01-01)"
+                className="mt-1 min-h-[100px]"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                These dates will be excluded from working day calculations across projects.
+              </p>
             </div>
           </CardContent>
         </Card>

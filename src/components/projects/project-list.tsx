@@ -7,11 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Edit, MoreHorizontal, Trash2, Eye } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, CalendarCheck2 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import type { Project, ProjectStatus } from "./project-form"; // Import Project type
-import { ProjectForm } from "./project-form"; // Import ProjectForm
+import type { Project, ProjectStatus } from "./project-form";
+import { ProjectForm } from "./project-form";
+import { formatDate } from "@/lib/date-utils";
+
 
 interface ProjectListProps {
   projects: Project[];
@@ -22,7 +24,7 @@ interface ProjectListProps {
 export function ProjectList({ projects, onUpdateProject, onDeleteProject }: ProjectListProps) {
   const { toast } = useToast();
 
-  const getStatusVariant = (status: ProjectStatus): "default" | "secondary" | "destructive" | "outline" => {
+  const getStatusVariant = (status?: ProjectStatus): "default" | "secondary" | "destructive" | "outline" => {
     switch (status?.toLowerCase()) {
       case "in progress": return "default";
       case "completed": return "secondary"; 
@@ -52,6 +54,7 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
           <div className="text-center py-10">
             <p className="text-muted-foreground">No projects found.</p>
             <p className="text-sm text-muted-foreground">Get started by creating a new project.</p>
+            {/* The "Create Project" button is in the PageTitle actions on projects/page.tsx */}
           </div>
         </CardContent>
       </Card>
@@ -70,8 +73,17 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead className="hidden md:table-cell">Team Size</TableHead>
+              <TableHead className="hidden md:table-cell">
+                <div className="flex items-center gap-1">
+                   <CalendarCheck2 className="h-4 w-4" /> Start Date
+                </div>
+              </TableHead>
+              <TableHead>
+                 <div className="flex items-center gap-1">
+                   <CalendarCheck2 className="h-4 w-4" /> Due Date
+                </div>
+              </TableHead>
+              <TableHead className="hidden lg:table-cell">Team Size</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -88,8 +100,9 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
                 <TableCell>
                   <Badge variant={getStatusVariant(project.status)}>{project.status}</Badge>
                 </TableCell>
-                <TableCell>{project.dueDate || 'N/A'}</TableCell>
-                <TableCell className="hidden md:table-cell">{project.teamSize || 'N/A'}</TableCell>
+                <TableCell className="hidden md:table-cell">{formatDate(project.startDate, 'yyyy-MM-dd')}</TableCell>
+                <TableCell>{formatDate(project.dueDate, 'yyyy-MM-dd')}</TableCell>
+                <TableCell className="hidden lg:table-cell">{project.teamSize || 'N/A'}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -110,7 +123,7 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
                         onSave={onUpdateProject}
                         triggerButton={
                            <DropdownMenuItem 
-                            onSelect={(e) => e.preventDefault()} // Important: Prevents DropdownMenu from closing Dialog
+                            onSelect={(e) => e.preventDefault()} 
                             className="flex items-center w-full"
                           >
                             <Edit className="mr-2 h-4 w-4" />Edit
@@ -120,7 +133,7 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                            <DropdownMenuItem 
-                              onSelect={(e) => e.preventDefault()} // Prevent auto-closing dropdown
+                              onSelect={(e) => e.preventDefault()} 
                               className="text-destructive focus:text-destructive focus:bg-destructive/10 w-full flex items-center"
                             >
                              <Trash2 className="mr-2 h-4 w-4" />Delete
