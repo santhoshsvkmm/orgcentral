@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Project, ProjectStatus } from "./project-form";
 import { ProjectForm } from "./project-form";
 import { formatDate } from "@/lib/date-utils";
-
+import { useState } from "react";
 
 interface ProjectListProps {
   projects: Project[];
@@ -21,8 +21,24 @@ interface ProjectListProps {
   onDeleteProject: (projectId: string) => void;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function ProjectList({ projects, onUpdateProject, onDeleteProject }: ProjectListProps) {
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentProjects = projects.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
 
   const getStatusVariant = (status?: ProjectStatus): "default" | "secondary" | "destructive" | "outline" => {
     switch (status?.toLowerCase()) {
@@ -41,6 +57,14 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
       title: "Project Deleted",
       description: `Project "${project.name}" has been deleted.`,
     });
+     // Reset to page 1 if current page becomes empty after deletion
+    if (currentProjects.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+    } else if (projects.slice((currentPage - 1) * ITEMS_PER_PAGE, (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE).length === 0 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+    } else if (projects.length / ITEMS_PER_PAGE < currentPage ) {
+        setCurrentPage(Math.max(1, Math.ceil(projects.length / ITEMS_PER_PAGE) -1) || 1)
+    }
   }
 
   if (!projects || projects.length === 0) {
@@ -54,7 +78,6 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
           <div className="text-center py-10">
             <p className="text-muted-foreground">No projects found.</p>
             <p className="text-sm text-muted-foreground">Get started by creating a new project.</p>
-            {/* The "Create Project" button is in the PageTitle actions on projects/page.tsx */}
           </div>
         </CardContent>
       </Card>
@@ -90,7 +113,7 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
             </TableRow>
           </TableHeader>
           <TableBody>
-            {projects.map((project) => (
+            {currentProjects.map((project) => (
               <TableRow key={project.id}>
                 <TableCell className="font-medium">
                   <Link href={`/projects/${project.id}`} className="hover:underline">
@@ -161,6 +184,29 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
             ))}
           </TableBody>
         </Table>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-end space-x-2 py-4 mt-4 border-t pt-4">
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

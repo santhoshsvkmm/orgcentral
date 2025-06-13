@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -5,25 +6,64 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { suggestUserRole } from "@/ai/flows/suggest-user-role"; // Assuming this path is correct
-import { useState, type FormEvent } from "react";
+import { suggestUserRole } from "@/ai/flows/suggest-user-role";
+import { useState, type FormEvent, useEffect } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
+// Define a more specific User type, assuming UserList also uses this or a compatible one
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+  jobDescription?: string;
+  // Add other fields that might be part of userData
+}
+
 interface UserFormProps {
   triggerButton: React.ReactNode;
   mode: 'create' | 'edit';
-  userData?: any; // Define a proper user type later
+  userData?: User; // Use the User type
+  onSave: (user: User | (Omit<User, 'id' | 'avatar'> & { avatar?: string })) => void; // For create, id and avatar are generated
 }
 
-export function UserForm({ triggerButton, mode, userData }: UserFormProps) {
+const predefinedRoles = ["Admin", "Project Manager", "Member", "Editor", "Viewer", "Contributor", "HR Manager", "Project Lead", "Support Staff", "Analyst"];
+
+export function UserForm({ triggerButton, mode, userData, onSave }: UserFormProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [jobDescription, setJobDescription] = useState(userData?.jobDescription || '');
-  const [suggestedRoles, setSuggestedRoles] = useState<string[]>(userData?.suggestedRoles || []);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [selectedRole, setSelectedRole] = useState(userData?.role || '');
   const { toast } = useToast();
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+  const [aiSuggestedRoles, setAiSuggestedRoles] = useState<string[]>([]);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  const allAvailableRoles = Array.from(new Set([...predefinedRoles, ...aiSuggestedRoles]));
+
+
+  useEffect(() => {
+    if (isOpen) {
+        if (mode === 'edit' && userData) {
+            setName(userData.name);
+            setEmail(userData.email);
+            setSelectedRole(userData.role);
+            setJobDescription(userData.jobDescription || '');
+            setAiSuggestedRoles([]); // Clear AI suggestions on open, user can re-trigger
+        } else { // Create mode or no userData
+            setName('');
+            setEmail('');
+            setSelectedRole('');
+            setJobDescription('');
+            setAiSuggestedRoles([]);
+        }
+    }
+  }, [isOpen, mode, userData]);
+
 
   const handleSuggestRoles = async () => {
     if (!jobDescription) {
@@ -31,14 +71,17 @@ export function UserForm({ triggerButton, mode, userData }: UserFormProps) {
       return;
     }
     setIsLoadingSuggestions(true);
-    setSuggestedRoles([]); // Clear previous suggestions
+    setAiSuggestedRoles([]); 
     try {
       const result = await suggestUserRole({ jobDescription });
-      setSuggestedRoles(result.suggestedRoles);
-      if (result.suggestedRoles.length === 0) {
+      setAiSuggestedRoles(result.suggestedRoles || []);
+      if (!result.suggestedRoles || result.suggestedRoles.length === 0) {
         toast({ title: "No Suggestions", description: "AI could not suggest roles for this description." });
       } else {
          toast({ title: "Roles Suggested!", description: "AI has provided role suggestions." });
+         if (!selectedRole && result.suggestedRoles.length > 0) {
+           setSelectedRole(result.suggestedRoles[0]); // Auto-select the first suggestion if no role is selected
+         }
       }
     } catch (error)
     {
@@ -51,14 +94,23 @@ export function UserForm({ triggerButton, mode, userData }: UserFormProps) {
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    // Handle form submission logic here
-    const formData = new FormData(event.target as HTMLFormElement);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    // Use selectedRole state
-    console.log({ name, email, role: selectedRole, jobDescription });
+    if (!name.trim() || !email.trim() || !selectedRole) {
+        toast({ title: "Missing Fields", description: "Please fill in Name, Email, and select a Role.", variant: "destructive"});
+        return;
+    }
+
+    const userPayload = {
+        name: name.trim(),
+        email: email.trim(),
+        role: selectedRole,
+        jobDescription: jobDescription.trim(),
+        ...(mode === 'edit' && userData ? { id: userData.id, avatar: userData.avatar } : {}) // Include id and avatar for edit
+    };
+
+    onSave(userPayload as User | (Omit<User, 'id' | 'avatar'> & { avatar?: string }) );
+    
     toast({ title: mode === 'create' ? "User Created" : "User Updated", description: `User ${name} has been ${mode === 'create' ? 'added' : 'updated'}.` });
-    setIsOpen(false); // Close dialog on submit
+    setIsOpen(false); 
   };
 
   return (
@@ -72,14 +124,14 @@ export function UserForm({ triggerButton, mode, userData }: UserFormProps) {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">Name</Label>
-              <Input id="name" name="name" defaultValue={userData?.name || ""} className="col-span-3" required />
+              <Input id="name" name="name" value={name} onChange={e => setName(e.target.value)} className="col-span-3" required />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">Email</Label>
-              <Input id="email" name="email" type="email" defaultValue={userData?.email || ""} className="col-span-3" required />
+              <Input id="email" name="email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="col-span-3" required />
             </div>
             
             <div className="grid grid-cols-4 items-start gap-4">
@@ -94,7 +146,7 @@ export function UserForm({ triggerButton, mode, userData }: UserFormProps) {
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-                <div/> {/* Empty cell for alignment */}
+                <div/> 
                 <Button type="button" onClick={handleSuggestRoles} disabled={isLoadingSuggestions} variant="outline" className="col-span-3">
                   {isLoadingSuggestions ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4 text-accent" />}
                   Suggest Roles with AI
@@ -103,25 +155,21 @@ export function UserForm({ triggerButton, mode, userData }: UserFormProps) {
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">Role</Label>
-              <Select name="role" value={selectedRole} onValueChange={setSelectedRole}>
+              <Select name="role" value={selectedRole} onValueChange={setSelectedRole} required>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* Predefined roles + AI suggested roles */}
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="member">Member</SelectItem>
-                  {suggestedRoles.map(role => (
-                    <SelectItem key={role} value={role.toLowerCase().replace(/\s+/g, '-')}>
-                      {role} (AI)
+                  {allAvailableRoles.map(role => (
+                    <SelectItem key={role} value={role}>
+                      {role}{aiSuggestedRoles.includes(role) && !predefinedRoles.includes(role) ? ' (AI)' : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4 pt-4 border-t">
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>

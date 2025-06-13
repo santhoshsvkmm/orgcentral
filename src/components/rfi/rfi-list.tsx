@@ -13,17 +13,34 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/date-utils";
 import { RfiForm } from './rfi-form';
+import { useState } from 'react';
 
 interface RfiListProps {
   rfis: RFI[];
   projectId: string;
   onUpdateRfi: (updatedRfi: RFI) => void;
   onDeleteRfi: (rfiId: string) => void;
-  onCreateRfi: (newRfi: RFI) => void; // Added for the "Create RFI" button
+  onCreateRfi: (newRfi: RFI) => void; 
 }
+
+const ITEMS_PER_PAGE = 10;
 
 export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi, onCreateRfi }: RfiListProps) {
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(rfis.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentRfis = rfis.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
 
   const getStatusVariant = (status: RfiStatus): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
@@ -52,6 +69,14 @@ export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi, onCreateRfi
       title: "RFI Deleted",
       description: `RFI "${rfi.rfiNumber}: ${rfi.title}" has been deleted.`,
     });
+     // Reset to page 1 if current page becomes empty after deletion
+    if (currentRfis.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+    } else if (rfis.slice((currentPage - 1) * ITEMS_PER_PAGE, (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE).length === 0 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+    } else if (rfis.length / ITEMS_PER_PAGE < currentPage ) {
+        setCurrentPage(Math.max(1, Math.ceil(rfis.length / ITEMS_PER_PAGE) -1) || 1)
+    }
   };
 
   return (
@@ -79,101 +104,126 @@ export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi, onCreateRfi
             <p className="text-sm text-muted-foreground">Try adjusting your filters or create a new RFI.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>RFI No.</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                      <div className="flex items-center gap-1"><User className="h-4 w-4"/>Raised By</div>
-                  </TableHead>
-                  <TableHead className="hidden md:table-cell">
-                      <div className="flex items-center gap-1"><CalendarDays className="h-4 w-4"/>Created</div>
-                  </TableHead>
-                  <TableHead className="hidden lg:table-cell">
-                      <div className="flex items-center gap-1"><CalendarDays className="h-4 w-4"/>Due Date</div>
-                  </TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rfis.map((rfi) => (
-                  <TableRow key={rfi.id}>
-                    <TableCell className="font-medium">{rfi.rfiNumber}</TableCell>
-                    <TableCell>
-                      <Link href={`/projects/${projectId}/communication/rfi/${rfi.id}`} className="hover:underline">
-                        {rfi.title}
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(rfi.status)} className={`${getStatusColorClass(rfi.status)} text-white`}>{rfi.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={rfi.priority === 'High' ? 'destructive' : rfi.priority === 'Medium' ? 'default' : 'outline'}>
-                        {rfi.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{rfi.raisedByUserName}</TableCell>
-                    <TableCell className="hidden md:table-cell">{formatDate(rfi.createdAt, 'yyyy-MM-dd')}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{formatDate(rfi.dueDate, 'yyyy-MM-dd')}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/projects/${projectId}/communication/rfi/${rfi.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
-                          </DropdownMenuItem>
-                          <RfiForm
-                            mode="edit"
-                            projectId={projectId}
-                            rfiData={rfi}
-                            onSave={onUpdateRfi}
-                            triggerButton={
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="flex items-center w-full">
-                                <Edit className="mr-2 h-4 w-4" />Edit
-                              </DropdownMenuItem>
-                            }
-                          />
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive focus:bg-destructive/10 w-full flex items-center">
-                                <Trash2 className="mr-2 h-4 w-4" />Delete
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete RFI "{rfi.rfiNumber}: {rfi.title}".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(rfi)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+          <>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>RFI No.</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                        <div className="flex items-center gap-1"><User className="h-4 w-4"/>Raised By</div>
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                        <div className="flex items-center gap-1"><CalendarDays className="h-4 w-4"/>Created</div>
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                        <div className="flex items-center gap-1"><CalendarDays className="h-4 w-4"/>Due Date</div>
+                    </TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {currentRfis.map((rfi) => (
+                    <TableRow key={rfi.id}>
+                      <TableCell className="font-medium">{rfi.rfiNumber}</TableCell>
+                      <TableCell>
+                        <Link href={`/projects/${projectId}/communication/rfi/${rfi.id}`} className="hover:underline">
+                          {rfi.title}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(rfi.status)} className={`${getStatusColorClass(rfi.status)} text-white`}>{rfi.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={rfi.priority === 'High' ? 'destructive' : rfi.priority === 'Medium' ? 'default' : 'outline'}>
+                          {rfi.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{rfi.raisedByUserName}</TableCell>
+                      <TableCell className="hidden md:table-cell">{formatDate(rfi.createdAt, 'yyyy-MM-dd')}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{formatDate(rfi.dueDate, 'yyyy-MM-dd')}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/projects/${projectId}/communication/rfi/${rfi.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
+                            </DropdownMenuItem>
+                            <RfiForm
+                              mode="edit"
+                              projectId={projectId}
+                              rfiData={rfi}
+                              onSave={onUpdateRfi}
+                              triggerButton={
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="flex items-center w-full">
+                                  <Edit className="mr-2 h-4 w-4" />Edit
+                                </DropdownMenuItem>
+                              }
+                            />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive focus:bg-destructive/10 w-full flex items-center">
+                                  <Trash2 className="mr-2 h-4 w-4" />Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete RFI "{rfi.rfiNumber}: {rfi.title}".
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(rfi)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-end space-x-2 py-4 mt-4 border-t pt-4">
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
