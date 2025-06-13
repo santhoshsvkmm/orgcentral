@@ -44,7 +44,8 @@ import {
   FileSearch, 
   FilePlus2,
   SquareKanban,
-  LayoutGrid
+  LayoutGrid,
+  DollarSign // Added for Financial Overview potentially
 } from "lucide-react";
 
 interface ProjectMenubarProps {
@@ -53,7 +54,7 @@ interface ProjectMenubarProps {
 
 export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
   return (
-    <Menubar className="mb-6 rounded-md border bg-card shadow-sm">
+    <Menubar className="mb-6 rounded-md border bg-card shadow-sm flex-wrap justify-start">
       <MenubarMenu>
         <MenubarTrigger asChild className="cursor-pointer">
           <Link href={`/projects/${projectId}`}>
@@ -243,7 +244,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <MessageSquare className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
+          <MessageSquare className="mr-1 h-4 w-4" />
           Communication
         </MenubarTrigger>
         <MenubarContent>
@@ -256,7 +257,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-            <ClipboardList className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
+            <ClipboardList className="mr-1 h-4 w-4" />
             Reports
         </MenubarTrigger>
         <MenubarContent>
@@ -280,4 +281,3 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
     </Menubar>
   );
 }
-
