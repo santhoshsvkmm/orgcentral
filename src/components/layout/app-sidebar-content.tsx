@@ -3,17 +3,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Users, HardHat, Handshake } from 'lucide-react'; // Added Handshake, updated Users
+import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder } from 'lucide-react'; // Added Folder
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/projects', label: 'Projects', icon: Briefcase },
-  { href: '/users', label: 'User Management', icon: Users }, // Users icon is fine for general user management
+  { href: '/users', label: 'User Management', icon: Users },
   { href: '/subcontractors', label: 'Subcontractors', icon: HardHat },
-  { href: '/consultants', label: 'Consultants', icon: Users }, // Users icon can also represent consultants/experts
+  { href: '/consultants', label: 'Consultants', icon: Users },
   { href: '/clients', label: 'Clients', icon: Handshake },
+  { href: '/drive', label: 'File Storage', icon: Folder }, // New Item
 ];
 
 export function AppSidebarContent() {
