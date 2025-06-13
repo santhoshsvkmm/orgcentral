@@ -1,8 +1,9 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Users } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, HardHat } from 'lucide-react'; // Added HardHat
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +11,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/projects', label: 'Projects', icon: Briefcase },
   { href: '/users', label: 'User Management', icon: Users },
+  { href: '/subcontractors', label: 'Subcontractors', icon: HardHat }, // New Item
 ];
 
 export function AppSidebarContent() {
