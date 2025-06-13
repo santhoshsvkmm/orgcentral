@@ -15,15 +15,25 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search } from 'lucide-react';
+import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search as SearchIcon } from 'lucide-react'; // Added SearchIcon
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { useState } from 'react'; // Added useState for search input
 
 export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
+  const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+
+  const handleGlobalSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Placeholder: In a real app, this would trigger a global search
+    console.log("Global search submitted for:", globalSearchTerm);
+    alert(`Global search for "${globalSearchTerm}" would be initiated here, searching across projects, tasks, users, etc.`);
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <Sidebar 
@@ -40,7 +50,7 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
         </SidebarContent>
         <SidebarFooter className="border-t p-2">
            <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link href="/dashboard/settings"> {/* Placeholder link */}
+              <Link href="/dashboard/settings"> 
                 <Settings className="mr-2 h-4 w-4" />
                 <span className="group-data-[state=collapsed]:hidden">Settings</span>
               </Link>
@@ -48,13 +58,27 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6 md:justify-end">
-          <div className="md:hidden"> {/* This trigger is for mobile */}
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
+          <div className="md:hidden"> 
             <SidebarTrigger />
           </div>
-          <div className="hidden font-semibold md:block md:flex-1">
-            {/* Breadcrumbs or dynamic page title could go here */}
+          
+          {/* Global Search Bar Area - More prominent now */}
+          <div className="flex-1 flex justify-center px-4">
+            <form onSubmit={handleGlobalSearchSubmit} className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search tasks, projects, people..."
+                  className="w-full pl-10 h-9 bg-muted/40 hover:bg-muted/70 focus:bg-background"
+                  value={globalSearchTerm}
+                  onChange={(e) => setGlobalSearchTerm(e.target.value)}
+                />
+              </div>
+            </form>
           </div>
+
           <div className="flex items-center gap-2">
             <Sheet>
               <SheetTrigger asChild>
@@ -76,12 +100,11 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
                 </SheetHeader>
                 <div className="p-4">
                   <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search contacts..." className="pl-8" />
                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {/* Placeholder for user list */}
                   {[
                     { name: "Alice W.", status: "Online", avatar: "AW", dataAiHint:"user avatar" },
                     { name: "Bob B.", status: "Offline", avatar: "BB", dataAiHint:"user avatar" },
@@ -100,7 +123,6 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
                   ))}
                 </div>
                 <Separator />
-                {/* Placeholder for chat window / call actions */}
                 <div className="p-4 space-y-3 flex-grow-0">
                     <div className="text-center text-sm text-muted-foreground p-4 border border-dashed rounded-md min-h-[150px] flex flex-col justify-center items-center">
                         <MessageSquare className="h-10 w-10 text-muted-foreground mb-2" />
