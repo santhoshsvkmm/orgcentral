@@ -27,6 +27,7 @@ import {
   Users, // For Team Members
   Construction, // For Equipment
   Laptop, // For Software
+  Warehouse, // For Warehouse Management
   Landmark, // For Financial
   PiggyBank, // For Budget
   Receipt, // For Expenses
@@ -97,6 +98,12 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <MenubarItem onClick={() => console.log('Software Licenses for project', projectId)}>
             <Laptop className="mr-2 h-4 w-4" /> Software
           </MenubarItem>
+           <MenubarSeparator />
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/resources/warehouses`}>
+              <Warehouse className="mr-2 h-4 w-4" /> Warehouse Mgmt
+            </Link>
+          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
@@ -152,7 +159,6 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
               <FileQuestion className="mr-2 h-4 w-4" /> RFIs
             </Link>
           </MenubarItem>
-          {/* Other communication items can go here */}
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
