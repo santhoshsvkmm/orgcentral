@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, BarChartBig, Users, Briefcase, Brain, ShieldCheck, Layers, Wand2, Mail, Phone, MapPin, Twitter, Facebook, Linkedin } from 'lucide-react';
+import { CheckCircle, Users, Briefcase, Brain, ShieldCheck, Layers, Wand2, Mail, Phone, MapPin, Twitter, Facebook, Linkedin, Handshake, FolderOpen } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -15,28 +15,28 @@ import { motion } from 'framer-motion';
 
 const features = [
   {
-    icon: <BarChartBig className="h-10 w-10 text-primary" />,
-    title: 'Insightful Dashboard',
-    description: 'Get a clear overview of organizational metrics and project progress at a glance.',
-    dataAiHint: 'dashboard analytics'
-  },
-  {
     icon: <Briefcase className="h-10 w-10 text-primary" />,
-    title: 'Project Management',
-    description: 'Efficiently manage projects and tasks with intuitive CRUD operations.',
-    dataAiHint: 'project collaboration'
+    title: 'Comprehensive Project Hub',
+    description: 'Oversee projects from inception to completion with tools for planning, task management, document control (2D/3D models), resources, and financials.',
+    dataAiHint: 'project planning tasks documents'
   },
   {
     icon: <Users className="h-10 w-10 text-primary" />,
-    title: 'User Administration',
-    description: 'Easily manage users, roles, and permissions within your organization.',
-    dataAiHint: 'team management'
+    title: 'Granular User & Role Control',
+    description: 'Manage users and define precise roles with detailed, module-specific permissions for robust access management across the application.',
+    dataAiHint: 'user roles permissions access'
   },
   {
     icon: <Brain className="h-10 w-10 text-primary" />,
-    title: 'AI Role Suggestion',
-    description: 'Leverage AI to get smart role suggestions based on job descriptions.',
-    dataAiHint: 'artificial intelligence'
+    title: 'AI-Powered Assistance',
+    description: 'Enhance decision-making with AI-driven role suggestions, project issue analysis, and other intelligent features to boost productivity.',
+    dataAiHint: 'artificial intelligence insights'
+  },
+  {
+    icon: <Handshake className="h-10 w-10 text-primary" />,
+    title: 'Stakeholder Collaboration',
+    description: 'Streamline interactions with clients, consultants, and subcontractors through dedicated portals, project mappings, and invitation features.',
+    dataAiHint: 'client consultant subcontractor'
   },
 ];
 
@@ -44,20 +44,20 @@ const whyChooseUsItems = [
   {
     icon: <Layers className="h-10 w-10 text-primary" />,
     title: 'Unified Platform',
-    description: 'Bring all your organizational tools and data into one seamless experience.',
-    dataAiHint: 'integrated system'
+    description: 'Bring all your organizational tools and data—from projects and HR to financials and CRM—into one seamless experience.',
+    dataAiHint: 'integrated system platform'
   },
   {
     icon: <Wand2 className="h-10 w-10 text-primary" />,
-    title: 'Intelligent Automation',
-    description: 'Leverage AI to automate routine tasks and gain deeper insights.',
-    dataAiHint: 'smart technology'
+    title: 'AI-Driven Efficiency',
+    description: 'Leverage built-in AI for smart suggestions, risk analysis, and to streamline complex decision-making processes.',
+    dataAiHint: 'ai automation efficiency'
   },
   {
     icon: <ShieldCheck className="h-10 w-10 text-primary" />,
-    title: 'Scalable & Secure',
-    description: 'Built to grow with your organization, ensuring data safety and reliability.',
-    dataAiHint: 'secure platform'
+    title: 'Customizable & Secure Access',
+    description: 'Tailor application access with granular role-based permissions, built on a platform designed for security and scalability.',
+    dataAiHint: 'secure customizable access'
   }
 ];
 
@@ -525,3 +525,6 @@ export default function LandingPage() {
     </div>
   );
 }
+
+
+    
