@@ -1,18 +1,14 @@
 
 'use client';
-import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea'; // Added Textarea
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Briefcase } from 'lucide-react';
+import { Save, Bell } from 'lucide-react';
 
-export default function SettingsPage() {
+export default function NotificationSettingsPage() {
   const { toast } = useToast();
 
   const [notifications, setNotifications] = useState({
@@ -20,167 +16,83 @@ export default function SettingsPage() {
     emailProjectUpdates: false,
     pushDesktop: true,
   });
-  const [theme, setTheme] = useState('system'); 
-  const [language, setLanguage] = useState('en');
-  const [fontSize, setFontSize] = useState('medium'); 
-  const [nonWorkingDays, setNonWorkingDays] = useState(''); // New state for non-working days
 
   const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSaveChanges = () => {
-    console.log("Settings saved:", { notifications, theme, language, fontSize, nonWorkingDays });
+    // In a real app, persist these settings
+    console.log("Notification Settings saved:", { notifications });
     toast({
-      title: "Settings Saved",
-      description: "Your preferences have been updated.",
+      title: "Notification Settings Saved",
+      description: "Your notification preferences have been updated.",
     });
   };
 
   return (
     <>
-      <PageTitle
-        title="Application Settings"
-        description="Customize your application experience and preferences."
-      />
-      <div className="space-y-8 max-w-3xl mx-auto">
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>Manage how you receive notifications from the application.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <Label htmlFor="emailNewTasks" className="flex flex-col space-y-1 cursor-pointer flex-grow">
-                <span>Email for new tasks</span>
-                <span className="font-normal leading-snug text-muted-foreground text-sm">
-                  Receive an email when you are assigned a new task or mentioned.
-                </span>
-              </Label>
-              <Switch
-                id="emailNewTasks"
-                checked={notifications.emailNewTasks}
-                onCheckedChange={() => handleNotificationChange('emailNewTasks')}
-                aria-labelledby="emailNewTasksLabel"
-              />
-            </div>
-            
-            <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <Label htmlFor="emailProjectUpdates" className="flex flex-col space-y-1 cursor-pointer flex-grow">
-                <span>Email for project updates</span>
-                <span className="font-normal leading-snug text-muted-foreground text-sm">
-                  Get email summaries of key project activities and milestones.
-                </span>
-              </Label>
-              <Switch
-                id="emailProjectUpdates"
-                checked={notifications.emailProjectUpdates}
-                onCheckedChange={() => handleNotificationChange('emailProjectUpdates')}
-                aria-labelledby="emailProjectUpdatesLabel"
-              />
-            </div>
-            
-            <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <Label htmlFor="pushDesktop" className="flex flex-col space-y-1 cursor-pointer flex-grow">
-                <span>Desktop push notifications</span>
-                <span className="font-normal leading-snug text-muted-foreground text-sm">
-                  Receive real-time push notifications on your desktop (if supported).
-                </span>
-              </Label>
-              <Switch
-                id="pushDesktop"
-                checked={notifications.pushDesktop}
-                onCheckedChange={() => handleNotificationChange('pushDesktop')}
-                aria-labelledby="pushDesktopLabel"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>Appearance & Accessibility</CardTitle>
-            <CardDescription>Customize the look, feel, and accessibility of the application.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <Label htmlFor="themePreference" className="md:col-span-1 font-medium">Theme</Label>
-              <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger id="themePreference" className="md:col-span-2">
-                  <SelectValue placeholder="Select theme" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Light Mode</SelectItem>
-                  <SelectItem value="dark">Dark Mode</SelectItem>
-                  <SelectItem value="system">System Default</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-             <Separator />
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <Label htmlFor="languagePreference" className="md:col-span-1 font-medium">Language</Label>
-               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger id="languagePreference" className="md:col-span-2">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English (US)</SelectItem>
-                  <SelectItem value="en-gb">English (UK)</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Separator />
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <Label htmlFor="fontSizePreference" className="md:col-span-1 font-medium">Font Size</Label>
-               <Select value={fontSize} onValueChange={setFontSize}>
-                <SelectTrigger id="fontSizePreference" className="md:col-span-2">
-                  <SelectValue placeholder="Select font size" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="small">Small</SelectItem>
-                  <SelectItem value="medium">Medium (Default)</SelectItem>
-                  <SelectItem value="large">Large</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-                <Briefcase className="mr-2 h-5 w-5 text-primary" />
-                Scheduling Settings
-            </CardTitle>
-            <CardDescription>Configure non-working days for project planning.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="nonWorkingDays">Company Non-Working Days</Label>
-              <Textarea
-                id="nonWorkingDays"
-                value={nonWorkingDays}
-                onChange={(e) => setNonWorkingDays(e.target.value)}
-                placeholder="Enter dates in YYYY-MM-DD format, separated by commas (e.g., 2024-12-25, 2025-01-01)"
-                className="mt-1 min-h-[100px]"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                These dates will be excluded from working day calculations across projects.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="flex justify-end pt-4">
-          <Button onClick={handleSaveChanges} className="bg-primary hover:bg-primary/90 min-w-[150px]">
-            <Save className="mr-2 h-4 w-4" />
-            Save All Settings
-          </Button>
-        </div>
-      </div>
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Bell className="mr-2 h-5 w-5 text-primary" />
+            Notification Preferences
+          </CardTitle>
+          <CardDescription>Manage how you receive notifications from the application.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+            <Label htmlFor="emailNewTasks" className="flex flex-col space-y-1 cursor-pointer flex-grow">
+              <span>Email for new tasks</span>
+              <span className="font-normal leading-snug text-muted-foreground text-sm">
+                Receive an email when you are assigned a new task or mentioned.
+              </span>
+            </Label>
+            <Switch
+              id="emailNewTasks"
+              checked={notifications.emailNewTasks}
+              onCheckedChange={() => handleNotificationChange('emailNewTasks')}
+              aria-labelledby="emailNewTasksLabel"
+            />
+          </div>
+          
+          <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+            <Label htmlFor="emailProjectUpdates" className="flex flex-col space-y-1 cursor-pointer flex-grow">
+              <span>Email for project updates</span>
+              <span className="font-normal leading-snug text-muted-foreground text-sm">
+                Get email summaries of key project activities and milestones.
+              </span>
+            </Label>
+            <Switch
+              id="emailProjectUpdates"
+              checked={notifications.emailProjectUpdates}
+              onCheckedChange={() => handleNotificationChange('emailProjectUpdates')}
+              aria-labelledby="emailProjectUpdatesLabel"
+            />
+          </div>
+          
+          <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+            <Label htmlFor="pushDesktop" className="flex flex-col space-y-1 cursor-pointer flex-grow">
+              <span>Desktop push notifications</span>
+              <span className="font-normal leading-snug text-muted-foreground text-sm">
+                Receive real-time push notifications on your desktop (if supported).
+              </span>
+            </Label>
+            <Switch
+              id="pushDesktop"
+              checked={notifications.pushDesktop}
+              onCheckedChange={() => handleNotificationChange('pushDesktop')}
+              aria-labelledby="pushDesktopLabel"
+            />
+          </div>
+           <div className="flex justify-end pt-4">
+            <Button onClick={handleSaveChanges} className="bg-primary hover:bg-primary/90 min-w-[150px]">
+              <Save className="mr-2 h-4 w-4" />
+              Save Notifications
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
