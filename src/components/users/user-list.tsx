@@ -84,6 +84,7 @@ export function UserList() {
       accessorKey: "email",
       header: "Email",
       enableSorting: true,
+      cell: ({ row }) => <>{row.email}</>,
     },
     {
       accessorKey: "role",
@@ -170,7 +171,7 @@ export function UserList() {
         <DataTable
           columns={columns}
           data={users}
-          itemsPerPage={10} // Default is 10, can be adjusted
+          itemsPerPage={10} 
           searchableColumns={searchableUserColumns}
           globalFilterPlaceholder="Search users (name, email, role)..."
           noResultsMessage="No users match your search."
