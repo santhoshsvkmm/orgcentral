@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Briefcase, CheckSquare, DollarSign, Users, ListChecks, Activity, Orbit, AlertCircle, CalendarClock, ShieldAlert } from "lucide-react";
+import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon } from "lucide-react";
 import { PageTitle } from "@/components/page-title";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,13 +26,10 @@ import {
 
 
 const metrics = [
-  { title: "Total Projects", value: "12", icon: <Briefcase className="h-5 w-5 text-muted-foreground" />, dataAiHint: "projects chart" },
-  { title: "Active Tasks", value: "78", icon: <CheckSquare className="h-5 w-5 text-muted-foreground" />, dataAiHint: "tasks progress" },
-  { title: "Completed Tasks", value: "153", icon: <ListChecks className="h-5 w-5 text-muted-foreground" />, dataAiHint: "completed items" },
-  { title: "In Progress Tasks", value: "45", icon: <Orbit className="h-5 w-5 text-muted-foreground" />, dataAiHint: "task progress" },
-  { title: "Delayed Tasks", value: "8", icon: <AlertCircle className="h-5 w-5 text-muted-foreground" />, dataAiHint: "overdue tasks" },
-  { title: "Upcoming Tasks", value: "22", icon: <CalendarClock className="h-5 w-5 text-muted-foreground" />, dataAiHint: "task schedule" },
-  { title: "Critical Tasks", value: "3", icon: <ShieldAlert className="h-5 w-5 text-muted-foreground" />, dataAiHint: "priority tasks" },
+  { title: "Total Projects", value: "12", icon: <Briefcase className="h-5 w-5 text-muted-foreground" />, dataAiHint: "projects overview" },
+  { title: "Projects Running Smoothly", value: "7", icon: <TrendingUp className="h-5 w-5 text-green-500" />, dataAiHint: "successful projects" },
+  { title: "Projects with Warnings", value: "3", icon: <AlertTriangle className="h-5 w-5 text-yellow-500" />, dataAiHint: "projects risk" },
+  { title: "Projects in Critical State", value: "2", icon: <XOctagon className="h-5 w-5 text-red-500" />, dataAiHint: "danger projects" },
   { title: "Team Members", value: "23", icon: <Users className="h-5 w-5 text-muted-foreground" />, dataAiHint: "team collaboration" },
   { title: "Budget Overview", value: "$1.2M", icon: <DollarSign className="h-5 w-5 text-muted-foreground" />, dataAiHint: "finance graph" },
 ];
@@ -87,7 +84,7 @@ export default function DashboardPage() {
   return (
     <>
       <PageTitle title="Dashboard" description="Overview of your organization's key metrics and activities." />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"> {/* Adjusted xl:grid-cols-3 for 9 items */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {metrics.map((metric) => (
           <Card key={metric.title} className="shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -104,8 +101,8 @@ export default function DashboardPage() {
         <Card className="shadow-sm hover:shadow-md transition-shadow md:col-span-2">
           <CardHeader className="flex flex-row items-start justify-between gap-2">
             <div>
-              <CardTitle>Project Progress Overview</CardTitle>
-              <CardDescription>Visual summary of planned vs. actual progress.</CardDescription>
+              <CardTitle>Overall Project Progress</CardTitle>
+              <CardDescription>Visual summary of planned vs. actual progress across all projects.</CardDescription>
             </div>
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-[180px]">
@@ -212,12 +209,12 @@ export default function DashboardPage() {
         </Card>
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle>Task Summary</CardTitle>
+            <CardTitle>Budget Allocation</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">Placeholder for task summary or chart.</p>
-            <div className="mt-4 h-48 w-full bg-muted rounded-md flex items-center justify-center" data-ai-hint="tasks completion donut">
-              <span className="text-sm text-muted-foreground">Task Completion Chart</span>
+            <p className="text-muted-foreground">Placeholder for budget allocation chart.</p>
+            <div className="mt-4 h-48 w-full bg-muted rounded-md flex items-center justify-center" data-ai-hint="budget distribution pie">
+              <span className="text-sm text-muted-foreground">Budget Allocation Chart</span>
             </div>
           </CardContent>
         </Card>
@@ -225,4 +222,3 @@ export default function DashboardPage() {
     </>
   );
 }
-
