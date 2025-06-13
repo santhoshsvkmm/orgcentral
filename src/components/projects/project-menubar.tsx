@@ -45,7 +45,8 @@ import {
   FilePlus2,
   SquareKanban,
   LayoutGrid,
-  DollarSign // Added for Financial Overview potentially
+  Box, // Icon for 3D Model Viewer
+  DollarSign 
 } from "lucide-react";
 
 interface ProjectMenubarProps {
@@ -153,6 +154,12 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
               </MenubarItem>
               <MenubarItem asChild>
                 <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
+              </MenubarItem>
+              <MenubarSeparator />
+              <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings/3d-model-viewer`}>
+                   <Box className="mr-2 h-4 w-4" /> 3D Model Viewer
+                </Link>
               </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>
