@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder } from 'lucide-react'; // Added Folder
+import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart } from 'lucide-react';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +14,9 @@ const navItems = [
   { href: '/subcontractors', label: 'Subcontractors', icon: HardHat },
   { href: '/consultants', label: 'Consultants', icon: Users },
   { href: '/clients', label: 'Clients', icon: Handshake },
-  { href: '/drive', label: 'File Storage', icon: Folder }, // New Item
+  { href: '/drive', label: 'File Storage', icon: Folder },
+  { href: '/financials', label: 'Financials', icon: Landmark },
+  { href: '/reports', label: 'Reports', icon: PieChart },
 ];
 
 export function AppSidebarContent() {
