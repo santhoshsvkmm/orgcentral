@@ -4,15 +4,17 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FolderPlus, Folder as FolderIcon, FileText as FileIcon } from "lucide-react";
-import { useState } from "react";
+import { FolderPlus, Folder as FolderIcon, FileText as FileIcon, HardDrive } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 
 // Mock file/folder structure
 interface FileSystemItem {
   id: string;
   name: string;
   type: 'folder' | 'file';
-  size?: string; // for files
+  size?: string; // for files, e.g., '1.2MB', '300KB'
   lastModified?: string; // ISO string
   children?: FileSystemItem[]; // for folders
 }
@@ -27,15 +29,62 @@ const initialFileSystem: FileSystemItem[] = [
   { id: 'folder-2', name: 'Client Communications', type: 'folder', lastModified: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), children: [] },
   { id: 'file-1', name: 'Company Policies.pdf', type: 'file', size: '300KB', lastModified: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
   { id: 'file-2', name: 'Team Meeting Notes.md', type: 'file', size: '15KB', lastModified: new Date(Date.now() - 60 * 60 * 1000).toISOString() },
+  { id: 'file-3', name: 'Large Video File.mp4', type: 'file', size: '150.5MB', lastModified: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
 ];
+
+// Helper to parse size string (e.g., '1.2MB', '300KB') to bytes
+const parseSizeToBytes = (sizeStr?: string): number => {
+  if (!sizeStr) return 0;
+  const match = sizeStr.match(/([\d.]+)([KMGT]?B)/i);
+  if (!match) return 0;
+
+  const size = parseFloat(match[1]);
+  const unit = match[2].toUpperCase();
+
+  switch (unit) {
+    case 'KB': return size * 1024;
+    case 'MB': return size * 1024 * 1024;
+    case 'GB': return size * 1024 * 1024 * 1024;
+    case 'TB': return size * 1024 * 1024 * 1024 * 1024;
+    default: return size; // Assume bytes if no unit or 'B'
+  }
+};
+
+const formatBytes = (bytes: number, decimals = 2) => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+};
 
 
 export default function DrivePage() {
   const [currentPath, setCurrentPath] = useState<string[]>([]); // Array of folder names for breadcrumbs
   const [items, setItems] = useState<FileSystemItem[]>(initialFileSystem);
 
-  // In a real app, navigation and CRUD operations would be complex.
-  // This is a very simplified display.
+  const totalSpaceGB = 15; // 15 GB total storage
+  const totalSpaceBytes = totalSpaceGB * 1024 * 1024 * 1024;
+
+  // Calculate used space from mock data for a more dynamic prototype
+  const usedSpaceBytes = useMemo(() => {
+    let totalBytes = 0;
+    function calculateUsedSpaceRecursive(currentItems: FileSystemItem[]) {
+      currentItems.forEach(item => {
+        if (item.type === 'file') {
+          totalBytes += parseSizeToBytes(item.size);
+        } else if (item.children) {
+          calculateUsedSpaceRecursive(item.children);
+        }
+      });
+    }
+    calculateUsedSpaceRecursive(initialFileSystem); // Calculate from the root of the mock data
+    return totalBytes;
+  }, []); // No dependencies, as initialFileSystem is static for this calculation
+
+  const usedSpacePercentage = (usedSpaceBytes / totalSpaceBytes) * 100;
+
 
   const handleCreateFolder = () => {
     // Non-functional placeholder for now
@@ -63,6 +112,25 @@ export default function DrivePage() {
           </Button>
         }
       />
+      <Card className="shadow-md mb-6">
+        <CardHeader>
+            <CardTitle className="flex items-center"><HardDrive className="mr-2 h-5 w-5 text-primary"/>Storage Overview</CardTitle>
+            <CardDescription>Your current storage usage.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="mb-2">
+                <Progress value={usedSpacePercentage} className="w-full h-3" />
+            </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+                <span>{formatBytes(usedSpaceBytes)} used</span>
+                <span>{formatBytes(totalSpaceBytes)} total</span>
+            </div>
+             {usedSpacePercentage > 90 && (
+                 <p className="text-xs text-destructive mt-2">Warning: Storage is almost full.</p>
+             )}
+        </CardContent>
+      </Card>
+
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>My Drive</CardTitle>
