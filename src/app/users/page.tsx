@@ -1,16 +1,17 @@
+
 'use client';
 
 import { UserList } from "@/components/users/user-list";
-import { PageTitle } from "@/components/page-title";
+// PageTitle is now handled by the layout: src/app/users/layout.tsx
 
 export default function UsersPage() {
   return (
     <>
-      <PageTitle 
-        title="User Management"
-        description="Administer users, assign roles, and manage permissions."
-        // The "Add User" button is now part of UserList component's header
-      />
+      {/* 
+        The PageTitle component (e.g., title="User Management") 
+        is now rendered by the src/app/users/layout.tsx file.
+        This page specifically renders the UserList.
+      */}
       <UserList />
     </>
   );
