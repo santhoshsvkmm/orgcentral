@@ -32,13 +32,13 @@
     --radius: 0.5rem;
 
     /* Sidebar specific colors - Light Theme Updated */
-    --sidebar-background: 220 15% 96%; /* Very light cool gray (#F3F4F6) */
-    --sidebar-foreground: 220 10% 25%; /* Darker gray text (#333F4D) */
+    --sidebar-background: 215 28% 97%; /* Very light slate gray (#F8F9FA) */
+    --sidebar-foreground: 215 28% 17%; /* Dark slate gray text (#212936) */
     --sidebar-primary: 217 89% 61%; /* Vivid Blue for active/primary items */
     --sidebar-primary-foreground: 0 0% 100%; /* White text on primary */
-    --sidebar-accent: 220 15% 90%; /* Slightly darker hover gray (#DDE1E6) */
+    --sidebar-accent: 215 20% 90%; /* Slightly darker slate for hover (#E0E5EB) */
     --sidebar-accent-foreground: 217 89% 61%; /* Primary blue for text on hover/active */
-    --sidebar-border: 220 10% 88%; /* Adjusted gray for borders */
+    --sidebar-border: 215 20% 85%; /* Slate gray border (#D1D8E0) */
     --sidebar-ring: 217 89% 61%; /* Primary color for focus rings */
   }
 
@@ -64,13 +64,13 @@
     --ring: 217 89% 61%;
 
     /* Dark Sidebar specific colors - Updated */
-    --sidebar-background: 220 10% 12%; /* Deep cool gray (#1A1C23) */
-    --sidebar-foreground: 220 15% 85%; /* Lighter text (#CED2DB) */
+    --sidebar-background: 220 13% 18%; /* Dark slate (#2A2E35) */
+    --sidebar-foreground: 215 20% 85%; /* Light slate gray text (#CBD3DF) */
     --sidebar-primary: 217 89% 61%; 
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 10% 18%; /* Subtle hover (#262A33) */
+    --sidebar-accent: 220 13% 25%; /* Slightly lighter dark slate for hover (#383D47) */
     --sidebar-accent-foreground: 217 89% 75%; /* Lighter primary blue for text on hover/active */
-    --sidebar-border: 220 10% 20%; /* Adjusted gray for borders */
+    --sidebar-border: 220 13% 22%; /* Darker slate border (#31353F) */
     --sidebar-ring: 217 89% 61%;
   }
 }
