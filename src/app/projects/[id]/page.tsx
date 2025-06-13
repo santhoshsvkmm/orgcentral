@@ -8,7 +8,7 @@ import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react"; // Added 'use'
 import type { Project } from "@/components/projects/project-form";
 import {
   Menubar,
@@ -45,7 +45,8 @@ const mockTasksForAI = [
 ];
 
 
-export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailsPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = use(paramsPromise);
   const projectId = params.id;
   const { toast } = useToast();
   const [project, setProject] = useState<Project | null>(null);
