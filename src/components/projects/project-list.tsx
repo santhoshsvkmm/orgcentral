@@ -49,8 +49,8 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
       header: "Name",
       enableSorting: true,
       cell: ({ row }) => (
-        <Link href={`/projects/${row.original.id}`} className="hover:underline font-medium">
-          {row.original.name}
+        <Link href={`/projects/${row.id}`} className="hover:underline font-medium">
+          {row.name}
         </Link>
       ),
     },
@@ -58,25 +58,25 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
       accessorKey: "status",
       header: "Status",
       enableSorting: true,
-      cell: ({ row }) => <Badge variant={getStatusVariant(row.original.status)}>{row.original.status}</Badge>,
+      cell: ({ row }) => <Badge variant={getStatusVariant(row.status)}>{row.status}</Badge>,
     },
     {
       accessorKey: "startDate",
       header: "Start Date",
       enableSorting: true,
-      cell: ({ row }) => formatDate(row.original.startDate, 'yyyy-MM-dd'),
+      cell: ({ row }) => formatDate(row.startDate, 'yyyy-MM-dd'),
     },
     {
       accessorKey: "dueDate",
       header: "Due Date",
       enableSorting: true,
-      cell: ({ row }) => formatDate(row.original.dueDate, 'yyyy-MM-dd'),
+      cell: ({ row }) => formatDate(row.dueDate, 'yyyy-MM-dd'),
     },
     {
       accessorKey: "teamSize",
       header: "Team Size",
       enableSorting: true,
-      cell: ({ row }) => row.original.teamSize || 'N/A',
+      cell: ({ row }) => row.teamSize || 'N/A',
     },
     {
       accessorKey: "actions",
@@ -85,10 +85,10 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
         <div className="flex items-center justify-end">
           <ProjectForm
             mode="edit"
-            projectData={row.original}
+            projectData={row}
             onSave={onUpdateProject}
             triggerButton={
-              <Button variant="ghost" size="icon" className="h-8 w-8 p-0" id={`edit-project-${row.original.id}-trigger`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 p-0" id={`edit-project-${row.id}-trigger`}>
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit Project</span>
               </Button>
@@ -104,25 +104,8 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem asChild>
-                <Link href={`/projects/${row.original.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
+                <Link href={`/projects/${row.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
               </DropdownMenuItem>
-              {/* The direct edit button above is preferred for clarity, 
-                  but if an edit option is needed *within* the dropdown, ProjectForm needs to be controllable 
-                  or DropdownMenuItem needs to manage the dialog opening.
-                  To keep it simple, we are relying on the direct Edit button for now.
-              */}
-              {/* 
-              <ProjectForm
-                mode="edit"
-                projectData={row.original}
-                onSave={onUpdateProject}
-                triggerButton={
-                   <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="flex items-center w-full">
-                     <Edit className="mr-2 h-4 w-4" />Edit (from dropdown)
-                   </DropdownMenuItem>
-                }
-              />
-              */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem
@@ -136,12 +119,12 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the project "{row.original.name}".
+                      This action cannot be undone. This will permanently delete the project "{row.name}".
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(row.original)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                    <AlertDialogAction onClick={() => handleDelete(row)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
