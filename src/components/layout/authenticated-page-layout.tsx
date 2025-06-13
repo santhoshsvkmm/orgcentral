@@ -15,9 +15,13 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Settings } from 'lucide-react';
+import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 
 export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
   return (
@@ -51,7 +55,73 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
           <div className="hidden font-semibold md:block md:flex-1">
             {/* Breadcrumbs or dynamic page title could go here */}
           </div>
-          <UserNav />
+          <div className="flex items-center gap-2">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <MessageSquare className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                  </span>
+                  <span className="sr-only">Open Chat</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="sm:max-w-md p-0 flex flex-col">
+                <SheetHeader className="p-6 pb-4 border-b">
+                  <SheetTitle>Chat & Collaboration</SheetTitle>
+                  <SheetDescription>
+                    Connect with your team in real-time.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="p-4">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search contacts..." className="pl-8" />
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {/* Placeholder for user list */}
+                  {[
+                    { name: "Alice W.", status: "Online", avatar: "AW", dataAiHint:"user avatar" },
+                    { name: "Bob B.", status: "Offline", avatar: "BB", dataAiHint:"user avatar" },
+                    { name: "Charlie C.", status: "Away", avatar: "CC", dataAiHint:"user avatar" },
+                  ].map(user => (
+                    <div key={user.name} className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer">
+                      <Avatar className="h-9 w-9 border">
+                        <AvatarImage src={`https://placehold.co/40x40.png?text=${user.avatar}`} alt={user.name} data-ai-hint={user.dataAiHint} />
+                        <AvatarFallback>{user.avatar}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-sm">{user.name}</p>
+                        <p className={`text-xs ${user.status === 'Online' ? 'text-green-500' : 'text-muted-foreground'}`}>{user.status}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Separator />
+                {/* Placeholder for chat window / call actions */}
+                <div className="p-4 space-y-3 flex-grow-0">
+                    <div className="text-center text-sm text-muted-foreground p-4 border border-dashed rounded-md min-h-[150px] flex flex-col justify-center items-center">
+                        <MessageSquare className="h-10 w-10 text-muted-foreground mb-2" />
+                        <p className="font-semibold">Select a contact to start chatting.</p>
+                        <p className="text-xs">Full chat, video/audio calls, and screen sharing features would be implemented here.</p>
+                    </div>
+                    <div className="flex justify-around pt-2">
+                        <Button variant="outline" size="icon" disabled><Video className="h-5 w-5"/></Button>
+                        <Button variant="outline" size="icon" disabled><Phone className="h-5 w-5"/></Button>
+                        <Button variant="outline" size="icon" disabled><ScreenShare className="h-5 w-5"/></Button>
+                    </div>
+                </div>
+                <SheetFooter className="p-4 border-t">
+                  <SheetClose asChild>
+                    <Button type="button" variant="outline" className="w-full">Close Panel</Button>
+                  </SheetClose>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
+            <UserNav />
+          </div>
         </header>
         <motion.main 
           className="flex-1 p-4 sm:p-6"
