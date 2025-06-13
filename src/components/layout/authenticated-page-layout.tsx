@@ -15,21 +15,30 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search as SearchIcon } from 'lucide-react'; // Added SearchIcon
+import { Settings, MessageSquare, Users, Video, Phone, ScreenShare, Search as SearchIcon, Bell, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react'; // Added useState for search input
+import { useState } from 'react';
+import { ThemeToggleButton } from './theme-toggle-button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator as DropdownMenuSeparatorNotifications,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
   const [globalSearchTerm, setGlobalSearchTerm] = useState('');
 
   const handleGlobalSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder: In a real app, this would trigger a global search
     console.log("Global search submitted for:", globalSearchTerm);
     alert(`Global search for "${globalSearchTerm}" would be initiated here, searching across projects, tasks, users, etc.`);
   };
@@ -63,7 +72,6 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
             <SidebarTrigger />
           </div>
           
-          {/* Global Search Bar Area - More prominent now */}
           <div className="flex-1 flex justify-center px-4">
             <form onSubmit={handleGlobalSearchSubmit} className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
               <div className="relative">
@@ -80,6 +88,54 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <ThemeToggleButton />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                   <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
+                  </span>
+                  <span className="sr-only">Open Notifications</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuSeparatorNotifications />
+                <DropdownMenuItem onSelect={() => alert('Placeholder: Notification 1 clicked')}>
+                  <div className="flex items-start gap-2 p-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="https://placehold.co/40x40.png?text=S" alt="System" data-ai-hint="system icon" />
+                      <AvatarFallback>S</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">Project Alpha Update</p>
+                      <p className="text-xs text-muted-foreground">Task 'Deployment' is overdue.</p>
+                    </div>
+                  </div>
+                </DropdownMenuItem>
+                 <DropdownMenuItem onSelect={() => alert('Placeholder: Notification 2 clicked')}>
+                   <div className="flex items-start gap-2 p-2">
+                    <Avatar className="h-8 w-8">
+                       <AvatarImage src="https://placehold.co/40x40.png?text=AU" alt="Alice" data-ai-hint="user avatar" />
+                       <AvatarFallback>AU</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">New Message from Alice</p>
+                      <p className="text-xs text-muted-foreground">Regarding RFI-003...</p>
+                    </div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparatorNotifications />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/settings" className="justify-center text-sm text-primary hover:underline">
+                    View all notifications
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
