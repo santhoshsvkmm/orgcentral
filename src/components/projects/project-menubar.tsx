@@ -46,7 +46,7 @@ import {
   SquareKanban,
   LayoutGrid,
   Box, // Icon for 3D Model Viewer
-  DollarSign 
+  Image // Icon for 2D Drawings
 } from "lucide-react";
 
 interface ProjectMenubarProps {
@@ -128,7 +128,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <MenubarSeparator />
           <MenubarSub>
             <MenubarSubTrigger>
-              <FolderKanbanIcon className="mr-2 h-4 w-4" /> Drawings
+              <Image className="mr-2 h-4 w-4" /> 2D Drawings
             </MenubarSubTrigger>
             <MenubarSubContent>
               <MenubarItem asChild>
@@ -147,22 +147,28 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
                 <Link href={`/projects/${projectId}/documents/drawings?type=plumbing`}>Plumbing</Link>
               </MenubarItem>
               <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=shop-drawing`}>Shop Drawing</Link>
+                <Link href={`/projects/${projectId}/documents/drawings?type=shop-drawings`}>Shop Drawings</Link>
+              </MenubarItem>
+               <MenubarItem asChild>
+                <Link href={`/projects/${projectId}/documents/drawings?type=detail-drawings`}>Detail Drawings</Link>
               </MenubarItem>
               <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=as-built`}>As-Built</Link>
+                <Link href={`/projects/${projectId}/documents/drawings?type=isometric-axonometric`}>Isometric/Axonometric</Link>
               </MenubarItem>
               <MenubarItem asChild>
                 <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
               </MenubarItem>
               <MenubarSeparator />
               <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings/3d-model-viewer`}>
-                   <Box className="mr-2 h-4 w-4" /> 3D Model Viewer
-                </Link>
+                <Link href={`/projects/${projectId}/documents/drawings?type=as-built`}>As-Built Drawings</Link>
               </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>
+           <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/documents/drawings/3d-model-viewer`}>
+               <Box className="mr-2 h-4 w-4" /> 3D Model Viewer/Editor
+            </Link>
+          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
