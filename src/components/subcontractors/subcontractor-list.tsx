@@ -47,15 +47,18 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
       accessorKey: "contactPerson",
       header: "Contact Person",
       enableSorting: true,
+      cell: ({ row }) => <>{row.contactPerson}</>,
     },
     {
       accessorKey: "email",
       header: "Email",
       enableSorting: true,
+      cell: ({ row }) => <>{row.email}</>,
     },
     {
       accessorKey: "phone",
       header: "Phone",
+      cell: ({ row }) => <>{row.phone || 'N/A'}</>,
     },
     {
       accessorKey: "mappedProjectsCount",
@@ -156,3 +159,4 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
     </Card>
   );
 }
+
