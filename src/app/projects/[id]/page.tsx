@@ -2,13 +2,13 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign } from "lucide-react"; // Added more icons
+import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign, FileQuestion } from "lucide-react"; // Added FileQuestion for RFI
 import { TaskList } from "@/components/projects/task-list";
 import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
-import { useState, useEffect, use, useMemo } from "react"; // Added useMemo
+import { useState, useEffect, use, useMemo } from "react"; 
 import type { Project } from "@/components/projects/project-form";
 import {
   Menubar,
@@ -36,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link"; // Added Link
 
 // Mock fetch function - replace with actual data fetching
 async function getProjectById(id: string): Promise<Project | null> {
@@ -63,7 +64,7 @@ const projectSpecificMetrics = [
   { title: "Total Tasks", value: "6", icon: <ListChecks className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project tasks" },
   { title: "Completed Tasks", value: "1", icon: <CheckCircle className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project done" },
   { title: "In Progress Tasks", value: "2", icon: <Orbit className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project progress" },
-  { title: "Delayed Tasks", value: "1", icon: <AlertCircleLucide className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project overdue" }, // Using AlertCircleLucide for consistency
+  { title: "Delayed Tasks", value: "1", icon: <AlertCircleLucide className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project overdue" }, 
   { title: "Upcoming Tasks", value: "2", icon: <CalendarClock className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project schedule" },
   { title: "Critical Tasks", value: "0", icon: <ShieldAlert className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project priority" },
 ];
@@ -118,7 +119,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
     if (chartTimeRange === "last3") {
       return projectAllChartDataPoints.slice(-3);
     }
-    if (chartTimeRange === "last6") { // Assuming we might want to show all if less than 6
+    if (chartTimeRange === "last6") { 
       return projectAllChartDataPoints.slice(-6);
     }
     return projectAllChartDataPoints;
@@ -136,7 +137,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         projectStatus: project.status,
         projectStartDate: project.startDate,
         projectDueDate: project.dueDate,
-        tasks: mockTasksForAI, // Using mock tasks for now
+        tasks: mockTasksForAI, 
       };
       const results = await analyzeProjectIssues(input);
       setAIAnalysisResults(results);
@@ -183,7 +184,6 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
             <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
             <CardContent><Skeleton className="h-24 w-full" /></CardContent>
         </Card>
-        {/* Skeletons for new metrics and chart */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
             {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
         </div>
@@ -274,6 +274,13 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
             <MenubarItem onClick={() => console.log('Generate New Quote')}>Generate New</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
+        <MenubarMenu>
+           <MenubarTrigger asChild>
+            <Link href={`/projects/${project.id}/rfi`} className="flex items-center">
+                <FileQuestion className="mr-1 h-4 w-4 group-hover:text-accent-foreground" /> RFI
+            </Link>
+          </MenubarTrigger>
+        </MenubarMenu>
       </Menubar>
 
       <Card className="mb-8 shadow-md">
@@ -333,7 +340,6 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         </CardContent>
       </Card>
 
-      {/* Project Specific Metrics Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-foreground mb-4">Project Task Overview</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -351,7 +357,6 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         </div>
       </div>
 
-      {/* Project Progress Chart Section */}
       <Card className="mb-8 shadow-md">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
           <div>
