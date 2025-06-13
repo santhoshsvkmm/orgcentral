@@ -30,6 +30,8 @@ const mockUsers = [
   { id: 'user-diana', name: 'Diana Prince' },
 ];
 
+const UNASSIGNED_ASSIGNEE_VALUE = "---unassigned---";
+
 
 export function RfiForm({ triggerButton, mode, projectId, rfiData, onSave }: RfiFormProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -163,12 +165,21 @@ export function RfiForm({ triggerButton, mode, projectId, rfiData, onSave }: Rfi
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="rfiAssignedTo" className="text-right">Assigned To</Label>
-              <Select value={assignedToUserId} onValueChange={(value) => setAssignedToUserId(value)}>
+              <Select
+                value={assignedToUserId === undefined ? UNASSIGNED_ASSIGNEE_VALUE : assignedToUserId}
+                onValueChange={(value) => {
+                  if (value === UNASSIGNED_ASSIGNEE_VALUE) {
+                    setAssignedToUserId(undefined);
+                  } else {
+                    setAssignedToUserId(value);
+                  }
+                }}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Assign to a user" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Unassigned</SelectItem>
+                  <SelectItem value={UNASSIGNED_ASSIGNEE_VALUE}>Unassigned</SelectItem>
                   {mockUsers.map(user => <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -193,3 +204,4 @@ export function RfiForm({ triggerButton, mode, projectId, rfiData, onSave }: Rfi
     </Dialog>
   );
 }
+
