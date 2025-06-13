@@ -8,6 +8,9 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { 
@@ -40,8 +43,8 @@ import {
   LayoutDashboard,
   FileSearch, 
   FilePlus2,
-  SquareKanban, // For Kanban Board
-  LayoutGrid // For Micro Planning trigger
+  SquareKanban,
+  LayoutGrid
 } from "lucide-react";
 
 interface ProjectMenubarProps {
@@ -75,11 +78,11 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
             </Link>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarMenu>
-            <MenubarTrigger className="flex items-center">
+          <MenubarSub>
+            <MenubarSubTrigger>
               <LayoutGrid className="mr-2 h-4 w-4" /> Micro Planning
-            </MenubarTrigger>
-            <MenubarContent>
+            </MenubarSubTrigger>
+            <MenubarSubContent>
               <MenubarItem asChild>
                 <Link href={`/projects/${projectId}/planning/micro-planning/kanban`}>
                   <SquareKanban className="mr-2 h-4 w-4" /> Kanban Board
@@ -90,8 +93,8 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
                   <GanttChartSquare className="mr-2 h-4 w-4" /> Gantt Chart (Sprint)
                 </Link>
               </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+            </MenubarSubContent>
+          </MenubarSub>
           <MenubarSeparator />
           <MenubarItem asChild>
             <Link href={`/projects/${projectId}/planning/resource-allocation`}>
@@ -121,11 +124,11 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
             </Link>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarMenu>
-            <MenubarTrigger className="flex items-center">
+          <MenubarSub>
+            <MenubarSubTrigger>
               <FolderKanbanIcon className="mr-2 h-4 w-4" /> Drawings
-            </MenubarTrigger>
-            <MenubarContent>
+            </MenubarSubTrigger>
+            <MenubarSubContent>
               <MenubarItem asChild>
                 <Link href={`/projects/${projectId}/documents/drawings?type=architectural`}>Architectural</Link>
               </MenubarItem>
@@ -150,8 +153,8 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
               <MenubarItem asChild>
                 <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
               </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+            </MenubarSubContent>
+          </MenubarSub>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
@@ -277,3 +280,4 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
     </Menubar>
   );
 }
+
