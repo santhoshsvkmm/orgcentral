@@ -2,13 +2,13 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign, FileQuestion, MessageSquare } from "lucide-react";
+import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, MessageSquare, FileQuestion } from "lucide-react";
 import { TaskList } from "@/components/projects/task-list";
 import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
-import { useState, useEffect, use, useMemo } from "react"; 
+import { useState, useEffect, use, useMemo } from "react";
 import type { Project } from "@/components/projects/project-form";
 import {
   Menubar,
@@ -16,9 +16,6 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { analyzeProjectIssues, AnalyzeProjectIssuesInput, AnalyzeProjectIssuesOutput, CriticalIssue } from "@/ai/flows/analyze-project-issues-flow";
@@ -39,10 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link"; 
-import { RfiList } from '@/components/rfi/rfi-list';
-import { RfiForm } from '@/components/rfi/rfi-form';
-import type { RFI } from '@/types/rfi';
+import Link from "next/link";
 
 
 // Mock fetch function - replace with actual data fetching
@@ -71,7 +65,7 @@ const projectSpecificMetrics = [
   { title: "Total Tasks", value: "6", icon: <ListChecks className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project tasks" },
   { title: "Completed Tasks", value: "1", icon: <CheckCircle className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project done" },
   { title: "In Progress Tasks", value: "2", icon: <Orbit className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project progress" },
-  { title: "Delayed Tasks", value: "1", icon: <AlertCircleLucide className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project overdue" }, 
+  { title: "Delayed Tasks", value: "1", icon: <AlertCircleLucide className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project overdue" },
   { title: "Upcoming Tasks", value: "2", icon: <CalendarClock className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project schedule" },
   { title: "Critical Tasks", value: "0", icon: <ShieldAlert className="h-5 w-5 text-muted-foreground" />, dataAiHint: "project priority" },
 ];
@@ -101,45 +95,6 @@ const projectChartConfig = {
   }
 } satisfies ChartConfig;
 
-// Mock RFI data for the project page
-const mockRfisData: RFI[] = [
-   {
-    id: 'rfi-1',
-    projectId: '1', // Assuming this page is for projectId '1'
-    rfiNumber: 'RFI-001',
-    title: 'Clarification on Structural Beam Specifications',
-    description: 'Need detailed specs for the main support beams in Sector A...',
-    status: 'Open',
-    priority: 'High',
-    raisedByUserId: 'user-alice',
-    raisedByUserName: 'Alice Wonderland',
-    assignedToUserId: 'user-bob',
-    assignedToUserName: 'Bob The Builder',
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-    messages: [],
-    attachments: [],
-    tags: ['Structural', 'Sector A'],
-  },
-   {
-    id: 'rfi-2',
-    projectId: '1',
-    rfiNumber: 'RFI-002',
-    title: 'Electrical Conduit Routing Plan Approval',
-    description: 'Submitting the proposed electrical conduit routing...',
-    status: 'In Progress',
-    priority: 'Medium',
-    raisedByUserId: 'user-charlie',
-    raisedByUserName: 'Charlie Brown',
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    messages: [],
-    attachments: [],
-    tags: ['Electrical', 'Approval'],
-  },
-];
-
 
 export default function ProjectDetailsPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
@@ -151,52 +106,23 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
   const [aiAnalysisResults, setAIAnalysisResults] = useState<AnalyzeProjectIssuesOutput | null>(null);
   const [chartTimeRange, setChartTimeRange] = useState<string>("all");
 
-  const [rfis, setRfis] = useState<RFI[]>([]);
 
   useEffect(() => {
-    const fetchProjectAndRfis = async () => {
+    const fetchProject = async () => {
       setLoading(true);
       const fetchedProject = await getProjectById(projectId);
       setProject(fetchedProject);
-      // Filter mock RFIs for the current project
-      setRfis(mockRfisData.filter(rfi => rfi.projectId === projectId));
       setLoading(false);
     };
-    fetchProjectAndRfis();
+    fetchProject();
   }, [projectId]);
 
-  const handleAddRfi = (newRfi: RFI) => {
-    setRfis(prevRfis => [
-      {
-        ...newRfi,
-        rfiNumber: `RFI-${String(prevRfis.length + 1).padStart(3, '0')}`, // Simple RFI number generation
-        projectId: projectId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      ...prevRfis,
-    ]);
-  };
-
-  const handleUpdateRfi = (updatedRfi: RFI) => {
-    setRfis(prevRfis =>
-      prevRfis.map(rfi => (rfi.id === updatedRfi.id ? { ...rfi, ...updatedRfi, updatedAt: new Date().toISOString() } : rfi))
-    );
-  };
-
-  const handleDeleteRfi = (rfiId: string) => {
-    setRfis(prevRfis => prevRfis.filter(rfi => rfi.id !== rfiId));
-     toast({
-      title: "RFI Deleted",
-      description: `RFI has been deleted.`,
-    });
-  };
 
   const filteredProjectChartData = useMemo(() => {
     if (chartTimeRange === "last3") {
       return projectAllChartDataPoints.slice(-3);
     }
-    if (chartTimeRange === "last6") { 
+    if (chartTimeRange === "last6") {
       return projectAllChartDataPoints.slice(-6);
     }
     return projectAllChartDataPoints;
@@ -214,7 +140,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         projectStatus: project.status,
         projectStartDate: project.startDate,
         projectDueDate: project.dueDate,
-        tasks: mockTasksForAI, 
+        tasks: mockTasksForAI,
       };
       const results = await analyzeProjectIssues(input);
       setAIAnalysisResults(results);
@@ -233,11 +159,11 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
       setIsAIAnalyzing(false);
     }
   };
-  
+
   const getSeverityBadgeVariant = (severity: CriticalIssue['severity']): "default" | "destructive" | "secondary" | "outline" => {
     switch (severity) {
       case 'High': return 'destructive';
-      case 'Medium': return 'default'; 
+      case 'Medium': return 'default';
       case 'Low': return 'outline';
       default: return 'outline';
     }
@@ -245,7 +171,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
    const getSeverityIcon = (severity: CriticalIssue['severity']) => {
     switch (severity) {
       case 'High': return <AlertTriangle className="h-4 w-4 mr-1 text-destructive" />;
-      case 'Medium': return <Clock className="h-4 w-4 mr-1 text-primary" />; 
+      case 'Medium': return <Clock className="h-4 w-4 mr-1 text-primary" />;
       case 'Low': return <CheckCircle className="h-4 w-4 mr-1 text-muted-foreground" />;
       default: return null;
     }
@@ -281,13 +207,13 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
       <PageTitle title="Project Not Found" description={`Could not find project with ID: ${projectId}.`}/>
     );
   }
-  
-  const companyNonWorkingDays = ["2024-07-04", "2024-12-25", "2025-01-01"]; 
+
+  const companyNonWorkingDays = ["2024-07-04", "2024-12-25", "2025-01-01"];
   const workingDays = calculateWorkingDays(project.startDate, project.dueDate, companyNonWorkingDays);
 
   return (
     <>
-      <PageTitle 
+      <PageTitle
         title={project.name}
         description="Detailed view of the project including tasks and progress."
         actions={
@@ -354,31 +280,18 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-          <MenubarTrigger>
-            <MessageSquare className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
-            Communication
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarSub>
-              <MenubarSubTrigger>
-                <FileQuestion className="mr-2 h-4 w-4" /> RFIs
-              </MenubarSubTrigger>
-              <MenubarSubContent>
-                <RfiForm
-                    mode="create"
-                    projectId={projectId}
-                    onSave={handleAddRfi}
-                    triggerButton={
-                        <MenubarItem onSelect={(e) => e.preventDefault()} className="w-full">
-                            <PlusCircle className="mr-2 h-4 w-4" /> Create New RFI
-                        </MenubarItem>
-                    }
-                />
-                {/* "View All RFIs" is removed as list is inline */}
-              </MenubarSubContent>
-            </MenubarSub>
-            {/* Other communication items can go here */}
-          </MenubarContent>
+            <MenubarTrigger>
+                 <MessageSquare className="mr-1 h-4 w-4 group-hover:text-accent-foreground" />
+                Communication
+            </MenubarTrigger>
+            <MenubarContent>
+                <MenubarItem asChild>
+                    <Link href={`/projects/${project.id}/communication/rfi`}>
+                        <FileQuestion className="mr-2 h-4 w-4" /> RFIs
+                    </Link>
+                </MenubarItem>
+                {/* Other communication items can go here */}
+            </MenubarContent>
         </MenubarMenu>
       </Menubar>
 
@@ -485,7 +398,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
                 <YAxis tickLine={false} axisLine={false} dx={-10} />
                 <RechartsTooltip
                   cursor={false}
-                  content={<ChartTooltipContent indicator="line" hideLabel />} 
+                  content={<ChartTooltipContent indicator="line" hideLabel />}
                 />
                 <Legend content={<ChartLegendContent />} />
                 <Line dataKey="planned" type="monotone" stroke="var(--color-planned)" strokeWidth={2} dot={true} />
@@ -549,23 +462,6 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
           </CardContent>
         </Card>
       )}
-      
-      <Separator className="my-8" />
-
-      <Card className="shadow-sm mt-8">
-        <CardHeader>
-          <CardTitle>Requests for Information (RFIs)</CardTitle>
-          <CardDescription>Manage and track RFIs for this project.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RfiList
-            rfis={rfis}
-            projectId={projectId}
-            onUpdateRfi={handleUpdateRfi}
-            onDeleteRfi={handleDeleteRfi}
-          />
-        </CardContent>
-      </Card>
 
       <Separator className="my-8" />
 
@@ -573,4 +469,3 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
     </>
   );
 }
-

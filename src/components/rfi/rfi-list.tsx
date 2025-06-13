@@ -32,7 +32,7 @@ export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi }: RfiListPr
       default: return "outline";
     }
   };
-  
+
   const getStatusColorClass = (status: RfiStatus): string => {
     switch (status) {
       case "Open": return "bg-blue-500 hover:bg-blue-600";
@@ -56,7 +56,7 @@ export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi }: RfiListPr
     return (
       <div className="text-center py-10">
         <p className="text-muted-foreground">No RFIs found for this project.</p>
-        <p className="text-sm text-muted-foreground">Get started by creating a new RFI.</p>
+        <p className="text-sm text-muted-foreground">Get started by creating a new RFI using the button above.</p>
       </div>
     );
   }
@@ -89,7 +89,7 @@ export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi }: RfiListPr
             <TableRow key={rfi.id}>
               <TableCell className="font-medium">{rfi.rfiNumber}</TableCell>
               <TableCell>
-                <Link href={`/projects/${projectId}/rfi/${rfi.id}`} className="hover:underline">
+                <Link href={`/projects/${projectId}/communication/rfi/${rfi.id}`} className="hover:underline">
                   {rfi.title}
                 </Link>
               </TableCell>
@@ -115,7 +115,7 @@ export function RfiList({ rfis, projectId, onUpdateRfi, onDeleteRfi }: RfiListPr
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuItem asChild>
-                      <Link href={`/projects/${projectId}/rfi/${rfi.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
+                      <Link href={`/projects/${projectId}/communication/rfi/${rfi.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
                     </DropdownMenuItem>
                     <RfiForm
                       mode="edit"
