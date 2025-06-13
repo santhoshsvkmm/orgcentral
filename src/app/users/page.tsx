@@ -1,3 +1,5 @@
+'use client';
+
 import { UserList } from "@/components/users/user-list";
 import { PageTitle } from "@/components/page-title";
 
