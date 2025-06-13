@@ -10,7 +10,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { FileQuestion, MessageSquare } from "lucide-react";
+import { FileQuestion, MessageSquare, Target } from "lucide-react"; // Added Target
 
 interface ProjectMenubarProps {
   projectId: string;
@@ -25,7 +25,11 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <MenubarItem asChild>
             <Link href={`/projects/${projectId}/planning/gantt`}>Gantt Chart</Link>
           </MenubarItem>
-          <MenubarItem onClick={() => console.log('View Milestones for project', projectId)}>Milestones</MenubarItem>
+          <MenubarItem asChild>
+            <Link href={`/projects/${projectId}/planning/milestones`}>
+              <Target className="mr-2 h-4 w-4" /> Milestones
+            </Link>
+          </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={() => console.log('Resource Allocation for project', projectId)}>Resource Allocation</MenubarItem>
         </MenubarContent>
