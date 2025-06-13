@@ -75,11 +75,13 @@ export default function AuditLogsPage() {
       accessorKey: "userName",
       header: "User",
       enableSorting: true,
+      cell: ({ row }) => row.userName,
     },
     {
       accessorKey: "actionType",
       header: "Action Type",
       enableSorting: true,
+      cell: ({ row }) => row.actionType,
     },
     {
       accessorKey: "details",
