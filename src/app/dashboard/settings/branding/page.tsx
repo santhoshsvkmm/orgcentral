@@ -8,50 +8,65 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Image as ImageIcon, UploadCloud } from 'lucide-react';
 import Image from 'next/image'; // Next.js Image component
+import { Separator } from '@/components/ui/separator';
 
 export default function BrandingSettingsPage() {
   const { toast } = useToast();
 
-  const [logoPreview, setLogoPreview] = useState<string | null>('https://placehold.co/200x100.png?text=Your+Logo');
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [primaryColor, setPrimaryColor] = useState('#4285F4'); // Default to current primary
-  const [secondaryColor, setSecondaryColor] = useState('#FFA000'); // Default to current accent
+  const [logoLightPreview, setLogoLightPreview] = useState<string | null>('https://placehold.co/200x100.png?text=Light+Logo');
+  const [logoLightFile, setLogoLightFile] = useState<File | null>(null);
+  const [logoDarkPreview, setLogoDarkPreview] = useState<string | null>('https://placehold.co/200x100.png?text=Dark+Logo&bg=333333&text=FFFFFF');
+  const [logoDarkFile, setLogoDarkFile] = useState<File | null>(null);
 
-  // In a real app, you would fetch current branding settings
+  const [primaryColor, setPrimaryColor] = useState('#4285F4'); 
+  const [secondaryColor, setSecondaryColor] = useState('#FFA000'); 
+
   useEffect(() => {
     // Fetch current branding settings and populate the state
-    // For now, using defaults
-    // e.g., setPrimaryColor(fetchedSettings.primaryColor || '#4285F4');
   }, []);
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoLightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setLogoFile(file);
+      setLogoLightFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
+        setLogoLightPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     } else {
-      setLogoFile(null);
-      // Revert to placeholder or fetched logo if selection is cleared
-      setLogoPreview('https://placehold.co/200x100.png?text=Your+Logo'); 
+      setLogoLightFile(null);
+      setLogoLightPreview('https://placehold.co/200x100.png?text=Light+Logo'); 
+    }
+  };
+
+  const handleLogoDarkChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setLogoDarkFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoDarkPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setLogoDarkFile(null);
+      setLogoDarkPreview('https://placehold.co/200x100.png?text=Dark+Logo&bg=333333&text=FFFFFF'); 
     }
   };
 
   const handleSaveChanges = () => {
-    // In a real app, persist these settings (upload logo, save colors)
-    console.log("Branding Settings to save:", { logoFile, primaryColor, secondaryColor });
-    if (logoFile) {
-        console.log("Logo to upload:", logoFile.name);
-        // Add actual logo upload logic here
+    console.log("Branding Settings to save:", { logoLightFile, logoDarkFile, primaryColor, secondaryColor });
+    if (logoLightFile) {
+        console.log("Light mode logo to upload:", logoLightFile.name);
+    }
+    if (logoDarkFile) {
+        console.log("Dark mode logo to upload:", logoDarkFile.name);
     }
     toast({
       title: "Branding Settings Saved",
       description: "Your branding preferences have been updated.",
     });
-    // Note: Applying these colors to the theme dynamically is a separate, more complex task.
   };
 
   return (
@@ -61,24 +76,43 @@ export default function BrandingSettingsPage() {
           <ImageIcon className="mr-2 h-5 w-5 text-primary" />
           Branding & Customization
         </CardTitle>
-        <CardDescription>Manage your company logo and application theme colors.</CardDescription>
+        <CardDescription>Manage your company logos and application theme colors.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
         
         <div className="space-y-2">
-          <Label htmlFor="companyLogo" className="text-base font-medium">Company Logo</Label>
+          <Label htmlFor="companyLogoLight" className="text-base font-medium">Light Mode Logo</Label>
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="w-48 h-24 rounded-md border border-dashed flex items-center justify-center bg-muted overflow-hidden">
-              {logoPreview ? (
-                <Image src={logoPreview} alt="Logo preview" width={192} height={96} className="object-contain" data-ai-hint="company logo" />
+              {logoLightPreview ? (
+                <Image src={logoLightPreview} alt="Light mode logo preview" width={192} height={96} className="object-contain" data-ai-hint="company logo light" />
               ) : (
                 <UploadCloud className="h-10 w-10 text-muted-foreground" />
               )}
             </div>
-            <Input id="companyLogo" type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleLogoChange} className="max-w-xs" />
+            <Input id="companyLogoLight" type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleLogoLightChange} className="max-w-xs" />
           </div>
-          <p className="text-xs text-muted-foreground">Recommended: PNG, JPG, or SVG. Max size: 2MB. Aspect ratio: ~2:1.</p>
+          <p className="text-xs text-muted-foreground">Visible when light theme is active. Recommended: PNG, JPG, or SVG. Max size: 2MB. Aspect ratio: ~2:1.</p>
         </div>
+
+        <Separator />
+
+        <div className="space-y-2">
+          <Label htmlFor="companyLogoDark" className="text-base font-medium">Dark Mode Logo</Label>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-48 h-24 rounded-md border border-dashed flex items-center justify-center bg-slate-700 overflow-hidden">
+              {logoDarkPreview ? (
+                <Image src={logoDarkPreview} alt="Dark mode logo preview" width={192} height={96} className="object-contain" data-ai-hint="company logo dark" />
+              ) : (
+                <UploadCloud className="h-10 w-10 text-slate-400" />
+              )}
+            </div>
+            <Input id="companyLogoDark" type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={handleLogoDarkChange} className="max-w-xs" />
+          </div>
+          <p className="text-xs text-muted-foreground">Visible when dark theme is active. Ensure good contrast on dark backgrounds.</p>
+        </div>
+
+        <Separator />
         
         <div className="space-y-2">
           <Label htmlFor="primaryColor" className="text-base font-medium">Primary Color</Label>
