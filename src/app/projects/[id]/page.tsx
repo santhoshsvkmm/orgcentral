@@ -2,7 +2,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign, FileQuestion, MessageSquare } from "lucide-react"; // Added MessageSquare
+import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks, DollarSign, FileQuestion, MessageSquare } from "lucide-react";
 import { TaskList } from "@/components/projects/task-list";
 import { PageTitle } from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +40,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link"; 
+import { RfiList } from '@/components/rfi/rfi-list';
+import { RfiForm } from '@/components/rfi/rfi-form';
+import type { RFI } from '@/types/rfi';
+
 
 // Mock fetch function - replace with actual data fetching
 async function getProjectById(id: string): Promise<Project | null> {
@@ -97,6 +101,45 @@ const projectChartConfig = {
   }
 } satisfies ChartConfig;
 
+// Mock RFI data for the project page
+const mockRfisData: RFI[] = [
+   {
+    id: 'rfi-1',
+    projectId: '1', // Assuming this page is for projectId '1'
+    rfiNumber: 'RFI-001',
+    title: 'Clarification on Structural Beam Specifications',
+    description: 'Need detailed specs for the main support beams in Sector A...',
+    status: 'Open',
+    priority: 'High',
+    raisedByUserId: 'user-alice',
+    raisedByUserName: 'Alice Wonderland',
+    assignedToUserId: 'user-bob',
+    assignedToUserName: 'Bob The Builder',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    messages: [],
+    attachments: [],
+    tags: ['Structural', 'Sector A'],
+  },
+   {
+    id: 'rfi-2',
+    projectId: '1',
+    rfiNumber: 'RFI-002',
+    title: 'Electrical Conduit Routing Plan Approval',
+    description: 'Submitting the proposed electrical conduit routing...',
+    status: 'In Progress',
+    priority: 'Medium',
+    raisedByUserId: 'user-charlie',
+    raisedByUserName: 'Charlie Brown',
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    messages: [],
+    attachments: [],
+    tags: ['Electrical', 'Approval'],
+  },
+];
+
 
 export default function ProjectDetailsPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
@@ -108,15 +151,46 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
   const [aiAnalysisResults, setAIAnalysisResults] = useState<AnalyzeProjectIssuesOutput | null>(null);
   const [chartTimeRange, setChartTimeRange] = useState<string>("all");
 
+  const [rfis, setRfis] = useState<RFI[]>([]);
+
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProjectAndRfis = async () => {
       setLoading(true);
       const fetchedProject = await getProjectById(projectId);
       setProject(fetchedProject);
+      // Filter mock RFIs for the current project
+      setRfis(mockRfisData.filter(rfi => rfi.projectId === projectId));
       setLoading(false);
     };
-    fetchProject();
+    fetchProjectAndRfis();
   }, [projectId]);
+
+  const handleAddRfi = (newRfi: RFI) => {
+    setRfis(prevRfis => [
+      {
+        ...newRfi,
+        rfiNumber: `RFI-${String(prevRfis.length + 1).padStart(3, '0')}`, // Simple RFI number generation
+        projectId: projectId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      ...prevRfis,
+    ]);
+  };
+
+  const handleUpdateRfi = (updatedRfi: RFI) => {
+    setRfis(prevRfis =>
+      prevRfis.map(rfi => (rfi.id === updatedRfi.id ? { ...rfi, ...updatedRfi, updatedAt: new Date().toISOString() } : rfi))
+    );
+  };
+
+  const handleDeleteRfi = (rfiId: string) => {
+    setRfis(prevRfis => prevRfis.filter(rfi => rfi.id !== rfiId));
+     toast({
+      title: "RFI Deleted",
+      description: `RFI has been deleted.`,
+    });
+  };
 
   const filteredProjectChartData = useMemo(() => {
     if (chartTimeRange === "last3") {
@@ -290,13 +364,20 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
                 <FileQuestion className="mr-2 h-4 w-4" /> RFIs
               </MenubarSubTrigger>
               <MenubarSubContent>
-                <MenubarItem asChild>
-                  <Link href={`/projects/${project.id}/rfi`}>View All RFIs</Link>
-                </MenubarItem>
-                {/* Optionally add "Create New RFI" if a direct create page/dialog is desired from here */}
+                <RfiForm
+                    mode="create"
+                    projectId={projectId}
+                    onSave={handleAddRfi}
+                    triggerButton={
+                        <MenubarItem onSelect={(e) => e.preventDefault()} className="w-full">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Create New RFI
+                        </MenubarItem>
+                    }
+                />
+                {/* "View All RFIs" is removed as list is inline */}
               </MenubarSubContent>
             </MenubarSub>
-            {/* Other communication items can go here, e.g., Meeting Minutes, Client Portal */}
+            {/* Other communication items can go here */}
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
@@ -468,6 +549,25 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
           </CardContent>
         </Card>
       )}
+      
+      <Separator className="my-8" />
+
+      <Card className="shadow-sm mt-8">
+        <CardHeader>
+          <CardTitle>Requests for Information (RFIs)</CardTitle>
+          <CardDescription>Manage and track RFIs for this project.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RfiList
+            rfis={rfis}
+            projectId={projectId}
+            onUpdateRfi={handleUpdateRfi}
+            onDeleteRfi={handleDeleteRfi}
+          />
+        </CardContent>
+      </Card>
+
+      <Separator className="my-8" />
 
       <TaskList projectId={projectId} />
     </>
