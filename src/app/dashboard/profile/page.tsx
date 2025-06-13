@@ -1,0 +1,146 @@
+
+'use client';
+import { PageTitle } from '@/components/page-title';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from 'react';
+import { Edit3, Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+export default function ProfilePage() {
+  const { toast } = useToast();
+  // Mock user data, in a real app, fetch this
+  const [user, setUser] = useState({
+    name: 'Demo User',
+    email: 'demo@orgcentral.com',
+    role: 'Administrator',
+    bio: 'Experienced project manager with a knack for leading cross-functional teams to deliver high-quality software solutions. Passionate about agile methodologies and continuous improvement.',
+    avatarUrl: 'https://placehold.co/128x128.png'
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState(user);
+
+  useEffect(() => {
+    // Initialize formData when user data is available or changes
+    setFormData(user);
+  }, [user]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    // In a real app, this would be an API call to update user data
+    setUser(formData); 
+    setIsEditing(false);
+    toast({
+      title: 'Profile Updated',
+      description: 'Your profile information has been successfully saved.',
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setFormData(user); // Reset form data to original user data
+    setIsEditing(false);
+  };
+
+  return (
+    <>
+      <PageTitle
+        title="User Profile"
+        description="Manage your personal information and profile settings."
+        actions={
+          isEditing ? (
+            <div className="flex gap-2">
+              <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+                <Save className="mr-2 h-4 w-4" />
+                Save Changes
+              </Button>
+              <Button onClick={handleCancelEdit} variant="outline">
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={() => setIsEditing(true)} variant="outline">
+              <Edit3 className="mr-2 h-4 w-4" />
+              Edit Profile
+            </Button>
+          )
+        }
+      />
+      <div className="grid gap-8 md:grid-cols-3">
+        <div className="md:col-span-1">
+          <Card className="shadow-md">
+            <CardHeader className="items-center text-center p-6">
+              <Avatar className="h-32 w-32 mb-4 border-2 border-primary shadow-lg">
+                <AvatarImage src={isEditing ? formData.avatarUrl : user.avatarUrl} alt={formData.name} data-ai-hint="user portrait" />
+                <AvatarFallback className="text-3xl">{formData.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <CardTitle className="text-2xl font-headline">{isEditing ? formData.name : user.name}</CardTitle>
+              <CardDescription>{user.role}</CardDescription>
+            </CardHeader>
+            {isEditing && (
+              <CardContent className="p-6 pt-0">
+                <div className="space-y-2">
+                   <Label htmlFor="avatarUrl">Avatar URL</Label>
+                   <Input name="avatarUrl" id="avatarUrl" value={formData.avatarUrl} onChange={handleInputChange} placeholder="https://example.com/avatar.png" />
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </div>
+
+        <div className="md:col-span-2">
+          <Card className="shadow-md">
+            <CardHeader className="p-6">
+              <CardTitle>Account Details</CardTitle>
+              <CardDescription>View and update your account information. Your role is managed by administrators.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 p-6">
+              <div>
+                <Label htmlFor="name" className="font-semibold">Full Name</Label>
+                {isEditing ? (
+                  <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="mt-1" />
+                ) : (
+                  <p className="text-foreground mt-1 text-base">{user.name}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="email" className="font-semibold">Email Address</Label>
+                 {isEditing ? (
+                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} className="mt-1" />
+                ) : (
+                  <p className="text-foreground mt-1 text-base">{user.email}</p>
+                )}
+              </div>
+               <div>
+                <Label htmlFor="role" className="font-semibold">Role</Label>
+                <p className="text-muted-foreground mt-1 text-base">{user.role} (Read-only)</p>
+              </div>
+              <div>
+                <Label htmlFor="bio" className="font-semibold">Bio</Label>
+                {isEditing ? (
+                  <Textarea
+                    id="bio"
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    className="mt-1 min-h-[120px]"
+                    placeholder="Tell us a little about yourself..."
+                  />
+                ) : (
+                  <p className="text-muted-foreground mt-1 whitespace-pre-line text-base">{user.bio || 'No bio provided.'}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </>
+  );
+}
