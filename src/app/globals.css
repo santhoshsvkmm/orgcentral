@@ -32,14 +32,14 @@
     --radius: 0.5rem;
 
     /* Sidebar specific colors - Light Theme Updated */
-    --sidebar-background: 215 28% 97%; /* Very light slate gray (#F8F9FA) */
-    --sidebar-foreground: 215 28% 17%; /* Dark slate gray text (#212936) */
-    --sidebar-primary: 217 89% 61%; /* Vivid Blue for active/primary items */
-    --sidebar-primary-foreground: 0 0% 100%; /* White text on primary */
-    --sidebar-accent: 215 20% 90%; /* Slightly darker slate for hover (#E0E5EB) */
-    --sidebar-accent-foreground: 217 89% 61%; /* Primary blue for text on hover/active */
-    --sidebar-border: 215 20% 85%; /* Slate gray border (#D1D8E0) */
-    --sidebar-ring: 217 89% 61%; /* Primary color for focus rings */
+    --sidebar-background: 210 16% 98%; /* #F8F9FA - Very light cool gray */
+    --sidebar-foreground: 210 20% 20%; /* #262D33 - Dark cool gray for text */
+    --sidebar-primary: 217 89% 61%; /* Existing primary blue for active item icon/text */
+    --sidebar-primary-foreground: 0 0% 100%; /* White text on primary (if primary is bg) */
+    --sidebar-accent: 210 16% 90%; /* #E0E5EB - Light gray for hover background */
+    --sidebar-accent-foreground: 217 89% 55%; /* Darker Primary blue for hover text */
+    --sidebar-border: 210 16% 88%; /* #DDE1E6 - Slightly darker gray border */
+    --sidebar-ring: 217 89% 61%; /* Existing primary for focus */
   }
 
   .dark {
@@ -64,13 +64,13 @@
     --ring: 217 89% 61%;
 
     /* Dark Sidebar specific colors - Updated */
-    --sidebar-background: 220 13% 18%; /* Dark slate (#2A2E35) */
-    --sidebar-foreground: 215 20% 85%; /* Light slate gray text (#CBD3DF) */
-    --sidebar-primary: 217 89% 61%; 
+    --sidebar-background: 220 15% 15%; /* #212529 - Very dark slate/charcoal */
+    --sidebar-foreground: 210 15% 85%; /* #CED4DA - Light gray text */
+    --sidebar-primary: 217 89% 61%; /* Existing primary blue for active item icon/text */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 25%; /* Slightly lighter dark slate for hover (#383D47) */
-    --sidebar-accent-foreground: 217 89% 75%; /* Lighter primary blue for text on hover/active */
-    --sidebar-border: 220 13% 22%; /* Darker slate border (#31353F) */
+    --sidebar-accent: 220 15% 25%; /* #343A40 - Slightly lighter dark slate for hover */
+    --sidebar-accent-foreground: 217 89% 75%; /* Lighter primary blue for hover text */
+    --sidebar-border: 220 15% 20%; /* #2C3034 - Darker border */
     --sidebar-ring: 217 89% 61%;
   }
 }
