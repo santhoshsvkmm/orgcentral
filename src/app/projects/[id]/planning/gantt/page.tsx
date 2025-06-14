@@ -118,15 +118,6 @@ export default function GanttChartPage({ params: paramsPromise }: { params: Prom
         }
       />
       <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <GanttChartSquare className="mr-2 h-5 w-5 text-primary" />
-            Gantt Chart Display
-          </CardTitle>
-          <CardDescription>
-            Interactive Gantt chart for project planning and scheduling. Visualize tasks, durations, dependencies, and progress.
-          </CardDescription>
-        </CardHeader>
         <CardContent>
           {error ? (
             <div className="p-6 border border-red-300 bg-red-50 rounded-md">
