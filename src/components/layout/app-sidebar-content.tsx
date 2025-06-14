@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart, UsersRound, TrendingUp, MessagesSquare, History } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, HardHat, Handshake, Folder, Landmark, PieChart, UsersRound, TrendingUp, MessagesSquare, History, Mailbox } from 'lucide-react';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 
@@ -14,12 +14,13 @@ const navItems = [
   { href: '/hr', label: 'HR Management', icon: UsersRound },
   { href: '/sales', label: 'Sales & CRM', icon: TrendingUp },
   { href: '/subcontractors', label: 'Subcontractors', icon: HardHat },
-  { href: '/consultants', label: 'Consultants', icon: Users }, // Consider a different icon if 'Users' is too generic
+  { href: '/consultants', label: 'Consultants', icon: Users }, 
   { href: '/clients', label: 'Clients', icon: Handshake },
   { href: '/drive', label: 'File Storage', icon: Folder },
   { href: '/financials', label: 'Financials', icon: Landmark },
   { href: '/reports', label: 'Reports', icon: PieChart },
   { href: '/communication', label: 'Communication', icon: MessagesSquare },
+  { href: '/email-templates', label: 'Email Templates', icon: Mailbox },
   { href: '/audit-logs', label: 'Audit Logs', icon: History },
 ];
 
