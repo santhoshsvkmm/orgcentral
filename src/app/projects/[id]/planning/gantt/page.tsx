@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, use } from 'react';
@@ -8,14 +7,20 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, GanttChartSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GanttChart } from '@/components/ui/gantt-chart';
 
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 100)); // Simulate API delay
-  if (id === "1") return "Alpha Launch";
-  if (id === "2") return "Beta Platform Development";
-  if (id === "3") return "Gamma Initiative Research";
-  return `Project (ID: ${id})`;
+  try {
+    await new Promise(resolve => setTimeout(resolve, 100)); // Simulate API delay
+    if (id === "1") return "Alpha Launch";
+    if (id === "2") return "Beta Platform Development";
+    if (id === "3") return "Gamma Initiative Research";
+    return `Project (ID: ${id})`;
+  } catch (error) {
+    console.error('Error fetching project name:', error);
+    throw new Error('Failed to fetch project name. Please try again.');
+  }
 }
 
 export default function GanttChartPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
@@ -23,6 +28,8 @@ export default function GanttChartPage({ params: paramsPromise }: { params: Prom
   const projectId = params.id;
   const [projectName, setProjectName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dhtmlxLoaded, setDhtmlxLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (projectId) {
@@ -34,15 +41,46 @@ export default function GanttChartPage({ params: paramsPromise }: { params: Prom
         })
         .catch(error => {
           console.error("Failed to fetch project name:", error);
-          setProjectName("Error"); // Or handle error appropriately
+          setProjectName("Unknown Project");
+          setError(`Failed to load project details: ${error.message || 'Unknown error'}`);
           setIsLoading(false);
         });
     } else {
-        // Handle case where projectId is not available
-        setIsLoading(false); 
-        setProjectName(null); 
+      // Handle case where projectId is not available
+      setIsLoading(false); 
+      setProjectName(null); 
     }
   }, [projectId]);
+
+  // Load dhtmlxGantt CSS
+  useEffect(() => {
+    // Add dhtmlxGantt CSS
+    try {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/vendor/dhtmlx/codebase/dhtmlxgantt.css';
+      
+      link.onload = () => {
+        setDhtmlxLoaded(true);
+      };
+      
+      link.onerror = () => {
+        setError('Failed to load Gantt chart styles. Please refresh the page to try again.');
+      };
+      
+      document.head.appendChild(link);
+      
+      return () => {
+        // Clean up on unmount
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
+      };
+    } catch (err) {
+      console.error('Error loading dhtmlxGantt CSS:', err);
+      setError('An error occurred while setting up the Gantt chart. Please try again later.');
+    }
+  }, []);
 
   if (isLoading && !projectName) { 
     return (
@@ -86,30 +124,31 @@ export default function GanttChartPage({ params: paramsPromise }: { params: Prom
             Gantt Chart Display
           </CardTitle>
           <CardDescription>
-            This area is designated for the project&apos;s Gantt chart, visualizing task schedules and progress over time.
+            Interactive Gantt chart for project planning and scheduling. Visualize tasks, durations, dependencies, and progress.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
-            <p className="font-semibold text-blue-700">Note on Gantt Chart Implementation:</p>
-            <p className="text-sm text-blue-600 mt-1">
-              Integrating a comprehensive, feature-rich Gantt chart library like **dhtmlx-gantt** involves specific setup and licensing considerations that fall outside the immediate capabilities of our current UI component set (ShadCN UI & Recharts).
-            </p>
-          </div>
-
-          <p className="text-muted-foreground">
-            While **ShadCN UI charts (based on Recharts)** can be used to create simplified Gantt-like visualizations (e.g., using horizontal bar charts to represent task durations against a timeline), developing a full-fledged Gantt chart with features such as interactive task dependencies, drag-and-drop scheduling, critical path highlighting, and resource management typically requires a dedicated Gantt component or library.
-          </p>
-
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed" data-ai-hint="gantt chart placeholder">
-            <GanttChartSquare className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-semibold text-foreground">Gantt Chart Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1">Task timeline visualization will appear here.</p>
-          </div>
-          
-          <p className="text-sm text-muted-foreground mt-4">
-            For a rich Gantt experience as offered by specialized libraries like dhtmlx-gantt, further integration steps would be necessary. We can explore options for a simplified custom Gantt representation using available tools if that meets your needs.
-          </p>
+        <CardContent>
+          {error ? (
+            <div className="p-6 border border-red-300 bg-red-50 rounded-md">
+              <h3 className="text-lg font-semibold text-red-700 mb-2">Error Loading Gantt Chart</h3>
+              <p className="text-red-600">{error}</p>
+              <Button 
+                variant="outline" 
+                className="mt-4" 
+                onClick={() => window.location.reload()}
+              >
+                Retry
+              </Button>
+            </div>
+          ) : dhtmlxLoaded && projectId && projectName ? (
+            <GanttChart projectId={projectId} projectName={projectName || ''} />
+          ) : (
+            <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed">
+              <GanttChartSquare className="h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-xl font-semibold text-foreground">Loading Gantt Chart...</p>
+              <p className="text-sm text-muted-foreground mt-1">Please wait while the chart is being prepared.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </>
