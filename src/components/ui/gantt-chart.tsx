@@ -10,8 +10,8 @@ import { Label } from './label';
 import { Slider } from './slider';
 import { Calendar, ChevronDown } from 'lucide-react';
 
-// Ensure the DHTMLX Gantt CSS is imported
-import '/public/vendor/dhtmlx/codebase/dhtmlxgantt.css';
+import '@/vendor/dhtmlx/codebase/dhtmlxgantt.css';
+
 
 // Define task data structure
 interface Task {
