@@ -49,7 +49,7 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
       header: "Name",
       enableSorting: true,
       cell: ({ row }) => (
-        <Link href={`/projects/${row.id}`} className="hover:underline font-medium">
+        <Link href={`/projects/${row.id}`} className="hover:underline font-medium text-primary">
           {row.name}
         </Link>
       ),
@@ -176,3 +176,4 @@ export function ProjectList({ projects, onUpdateProject, onDeleteProject }: Proj
     </Card>
   );
 }
+
