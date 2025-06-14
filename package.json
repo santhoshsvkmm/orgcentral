@@ -60,8 +60,10 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint-config-next": "^15.3.3",
     "genkit-cli": "^1.8.0",
     "postcss": "^8",
+    "simple-git-hooks": "^2.13.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
