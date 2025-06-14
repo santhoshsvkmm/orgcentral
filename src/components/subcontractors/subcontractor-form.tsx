@@ -75,13 +75,13 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
     setMappedProjects(mappedProjects.filter((_, i) => i !== index));
   };
 
-  const handleProjectMappingChange = (index: number, field: keyof SubcontractorProjectMapping, value: any) => {
+  const handleProjectMappingChange = (index: number, field: keyof SubcontractorProjectMapping, value: SubcontractorProjectMapping[keyof SubcontractorProjectMapping]) => {
     const newMappedProjects = [...mappedProjects];
-    (newMappedProjects[index] as any)[field] = value;
+ newMappedProjects[index][field] = value;
     setMappedProjects(newMappedProjects);
   };
 
-  const handleServiceTypeChange = (projectIndex: number, service: SuppliedService, checked: boolean) => {
+  function handleServiceTypeChange(projectIndex: number, service: SuppliedService, checked: boolean) {
     const newMappedProjects = [...mappedProjects];
     const currentServices = newMappedProjects[projectIndex].suppliedServices;
     if (checked) {
@@ -92,7 +92,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
       newMappedProjects[projectIndex].suppliedServices = currentServices.filter(s => s !== service);
     }
     setMappedProjects(newMappedProjects);
-  };
+  }
 
   const handleSendInvitation = (index: number) => {
     const newMappedProjects = [...mappedProjects];
@@ -280,13 +280,13 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
             </div>
              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700">
                 <AlertTriangle className="h-4 w-4 inline mr-1 mb-0.5" />
-                <strong>Reminder:</strong> The "Send Invitation" feature is a frontend prototype. In a real application, this would trigger backend processes to send actual emails and manage invitation lifecycles.
+                <strong>Reminder:</strong> The &quot;Send Invitation&quot; feature is a frontend prototype. In a real application, this would trigger backend processes to send actual emails and manage invitation lifecycles.
             </div>
           </div>
           <DialogFooter className="pt-6 border-t mt-4">
             <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
             <Button type="submit" className="bg-primary hover:bg-primary/90">
-              {mode === 'create' ? 'Create Subcontractor' : 'Save Changes'}
+              {mode === &#x27;create&#x27; ? &#x27;Create Subcontractor&#x27; : &#x27;Save Changes&#x27;}
             </Button>
           </DialogFooter>
         </form>

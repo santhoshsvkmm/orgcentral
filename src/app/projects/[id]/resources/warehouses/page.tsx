@@ -50,7 +50,9 @@ export default function ProjectWarehousesPage({ params: paramsPromise }: { param
       }
       setLoadingProjectDetails(false);
     };
-    fetchProjectData();
+    if (projectId) {
+        fetchProjectData();
+    }
   }, [projectId, toast]);
 
   const handleCreateWarehouse = (newWarehouse: Warehouse) => {
@@ -109,4 +111,3 @@ export default function ProjectWarehousesPage({ params: paramsPromise }: { param
     </>
   );
 }
-

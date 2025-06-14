@@ -85,7 +85,9 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
       setAllRfis(projectRfis);
       setLoadingProjectName(false);
     };
-    fetchProjectDetails();
+    if (projectId) {
+        fetchProjectDetails();
+    }
   }, [projectId]);
 
   useEffect(() => {
@@ -277,4 +279,3 @@ export default function ProjectRfiListPage({ params: paramsPromise }: { params: 
     </>
   );
 }
-

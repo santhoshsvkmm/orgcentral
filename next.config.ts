@@ -1,4 +1,9 @@
+
 import type {NextConfig} from 'next';
+
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -25,6 +30,14 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  experimental: {
+    allowedDevOrigins: [
+      'https://6000-firebase-studio-1749708322608.cluster-ejd22kqny5htuv5dfowoyipt52.cloudworkstations.dev',
+    ],
+  },
 };
 
-export default nextConfig;
+// Conditionally apply the bundle analyzer
+const finalConfig = process.env.ANALYZE === 'true' ? withBundleAnalyzer(nextConfig) : nextConfig;
+
+module.exports = finalConfig;

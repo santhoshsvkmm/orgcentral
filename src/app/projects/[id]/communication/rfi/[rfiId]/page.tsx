@@ -90,8 +90,8 @@ async function getRfiById(rfiId: string, projectId: string): Promise<RFI | null>
 
 
 export default function RfiDetailPage({ params: paramsPromise }: { params: Promise<{ id: string; rfiId: string }> }) {
-  const params = use(paramsPromise);
-  const { id: projectId, rfiId } = params; // 'id' here is projectId
+  const resolvedParams = use(paramsPromise);
+  const { id: projectId, rfiId } = resolvedParams; 
   const [rfi, setRfi] = useState<RFI | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -102,7 +102,9 @@ export default function RfiDetailPage({ params: paramsPromise }: { params: Promi
       setRfi(fetchedRfi);
       setLoading(false);
     };
-    fetchRfi();
+    if (projectId && rfiId) {
+        fetchRfi();
+    }
   }, [rfiId, projectId]);
 
   const handleUpdateRfi = (updatedRfi: RFI) => {
@@ -121,8 +123,8 @@ export default function RfiDetailPage({ params: paramsPromise }: { params: Promi
         title="Loading RFI Details..."
         description="Please wait while we fetch the information."
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}/communication/rfi`}>
+          <Button variant="outline" asChild disabled={!projectId}>
+            <Link href={projectId ? `/projects/${projectId}/communication/rfi` : '#'}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to RFIs
             </Link>
@@ -149,8 +151,8 @@ export default function RfiDetailPage({ params: paramsPromise }: { params: Promi
         title="RFI Not Found"
         description={`Could not find RFI with ID: ${rfiId} for this project.`}
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}/communication/rfi`}>
+          <Button variant="outline" asChild disabled={!projectId}>
+            <Link href={projectId ? `/projects/${projectId}/communication/rfi` : '#'}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to RFIs
             </Link>
@@ -178,4 +180,3 @@ export default function RfiDetailPage({ params: paramsPromise }: { params: Promi
     </>
   );
 }
-

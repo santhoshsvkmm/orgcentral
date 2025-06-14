@@ -19,18 +19,18 @@ async function getProjectNameById(id: string): Promise<string> {
 export default function ResourceAllocationPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const projectId = params.id;
-  const projectName = use(getProjectNameById(projectId));
+  const projectName = use(getProjectNameById(projectId || '')); 
 
   return (
     <>
       <PageTitle
-        title={`Resource Allocation: ${projectName}`}
+        title={`Resource Allocation: ${projectName || (projectId ? `Project ${projectId}`: 'Project')}`}
         description="Plan and manage resource allocation for project tasks and phases."
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}`}>
+          <Button variant="outline" asChild disabled={!projectId}>
+            <Link href={projectId ? `/projects/${projectId}` : '/projects'}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Project Details
+              Back to {projectId ? 'Project Details' : 'Projects'}
             </Link>
           </Button>
         }

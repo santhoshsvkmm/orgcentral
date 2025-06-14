@@ -5,8 +5,8 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { PageTitle } from '@/components/page-title';
 import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
-import { UserCog, BellRing, Settings2, Languages, LayoutGrid } from 'lucide-react'; // Added LayoutGrid for Overview
-import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent, MenubarItem } from "@/components/ui/menubar"; // Added MenubarContent and MenubarItem
+import { UserCog, BellRing, Settings2, LayoutGrid } from 'lucide-react'; // Added LayoutGrid for Overview
+import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
 const emailTemplateNavItems = [
   { href: '/email-templates', label: 'Overview', icon: LayoutGrid, exact: true },

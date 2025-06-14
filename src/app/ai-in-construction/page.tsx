@@ -3,7 +3,7 @@
 
 import { MainHeader } from '@/components/layout/main-header';
 import { Button } from '@/components/ui/button';
-import { Brain, UserCheck, AlertTriangle, TrendingUp, Building, Layers, Wand2, Mail, Phone, MapPin, Twitter, Facebook, Linkedin, CheckCircle } from 'lucide-react';
+import { Brain, UserCheck, AlertTriangle, TrendingUp, Building, Twitter, Facebook, Linkedin, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';

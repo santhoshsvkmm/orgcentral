@@ -22,18 +22,18 @@ export default function MicroPlanningGanttPage({ params: paramsPromise }: { para
   const params = use(paramsPromise);
   const projectId = params.id;
   
-  const projectName = use(getProjectNameById(projectId));
+  const projectName = use(getProjectNameById(projectId || '')); 
 
   return (
     <>
       <PageTitle
-        title={`Micro Planning: Gantt Chart - ${projectName}`}
+        title={`Micro Planning: Gantt Chart - ${projectName || (projectId ? `Project ${projectId}`: 'Project')}`}
         description="Visual timeline for tasks within the current sprint or iteration."
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}`}>
+          <Button variant="outline" asChild disabled={!projectId}>
+            <Link href={projectId ? `/projects/${projectId}` : '/projects'}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Project Details
+              Back to {projectId ? 'Project Details' : 'Projects'}
             </Link>
           </Button>
         }

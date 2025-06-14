@@ -1,12 +1,13 @@
 
 'use client';
 
-import { use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Target } from 'lucide-react'; // Added Target icon
+import { ArrowLeft, Target } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
@@ -17,24 +18,62 @@ async function getProjectNameById(id: string): Promise<string> {
   return `Project (ID: ${id})`;
 }
 
-
 export default function MilestonesPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const projectId = params.id;
-  
-  const projectName = use(getProjectNameById(projectId));
+  const [projectName, setProjectName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    if (projectId) {
+      setIsLoading(true);
+      getProjectNameById(projectId)
+        .then(name => {
+          setProjectName(name);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.error("Failed to fetch project name:", error);
+          setProjectName("Error");
+          setIsLoading(false);
+        });
+    } else {
+        setIsLoading(false);
+        setProjectName(null);
+    }
+  }, [projectId]);
+
+  if (isLoading && !projectName) {
+    return (
+      <>
+        <div className="mb-6">
+          <Skeleton className="h-8 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <Card className="shadow-md">
+          <CardHeader>
+            <Skeleton className="h-6 w-1/3 mb-1" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-72 w-full" />
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 
   return (
     <>
       <PageTitle
-        title={`Project Milestones: ${projectName}`}
+        title={`Project Milestones: ${projectName || (projectId ? `Project ${projectId}` : 'Project')}`}
         description="Track key project milestones, their target dates, and completion status."
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}`}>
+          <Button variant="outline" asChild disabled={!projectId}>
+            <Link href={projectId ? `/projects/${projectId}` : '/projects'}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Project Details
+              Back to {projectId ? 'Project Details' : 'Projects'}
             </Link>
           </Button>
         }

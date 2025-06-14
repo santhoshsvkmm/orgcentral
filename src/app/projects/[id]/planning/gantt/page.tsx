@@ -1,45 +1,80 @@
 
 'use client';
 
-import { use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, GanttChartSquare } from 'lucide-react'; // Added GanttChartSquare
+import { ArrowLeft, GanttChartSquare } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
   await new Promise(resolve => setTimeout(resolve, 100)); // Simulate API delay
-  // This is a simplified example. In a real app, you'd fetch actual project data.
-  // For instance, you might have a global store, context, or fetch from an API endpoint.
-  // For now, we'll just return a generic name based on ID.
   if (id === "1") return "Alpha Launch";
   if (id === "2") return "Beta Platform Development";
   if (id === "3") return "Gamma Initiative Research";
   return `Project (ID: ${id})`;
 }
 
-
 export default function GanttChartPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const projectId = params.id;
-  
-  // In a real app, you'd fetch project details here to get the name, etc.
-  // For this example, we use a mock async function.
-  const projectName = use(getProjectNameById(projectId));
+  const [projectName, setProjectName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    if (projectId) {
+      setIsLoading(true);
+      getProjectNameById(projectId)
+        .then(name => {
+          setProjectName(name);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.error("Failed to fetch project name:", error);
+          setProjectName("Error"); // Or handle error appropriately
+          setIsLoading(false);
+        });
+    } else {
+        // Handle case where projectId is not available
+        setIsLoading(false); 
+        setProjectName(null); 
+    }
+  }, [projectId]);
+
+  if (isLoading && !projectName) { 
+    return (
+      <>
+        <div className="mb-6">
+          <Skeleton className="h-8 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <Card className="shadow-md">
+          <CardHeader>
+            <Skeleton className="h-6 w-1/3 mb-1" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-72 w-full" />
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 
   return (
     <>
       <PageTitle
-        title={`Gantt Chart: ${projectName}`}
+        title={`Gantt Chart: ${projectName || (projectId ? `Project ${projectId}` : 'Project')}`}
         description="Visual timeline for project tasks, durations, and dependencies."
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}`}>
+          <Button variant="outline" asChild disabled={!projectId}>
+            <Link href={projectId ? `/projects/${projectId}` : '/projects'}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Project Details
+              Back to {projectId ? 'Project Details' : 'Projects'}
             </Link>
           </Button>
         }
@@ -58,14 +93,14 @@ export default function GanttChartPage({ params: paramsPromise }: { params: Prom
           <div className="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
             <p className="font-semibold text-blue-700">Note on Gantt Chart Implementation:</p>
             <p className="text-sm text-blue-600 mt-1">
-              Integrating a comprehensive, feature-rich Gantt chart library like <strong>dhtmlx-gantt</strong> involves specific setup and licensing considerations that fall outside the immediate capabilities of our current UI component set (ShadCN UI & Recharts).
+              Integrating a comprehensive, feature-rich Gantt chart library like **dhtmlx-gantt** involves specific setup and licensing considerations that fall outside the immediate capabilities of our current UI component set (ShadCN UI & Recharts).
             </p>
           </div>
-          
+
           <p className="text-muted-foreground">
-            While <strong>ShadCN UI charts (based on Recharts)</strong> can be used to create simplified Gantt-like visualizations (e.g., using horizontal bar charts to represent task durations against a timeline), developing a full-fledged Gantt chart with features such as interactive task dependencies, drag-and-drop scheduling, critical path highlighting, and resource management typically requires a dedicated Gantt component or library.
+            While **ShadCN UI charts (based on Recharts)** can be used to create simplified Gantt-like visualizations (e.g., using horizontal bar charts to represent task durations against a timeline), developing a full-fledged Gantt chart with features such as interactive task dependencies, drag-and-drop scheduling, critical path highlighting, and resource management typically requires a dedicated Gantt component or library.
           </p>
-          
+
           <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed" data-ai-hint="gantt chart placeholder">
             <GanttChartSquare className="h-16 w-16 text-muted-foreground mb-4" />
             <p className="text-xl font-semibold text-foreground">Gantt Chart Placeholder</p>
@@ -80,4 +115,3 @@ export default function GanttChartPage({ params: paramsPromise }: { params: Prom
     </>
   );
 }
-

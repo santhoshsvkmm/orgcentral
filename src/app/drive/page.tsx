@@ -4,11 +4,10 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input"; // Added Input
+import { Input } from "@/components/ui/input";
 import { FolderPlus, Folder as FolderIcon, FileText as FileIcon, HardDrive, Search } from "lucide-react"; // Added Search
 import { useState, useMemo } from "react";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress"; // Assuming Progress is used
 
 // Mock file/folder structure
 interface FileSystemItem {
@@ -63,8 +62,8 @@ const formatBytes = (bytes: number, decimals = 2) => {
 
 export default function DrivePage() {
   const [currentPath, setCurrentPath] = useState<string[]>([]); // Array of folder names for breadcrumbs
-  const [items, setItems] = useState<FileSystemItem[]>(initialFileSystem);
   const [filterText, setFilterText] = useState<string>(''); // State for filter text
+  const [items, setItems] = useState<FileSystemItem[]>(initialFileSystem); // Keep items state if navigation is planned
 
   const totalSpaceGB = 15; // 15 GB total storage
   const totalSpaceBytes = totalSpaceGB * 1024 * 1024 * 1024;

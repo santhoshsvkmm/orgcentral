@@ -1,13 +1,14 @@
 
 'use client';
 
-import { use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Box as BoxIcon, Edit3, MessageSquarePlus } from 'lucide-react'; // Added MessageSquarePlus for annotation idea
+import { ArrowLeft, Box as BoxIcon, Edit3, MessageSquarePlus } from 'lucide-react';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
@@ -18,18 +19,53 @@ async function getProjectNameById(id: string): Promise<string> {
   return `Project (ID: ${id})`;
 }
 
-
 export default function ModelViewerPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const projectId = params.id;
-  
-  const projectName = use(getProjectNameById(projectId));
+  const [projectName, setProjectName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    if (projectId) {
+      setIsLoading(true);
+      getProjectNameById(projectId)
+        .then(name => {
+          setProjectName(name);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.error("Failed to fetch project name:", error);
+          setProjectName("Error");
+          setIsLoading(false);
+        });
+    }
+  }, [projectId]);
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="mb-6">
+          <Skeleton className="h-8 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <Card className="shadow-md">
+          <CardHeader>
+            <Skeleton className="h-6 w-1/3 mb-1" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-96 w-full" />
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 
   return (
     <>
       <PageTitle
-        title={`3D Model Space: ${projectName}`}
+        title={`3D Model Space: ${projectName || 'Project'}`}
         description="View, interact with, annotate, and manage 3D models associated with this project."
         actions={
           <Button variant="outline" asChild>
@@ -70,6 +106,11 @@ export default function ModelViewerPage({ params: paramsPromise }: { params: Pro
               className="w-full h-full object-cover"
               data-ai-hint="3d model architecture"
             />
+            <div className="absolute flex flex-col items-center justify-center text-center p-4 bg-black/30 rounded-md">
+                <MessageSquarePlus className="h-12 w-12 text-white/70 mb-2" />
+                <p className="text-lg font-semibold text-white">3D Viewer & Annotator Area</p>
+                <p className="text-xs text-white/80">Interactive model viewing and annotation tools will be available here.</p>
+            </div>
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">

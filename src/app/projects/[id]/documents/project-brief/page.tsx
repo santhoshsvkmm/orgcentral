@@ -71,4 +71,3 @@ export default function ProjectBriefPage({ params: paramsPromise }: { params: Pr
     </>
   );
 }
-

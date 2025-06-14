@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
 import { useState, useEffect, use, useMemo } from "react";
 import type { Project } from "@/components/projects/project-form";
-import { ProjectMenubar } from "@/components/projects/project-menubar"; // Import the new menubar
+import { ProjectMenubar } from "@/components/projects/project-menubar"; 
 import { analyzeProjectIssues, AnalyzeProjectIssuesInput, AnalyzeProjectIssuesOutput, CriticalIssue } from "@/ai/flows/analyze-project-issues-flow";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";

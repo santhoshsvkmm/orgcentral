@@ -71,4 +71,3 @@ export default function MeetingNotesPage({ params: paramsPromise }: { params: Pr
     </>
   );
 }
-
