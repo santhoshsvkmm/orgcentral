@@ -5,11 +5,11 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96%; /* #F5F5F5 Light Gray */
+    --background: 40 30% 97%; /* Very Light Ivory */
     --foreground: 240 10% 3.9%; /* Dark Gray/Almost Black for text */
     --card: 0 0% 100%; /* White */
     --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
+    --popover: 0 0% 100%; /* White */
     --popover-foreground: 240 10% 3.9%;
     --primary: 217 89% 61%; /* #4285F4 Vivid Blue */
     --primary-foreground: 0 0% 100%; /* White */
@@ -43,11 +43,11 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 210 15% 12%; /* Deep Cool Charcoal */
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 210 15% 18%; /* Dark Cool Slate */
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 210 15% 18%; /* Dark Cool Slate */
     --popover-foreground: 0 0% 98%;
     --primary: 217 89% 61%;
     --primary-foreground: 0 0% 100%;
