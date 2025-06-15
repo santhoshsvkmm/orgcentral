@@ -35,30 +35,30 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
       accessorKey: "name",
       header: "Company Name",
       enableSorting: true,
-      cell: ({ row }) => <span className="font-medium">{row.name}</span>,
+      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
     },
     {
       accessorKey: "trade",
       header: "Trade/Specialty",
       enableSorting: true,
-      cell: ({ row }) => <Badge variant="secondary">{row.trade}</Badge>,
+      cell: ({ row }) => <Badge variant="secondary">{row.original.trade}</Badge>,
     },
     {
       accessorKey: "contactPerson",
       header: "Contact Person",
       enableSorting: true,
-      cell: ({ row }) => <>{row.contactPerson}</>,
+      cell: ({ row }) => <>{row.original.contactPerson}</>,
     },
     {
       accessorKey: "email",
       header: "Email",
       enableSorting: true,
-      cell: ({ row }) => <>{row.email}</>,
+      cell: ({ row }) => <>{row.original.email}</>,
     },
     {
       accessorKey: "phone",
       header: "Phone",
-      cell: ({ row }) => <>{row.phone || 'N/A'}</>,
+      cell: ({ row }) => <>{row.original.phone || 'N/A'}</>,
     },
     {
       accessorKey: "mappedProjectsCount",
@@ -66,7 +66,7 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
       enableSorting: true,
       cell: ({ row }) => (
         <Badge variant="outline">
-          {row.mappedProjects.length} Project{row.mappedProjects.length === 1 ? "" : "s"}
+          {row.original.mappedProjects.length} Project{row.original.mappedProjects.length === 1 ? "" : "s"}
         </Badge>
       ),
     },
@@ -77,7 +77,7 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
         <div className="flex items-center justify-end">
           <SubcontractorForm
             mode="edit"
-            subcontractorData={row}
+            subcontractorData={row.original}
             onSave={onUpdateSubcontractor}
             triggerButton={
               <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 p-0">
@@ -112,12 +112,12 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the subcontractor "{row.name}".
+                      This action cannot be undone. This will permanently delete the subcontractor "{row.original.name}".
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(row)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                    <AlertDialogAction onClick={() => handleDelete(row.original)} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>

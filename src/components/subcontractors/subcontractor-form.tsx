@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useState, type FormEvent, useEffect } from "react";
 import type { Subcontractor, SubcontractorProjectMapping, SuppliedService, InvitationStatus } from "@/types/subcontractor";
-import { PlusCircle, Trash2, Send, AlertTriangle, CheckCircleIcon, ClockIcon, BanIcon, InfoIcon } from "lucide-react";
+import { PlusCircle, Trash2, Send, AlertTriangle, CheckCircle, ClockIcon, BanIcon, InfoIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { formatDate } from "@/lib/date-utils";
@@ -77,7 +77,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
 
   const handleProjectMappingChange = (index: number, field: keyof SubcontractorProjectMapping, value: SubcontractorProjectMapping[keyof SubcontractorProjectMapping]) => {
     const newMappedProjects = [...mappedProjects];
- newMappedProjects[index][field] = value;
+    newMappedProjects[index][field] = value;
     setMappedProjects(newMappedProjects);
   };
 
@@ -117,7 +117,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
     switch (status) {
       case "Not Sent": return <Badge variant="outline" className="border-dashed"><InfoIcon className="h-3 w-3 mr-1" />{status}</Badge>;
       case "Pending": return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-700 border-yellow-500/50"><ClockIcon className="h-3 w-3 mr-1" />{status}</Badge>;
-      case "Accepted": return <Badge variant="secondary" className="bg-green-500/20 text-green-700 border-green-500/50"><CheckCircleIcon className="h-3 w-3 mr-1" />{status}</Badge>;
+      case "Accepted": return <Badge variant="secondary" className="bg-green-500/20 text-green-700 border-green-500/50"><CheckCircle className="h-3 w-3 mr-1" />{status}</Badge>;
       case "Declined": return <Badge variant="destructive"><BanIcon className="h-3 w-3 mr-1" />{status}</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
@@ -286,7 +286,7 @@ export function SubcontractorForm({ triggerButton, mode, subcontractorData, onSa
           <DialogFooter className="pt-6 border-t mt-4">
             <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
             <Button type="submit" className="bg-primary hover:bg-primary/90">
-              {mode === &#x27;create&#x27; ? &#x27;Create Subcontractor&#x27; : &#x27;Save Changes&#x27;}
+              {mode === "create" ? "Create Subcontractor" : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>
