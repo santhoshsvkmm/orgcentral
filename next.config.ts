@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Disable static generation for specific pages
+  unstable_excludeFiles: ['**/subcontractors/**'],
   images: {
     remotePatterns: [
       {
