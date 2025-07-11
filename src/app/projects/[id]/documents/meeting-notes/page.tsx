@@ -6,7 +6,9 @@ import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
 import { ArrowLeft, ClipboardList } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
@@ -50,6 +52,36 @@ export default function MeetingNotesPage({ params: paramsPromise }: { params: Pr
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Add New Meeting Notes Section */}
+ <div className="space-y-4">
+ <h3 className="text-lg font-semibold">Add New Meeting Note</h3>
+ <div className="grid gap-2">
+ <Label htmlFor="meetingDate">Date</Label>
+ <Input id="meetingDate" type="date" />
+ </div>
+ <div className="grid gap-2">
+ <Label htmlFor="meetingTopic">Topic</Label>
+ <Input id="meetingTopic" type="text" placeholder="Meeting Topic" />
+ </div>
+ <div className="grid gap-2">
+ <Label htmlFor="meetingNotes">Notes</Label>
+ {/* Replace with a Rich Text Editor later */}
+ <textarea
+ id="meetingNotes"
+ className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+ placeholder="Enter meeting notes here..."
+ ></textarea>
+ </div>
+ <Button>Save Meeting Note</Button>
+ </div>
+
+ {/* Previous Meeting Notes Section */}
+ <div className="space-y-4 mt-8">
+ <h3 className="text-lg font-semibold">Previous Meeting Notes</h3>
+ <div className="p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-48 border border-dashed">
+ <p className="text-sm text-muted-foreground">Previous meeting notes will be listed here.</p>
+ </div>
+ </div>
           <div className="p-4 border-l-4 border-purple-500 bg-purple-50 rounded-md">
             <p className="font-semibold text-purple-700">Note on Meeting Notes Management:</p>
             <p className="text-sm text-purple-600 mt-1">

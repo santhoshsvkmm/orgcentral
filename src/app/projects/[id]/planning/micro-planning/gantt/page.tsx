@@ -8,6 +8,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, GanttChartSquare } from 'lucide-react';
 
+// TODO: Import your Gantt chart component here
+// import { SprintGanttChart } from '@/components/projects/micro-planning/sprint-gantt-chart';
+
+
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
   await new Promise(resolve => setTimeout(resolve, 100)); // Simulate API delay
@@ -50,16 +54,19 @@ export default function MicroPlanningGanttPage({ params: paramsPromise }: { para
         </CardHeader>
         <CardContent className="space-y-4">
            <div className="p-4 border-l-4 border-teal-500 bg-teal-50 rounded-md">
-            <p className="font-semibold text-teal-700">Note on Sprint Gantt Chart:</p>
+ <p className="font-semibold text-teal-700">Note on Sprint Gantt Chart:</p>
             <p className="text-sm text-teal-600 mt-1">
               This view is tailored for short-term planning within a sprint or iteration, highlighting immediate task schedules and dependencies.
             </p>
           </div>
-          
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed" data-ai-hint="sprint gantt chart placeholder">
-            <GanttChartSquare className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-semibold text-foreground">Sprint Gantt Chart Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1">Task timeline visualization for the current micro-cycle will appear here.</p>
+
+ {/* TODO: Replace the placeholder div with your actual Gantt chart component */}
+ {/* You will likely need to fetch the sprint tasks based on projectId and pass them as data prop */}
+ {/* <SprintGanttChart projectId={projectId} data={sprintTasks} /> */}
+          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed">
+ <GanttChartSquare className="h-16 w-16 text-muted-foreground mb-4" />
+ <p className="text-xl font-semibold text-foreground">Sprint Gantt Chart Placeholder</p>
+ <p className="text-sm text-muted-foreground mt-1">Task timeline visualization for the current micro-cycle will appear here.</p>
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">

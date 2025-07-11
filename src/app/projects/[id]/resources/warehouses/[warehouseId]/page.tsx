@@ -1,5 +1,5 @@
 
-'use client';
+
 
 import { use } from 'react';
 import Link from 'next/link';
@@ -11,11 +11,12 @@ import { Separator } from '@/components/ui/separator';
 import type { Warehouse } from '@/types/warehouse';
 import { formatDate } from '@/lib/date-utils';
 
+
 // Mock data for warehouses (same as in warehouses page for consistency)
 const initialMockWarehouses: Warehouse[] = [
-  { id: 'wh-1', projectId: '1', name: 'Main Site Storage A', location: 'Sector A, Bay 1', capacity: 500, notes: 'Stores primary construction materials.', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'wh-2', projectId: '1', name: 'Equipment Shed 1', location: 'Near Gate 3', capacity: 100, notes: 'Heavy machinery and tools.', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'wh-3', projectId: '2', name: 'Central Parts Hub', location: 'Building C, Floor 1', capacity: 2000, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'wh-1', projectId: '1', name: 'Main Site Storage A', location: 'Sector A, Bay 1', capacity: 500, notes: 'Stores primary construction materials.', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), currentStock: 300 },
+  { id: 'wh-2', projectId: '1', name: 'Equipment Shed 1', location: 'Near Gate 3', capacity: 100, notes: 'Heavy machinery and tools.', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), currentStock: 80 },
+  { id: 'wh-3', projectId: '2', name: 'Central Parts Hub', location: 'Building C, Floor 1', capacity: 2000, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), currentStock: 1500 },
 ];
 
 // Mock function to get project name
@@ -27,10 +28,10 @@ async function getProjectNameById(id: string): Promise<string> {
 }
 
 // Mock function to get warehouse by ID
-async function getWarehouseById(warehouseId: string, projectId: string): Promise<Warehouse | null> {
+async function getWarehouseById(warehouseId: string, projectId: string): Promise<Warehouse | null> { 
     await new Promise(resolve => setTimeout(resolve, 50));
     return initialMockWarehouses.find(wh => wh.id === warehouseId && wh.projectId === projectId) || null;
-}
+} 
 
 export default function WarehouseDetailPage({ params: paramsPromise }: { params: Promise<{ id: string; warehouseId: string }> }) {
   const params = use(paramsPromise);
@@ -94,8 +95,12 @@ export default function WarehouseDetailPage({ params: paramsPromise }: { params:
                         <div><strong>Location:</strong> {warehouse.location || 'N/A'}</div>
                     </div>
                      <div className="flex items-start">
-                        <ScanLine className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground" /> {/* Placeholder for capacity icon */}
-                        <div><strong>Capacity:</strong> {warehouse.capacity !== undefined ? `${warehouse.capacity} units` : 'N/A'}</div>
+                        <Package className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground" /> {/* Use Package icon for capacity */}
+                        <div><strong>Capacity:</strong> {warehouse.capacity !== undefined ? `${warehouse.capacity}` : 'N/A'}</div>
+                    </div>
+                    <div className="flex items-start">
+                        <ScanLine className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground" /> {/* Use ScanLine for current stock */}
+                        <div><strong>Current Stock:</strong> {warehouse.currentStock !== undefined ? `${warehouse.currentStock}` : 'N/A'}</div>
                     </div>
                      <div className="flex items-start">
                         <FileText className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground" />

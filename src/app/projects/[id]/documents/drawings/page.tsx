@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Image as ImageIconLucide, Edit3, UploadCloud, FileText, Download, MessageSquarePlus } from 'lucide-react'; // Renamed Image to ImageIconLucide
+import { ArrowLeft, Image as ImageIconLucide, UploadCloud, FileText, Download } from 'lucide-react'; // Renamed Image to ImageIconLucide, added icons for drawing tools
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image'; // Imported Next.js Image
@@ -16,6 +16,7 @@ import Image from 'next/image'; // Imported Next.js Image
 interface DrawingVersion {
   version: string;
   fileUrl: string; // In a real app, this might be a signed URL
+  fileType: 'pdf' | 'png' | 'jpg' | 'svg' | 'dxf' | 'dwg'; // Added file type
   fileName: string;
   uploadedAt: string; // ISO Date string
 }
@@ -56,10 +57,10 @@ const drawingTypeLabels: Record<DrawingType, string> = {
 const placeholderDrawingsData: Record<DrawingType, Drawing[]> = {
   architectural: [
     { id: 'arch-001', name: 'Floor Plan - Ground Floor', versions: [{ version: '1.1', fileUrl: '#', fileName: 'arch-001-v1.1.pdf', uploadedAt: new Date().toISOString() }] },
-    { id: 'arch-002', name: 'Elevations - North and South', versions: [{ version: '1.0', fileUrl: '#', fileName: 'arch-002-v1.0.pdf', uploadedAt: new Date().toISOString() }] },
+    { id: 'arch-002', name: 'Elevations - North and South', versions: [{ version: '1.0', fileUrl: '#', fileName: 'arch-002-v1.0.pdf', uploadedAt: new Date().toISOString(), fileType: 'pdf' }] },
   ],
   structural: [
-    { id: 'stru-001', name: 'Foundation Plan', versions: [{ version: '1.2', fileUrl: '#', fileName: 'stru-001-v1.2.pdf', uploadedAt: new Date().toISOString() }] },
+    { id: 'stru-001', name: 'Foundation Plan', versions: [{ version: '1.2', fileUrl: '#', fileName: 'stru-001-v1.2.pdf', uploadedAt: new Date().toISOString(), fileType: 'pdf' }] },
   ],
   mechanical: [],
   electrical: [],
@@ -67,8 +68,8 @@ const placeholderDrawingsData: Record<DrawingType, Drawing[]> = {
   'shop-drawings': [],
   'detail-drawings': [{id: 'detail-001', name: 'Window Detail Section A', versions: [{version: '1.0', fileUrl: '#', fileName: 'window-detail-A-v1.pdf', uploadedAt: new Date().toISOString()}]}],
   'isometric-axonometric': [{id: 'iso-001', name: 'Overall Building Axo', versions: [{version: 'Draft 2', fileUrl: '#', fileName: 'building-axo-draft2.png', uploadedAt: new Date().toISOString()}]}],
-  'presentation-drawings': [],
-  'as-built': [],
+  'presentation-drawings': [{id: 'pres-001', name: 'Site Plan Render', versions: [{version: 'Final', fileUrl: '#', fileName: 'site-plan-render.jpg', uploadedAt: new Date().toISOString(), fileType: 'jpg'}]}],
+  'as-built': [{id: 'asbuilt-001', name: 'Plumbing Riser Diagram', versions: [{version: '1.0', fileUrl: '#', fileName: 'plumbing-riser-asbuilt.dxf', uploadedAt: new Date().toISOString(), fileType: 'dxf'}]}],
 };
 
 async function getProjectNameById(id: string): Promise<string> {
@@ -77,6 +78,8 @@ async function getProjectNameById(id: string): Promise<string> {
   if (id === "2") return "Beta Platform Development";
   return `Project (ID: ${id})`;
 }
+
+import CadViewer from '@/components/cad-viewer/cad-viewer'; // Import the CadViewer component
 
 export default function DrawingsPage() {
   const params = useParams();
@@ -89,6 +92,7 @@ export default function DrawingsPage() {
 
   const [drawings, setDrawings] = useState<Drawing[]>(placeholderDrawingsData[drawingType] || []);
   const [newDrawingName, setNewDrawingName] = useState('');
+  const [selectedDrawingVersion, setSelectedDrawingVersion] = useState<DrawingVersion | null>(null); // State to hold the selected drawing version for viewing
   const [newDrawingFile, setNewDrawingFile] = useState<File | null>(null);
   const [newVersionFile, setNewVersionFile] = useState<File | null>(null);
   const [uploadingDrawingId, setUploadingDrawingId] = useState<string | null>(null);
@@ -123,7 +127,7 @@ export default function DrawingsPage() {
         const newVersionNumber = (parseFloat(d.versions[0]?.version || '0') + 0.1).toFixed(1);
         return {
           ...d,
-          versions: [{ version: newVersionNumber, fileUrl: URL.createObjectURL(newVersionFile), fileName: newVersionFile.name, uploadedAt: new Date().toISOString() }, ...d.versions]
+          versions: [{ version: newVersionNumber, fileUrl: URL.createObjectURL(newVersionFile), fileName: newVersionFile.name, uploadedAt: new Date().toISOString(), fileType: newVersionFile.name.split('.').pop()?.toLowerCase() as DrawingVersion['fileType'] || 'pdf' }, ...d.versions]
         };
       }
       return d;
@@ -137,7 +141,7 @@ export default function DrawingsPage() {
       const newDrawing: Drawing = {
         id: `${drawingType}-${Date.now()}`,
         name: newDrawingName,
-        versions: [{ version: '1.0', fileUrl: URL.createObjectURL(newDrawingFile), fileName: newDrawingFile.name, uploadedAt: new Date().toISOString() }]
+        versions: [{ version: '1.0', fileUrl: URL.createObjectURL(newDrawingFile), fileName: newDrawingFile.name, uploadedAt: new Date().toISOString(), fileType: newDrawingFile.name.split('.').pop()?.toLowerCase() as DrawingVersion['fileType'] || 'pdf' }]
       };
       setDrawings(prev => [newDrawing, ...prev]);
       // Update the main placeholder data (for demo purposes)
@@ -151,6 +155,11 @@ export default function DrawingsPage() {
     } else {
         alert('Please provide a drawing name and select a file.');
     }
+  };
+
+  const handleViewDrawingVersion = (version: DrawingVersion) => {
+    setSelectedDrawingVersion(version);
+    // Scroll to the viewer section if needed
   };
 
   if (isLoadingProjectName) {
@@ -170,7 +179,7 @@ export default function DrawingsPage() {
     <div className="container mx-auto py-8">
       <PageTitle
         title={`${currentDrawingTypeLabel}: ${projectName}`}
-        description={`Manage, view, annotate, and potentially edit ${currentDrawingTypeLabel.toLowerCase()} for this project.`}
+        description={`View, annotate, and manage ${currentDrawingTypeLabel.toLowerCase()} for this project.`}
         actions={
           <Button variant="outline" asChild>
             <Link href={`/projects/${projectId}`}>
@@ -192,23 +201,12 @@ export default function DrawingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-4 border-l-4 border-teal-500 bg-teal-50 rounded-md">
-            <p className="font-semibold text-teal-700">Note on 2D Drawing Capabilities:</p>
-            <p className="text-sm text-teal-600 mt-1">
-              For advanced 2D drawing viewing, annotation, and editing (e.g., DXF, DWG files, or creating markups), integration with specialized JavaScript libraries such as <strong>Fabric.js</strong>, <strong>Konva.js</strong>, or connection to dedicated CAD APIs/services would be necessary.
-            </p>
-          </div>
-          
-          <div className="mt-6 p-0 bg-muted rounded-lg flex flex-col items-center justify-center h-96 border border-dashed overflow-hidden">
-            <Image 
-              src="https://images.unsplash.com/photo-1581092917144-438ab4916134?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" 
-              alt="2D drawing canvas placeholder" 
-              width={1200} 
-              height={800} 
-              className="w-full h-full object-cover"
-              data-ai-hint="blueprints drawing"
-            />
-          </div>
+          {/* Integrate the CadViewer component */}
+          <div className="relative mt-6 p-0 bg-muted rounded-lg flex flex-col items-center justify-center min-h-[600px] border overflow-hidden">
+            {/* The CadViewer component will handle rendering 2D/3D and tools */}
+            <CadViewer projectId={projectId} selectedDrawingVersion={selectedDrawingVersion} />
+            </div>
+
           
           <p className="text-sm text-muted-foreground mt-4">
             Future enhancements could include layer management, measurement tools, collaborative annotations, version comparison, and robust annotation tools.
@@ -258,13 +256,13 @@ export default function DrawingsPage() {
                 <h3 className="text-md font-semibold mb-2 text-muted-foreground">Versions:</h3>
                 <ul className="space-y-2 mb-4">
                   {drawing.versions.map((version) => (
-                    <li key={version.version} className="flex justify-between items-center p-2 border rounded-md hover:bg-muted/30">
+                    <li key={version.version} className={`flex justify-between items-center p-2 border rounded-md hover:bg-muted/30 cursor-pointer ${selectedDrawingVersion?.version === version.version && selectedDrawingVersion?.fileName === version.fileName ? 'bg-primary/10 border-primary' : ''}`} onClick={() => handleViewDrawingVersion(version)}>
                       <div className="flex items-center">
                         <FileText className="h-4 w-4 mr-2 text-primary" />
                         <div>
                             <span className="font-medium">Version {version.version}</span> - {version.fileName}
                             <p className="text-xs text-muted-foreground">Uploaded: {new Date(version.uploadedAt).toLocaleDateString()}</p>
-                        </div>
+                         </div>
                       </div>
                       <Button variant="outline" size="sm" asChild>
                         <a href={version.fileUrl} target="_blank" rel="noopener noreferrer">
@@ -277,7 +275,7 @@ export default function DrawingsPage() {
                 <div className="grid gap-2">
                   <Label htmlFor={`newVersion-${drawing.id}`} className="text-sm font-medium">Upload New Version:</Label>
                   <div className="flex gap-2 items-center">
-                    <Input id={`newVersion-${drawing.id}`} type="file" className="flex-grow" onChange={(e) => {setNewVersionFile(e.target.files ? e.target.files[0] : null); setUploadingDrawingId(drawing.id);}} />
+                    <Input id={`newVersion-${drawing.id}`} type="file" className="flex-grow" onChange={(e) => { setNewVersionFile(e.target.files ? e.target.files[0] : null); setUploadingDrawingId(drawing.id); }} />
                     <Button onClick={() => handleUploadNewVersion(drawing.id)} disabled={!newVersionFile || uploadingDrawingId !== drawing.id} size="sm">Upload</Button>
                   </div>
                 </div>

@@ -17,7 +17,7 @@ const settingsNavItems = [
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthenticatedPageLayout>
+    <>
       <PageTitle
         title="Application Settings"
         description="Customize your application experience and preferences."
@@ -37,6 +37,6 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       <div className="space-y-8 max-w-3xl mx-auto">
         {children}
       </div>
-    </AuthenticatedPageLayout>
+    </>
   );
 }

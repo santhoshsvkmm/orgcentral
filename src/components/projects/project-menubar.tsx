@@ -55,7 +55,7 @@ interface ProjectMenubarProps {
 
 export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
   return (
-    <Menubar className="mb-6 rounded-md border bg-card shadow-sm flex-wrap justify-start">
+    <Menubar className="mb-6 rounded-md border bg-card shadow-sm flex-wrap justify-start p-2 md:p-2">
       <MenubarMenu>
         <MenubarTrigger asChild className="cursor-pointer">
           <Link href={`/projects/${projectId}`}>
@@ -66,7 +66,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <DraftingCompass className="mr-2 h-4 w-4" /> Planning
+          <DraftingCompass className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Planning</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -82,9 +82,15 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           <MenubarSeparator />
           <MenubarSub>
             <MenubarSubTrigger>
-              <LayoutGrid className="mr-2 h-4 w-4" /> Micro Planning
+              <LayoutGrid className="mr-2 h-4 w-4" /> Micro Scheduling
             </MenubarSubTrigger>
             <MenubarSubContent>
+ <MenubarItem asChild>
+ <Link href={`/projects/${projectId}/planning/micro-planning`}>
+ <LayoutGrid className="mr-2 h-4 w-4" /> Overview
+ </Link>
+ </MenubarItem>
+ <MenubarSeparator />
               <MenubarItem asChild>
                 <Link href={`/projects/${projectId}/planning/micro-planning/kanban`}>
                   <SquareKanban className="mr-2 h-4 w-4" /> Kanban Board
@@ -107,7 +113,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <FolderKanban className="mr-2 h-4 w-4" /> Documents
+          <FolderKanban className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Documents</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -173,7 +179,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger className="flex items-center">
-          <Package className="mr-2 h-4 w-4" /> Resources
+          <Package className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Resources</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -201,7 +207,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <Landmark className="mr-2 h-4 w-4" /> Financial
+          <Landmark className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Financial</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -223,7 +229,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <Handshake className="mr-2 h-4 w-4" /> Contracts
+          <Handshake className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Contracts</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -240,7 +246,7 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <FileDigit className="mr-2 h-4 w-4" /> Quotation
+          <FileDigit className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Quotation</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -257,8 +263,8 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-          <MessageSquare className="mr-1 h-4 w-4" />
-          Communication
+          <MessageSquare className="mr-1 h-4 w-4 md:mr-0 md:h-5 md:w-5" />
+          <span className="hidden md:inline ml-2">Communication</span>
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem asChild>
@@ -270,8 +276,8 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>
-            <ClipboardList className="mr-1 h-4 w-4" />
-            Reports
+            <ClipboardList className="mr-1 h-4 w-4 md:mr-0 md:h-5 md:w-5" />
+            <span className="hidden md:inline ml-2">Reports</span>
         </MenubarTrigger>
         <MenubarContent>
             <MenubarItem asChild>
