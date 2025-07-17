@@ -1,4 +1,4 @@
-# Firebase Studio
+# New React Saas 
 
 This is a NextJS starter in Firebase Studio.
 
