@@ -4,7 +4,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { PageTitle } from '@/components/page-title';
-import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
 import { UserCircle, GraduationCap, Briefcase, FileText } from 'lucide-react';
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
@@ -17,7 +16,7 @@ const profileNavItems = [
 
 export default function ProfileLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthenticatedPageLayout>
+     <>
       <PageTitle
         title="Profile Management"
         description="View and manage your comprehensive user profile."
@@ -35,6 +34,6 @@ export default function ProfileLayout({ children }: { children: ReactNode }) {
         ))}
       </Menubar>
       <div>{children}</div>
-    </AuthenticatedPageLayout>
+    </>
   );
 }

@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
   }, [data, globalFilter, searchableColumns]);
 
   const sortedData = React.useMemo(() => {
-    let sortableItems = [...filteredData];
+    const sortableItems = [...filteredData];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
         const valA = a[sortConfig.key as keyof TData];
@@ -172,7 +172,7 @@ export function DataTable<TData, TValue>({
                 (String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && 
                 (actionColumnAlignment === 'center' ? 'justify-center' : actionColumnAlignment === 'right' ? 'justify-end' : '')
               )}>{typeof column.header === 'function' 
-                    ? column.header({ column: { toggleSorting: (isDesc) => handleSort(column.accessorKey), getIsSorted: () => sortConfig?.key === column.accessorKey ? sortConfig.direction : false } }) 
+                    ? column.header({ column: { toggleSorting: (_isDesc) => handleSort(column.accessorKey), getIsSorted: () => sortConfig?.key === column.accessorKey ? sortConfig.direction : false } }) 
                     : column.header}{column.enableSorting && getSortDirectionIcon(column.accessorKey)}</div></TableHead>)}</TableRow>
           </TableHeader>
           <TableBody>

@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { PageTitle } from '@/components/page-title';
-import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
+// import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
 import { Bell, Palette, Briefcase as SettingsBriefcaseIcon, Image as ImageIcon } from 'lucide-react'; // Renamed Briefcase to avoid conflict
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
@@ -17,7 +17,7 @@ const settingsNavItems = [
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthenticatedPageLayout>
+    <>
       <PageTitle
         title="Application Settings"
         description="Customize your application experience and preferences."
@@ -34,9 +34,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
           </MenubarMenu>
         ))}
       </Menubar>
-      <div className="space-y-8 max-w-3xl mx-auto">
+      <div>
         {children}
       </div>
-    </AuthenticatedPageLayout>
+    </>
   );
 }
