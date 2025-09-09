@@ -120,41 +120,7 @@ export function MainHeader() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem
-                      title="Main Dashboard"
-                      href="/dashboard"
-                      icon={<BarChart3 className="h-4 w-4" />}
-                    >
-                      Overview of all projects and key metrics
-                    </ListItem>
-                    <ListItem
-                      title="Construction Dashboard"
-                      href="/dashboard/construction"
-                      icon={<HardHat className="h-4 w-4" />}
-                    >
-                      Construction-specific metrics and project management
-                    </ListItem>
-                    <ListItem
-                      title="AI Features"
-                      href="/ai-features"
-                      icon={<Brain className="h-4 w-4" />}
-                    >
-                      AI-powered insights and role suggestions
-                    </ListItem>
-                    <ListItem
-                      title="Safety Center"
-                      href="/safety"
-                      icon={<Shield className="h-4 w-4" />}
-                    >
-                      Safety monitoring and compliance tracking
-                    </ListItem>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+
 
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>

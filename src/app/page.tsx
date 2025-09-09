@@ -275,6 +275,95 @@ export default function AiInConstructionPage() {
             </div>
           </div>
         </motion.section>
+
+        {/* Dashboard Features Section */}
+        <motion.section 
+          className="py-16 sm:py-20 bg-background" 
+          initial="hidden" 
+          whileInView="visible" 
+          viewport={{ once: true, amount: 0.1 }} 
+          variants={sectionVariants}
+        >
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl font-headline">Powerful Dashboard Features</h2>
+              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                Get real-time insights and manage your construction projects with our comprehensive dashboard.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <motion.div variants={itemVariants} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
+                <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+                  <CardHeader>
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                      <BarChart2 className="h-10 w-10 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline">Project Analytics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-muted-foreground">Real-time project metrics, progress tracking, and performance analytics in one unified view.</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              <motion.div variants={itemVariants} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
+                <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+                  <CardHeader>
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                      <Brain className="h-10 w-10 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline">AI Insights</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-muted-foreground">Intelligent recommendations and predictive analytics to optimize your construction workflows.</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              <motion.div variants={itemVariants} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
+                <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+                  <CardHeader>
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                      <Shield className="h-10 w-10 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline">Safety Monitoring</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-muted-foreground">Comprehensive safety tracking with incident reporting and compliance management tools.</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              <motion.div variants={itemVariants} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
+                <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+                  <CardHeader>
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                      <TrendingUp className="h-10 w-10 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline">Resource Management</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-muted-foreground">Optimize resource allocation and track material usage across all your construction projects.</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+            
+            {/* Dashboard Preview Image */}
+            <motion.div variants={itemVariants} className="mt-12">
+              <div className="relative mx-auto max-w-5xl">
+                <Image
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                  alt="Construction dashboard interface"
+                  width={1200}
+                  height={600}
+                  className="rounded-lg shadow-2xl object-cover w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg" />
+              </div>
+            </motion.div>
+          </div>
+        </motion.section>
       </main>
 
       <motion.footer  
@@ -343,9 +432,9 @@ export default function AiInConstructionPage() {
               <Link href="#" className="hover:text-primary"><Linkedin className="h-5 w-5" /></Link> 
             </div> 
             <div className="mt-4 sm:mt-0"> 
-              <Link href="#" className="hover:text-primary hover:underline">Privacy Policy</Link> 
+              <Link href="/privacy" className="hover:text-primary hover:underline">Privacy Policy</Link> 
               <span className="mx-2">|</span> 
-              <Link href="#" className="hover:text-primary hover:underline">Terms of Service</Link> 
+              <Link href="/terms" className="hover:text-primary hover:underline">Terms of Service</Link> 
             </div> 
           </motion.div> 
         </div> 

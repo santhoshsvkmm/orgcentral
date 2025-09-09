@@ -28,16 +28,65 @@ import { motion } from "framer-motion";
 import { ConstructionMetrics, sampleConstructionMetrics } from "@/components/construction/construction-metrics";
 import { AIInsightsPanel, sampleAIInsights } from "@/components/construction/ai-insights-panel";
 import { ProjectStatusCard } from "@/components/construction/project-status-card";
+import { ProjectTimeline, sampleTimelinePhases } from "@/components/construction/project-timeline";
+import { ResourceAllocation, sampleResources } from "@/components/construction/resource-allocation";
+import { SafetyDashboard, sampleSafetyIncidents, sampleSafetyMetrics } from "@/components/construction/safety-dashboard";
+import { FinancialOverview, sampleFinancialMetrics, sampleProjectBudgets } from "@/components/construction/financial-overview";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 
 
-const metrics = [
-  { title: "Total Projects", value: "12", icon: <Briefcase className="h-5 w-5 text-muted-foreground" />, dataAiHint: "projects overview" },
-  { title: "Projects Running Smoothly", value: "7", icon: <TrendingUp className="h-5 w-5 text-green-500" />, dataAiHint: "successful projects" },
-  { title: "Projects with Warnings", value: "3", icon: <AlertTriangle className="h-5 w-5 text-yellow-500" />, dataAiHint: "projects risk" },
-  { title: "Projects in Critical State", value: "2", icon: <XOctagon className="h-5 w-5 text-red-500" />, dataAiHint: "danger projects" },
-  { title: "Team Members", value: "23", icon: <Users className="h-5 w-5 text-muted-foreground" />, dataAiHint: "team collaboration" },
-  { title: "Budget Overview", value: "$1.2M", icon: <DollarSign className="h-5 w-5 text-muted-foreground" />, dataAiHint: "finance graph" },
+const sampleProjects = [
+  {
+    id: 'project-alpha',
+    name: 'Residential Tower A',
+    type: 'residential' as const,
+    status: 'in-progress' as const,
+    progress: 68,
+    budget: {
+      allocated: 850000,
+      spent: 578000,
+      currency: '$'
+    },
+    timeline: {
+      startDate: '2024-01-15',
+      endDate: '2024-06-30',
+      daysRemaining: 45
+    },
+    location: 'Downtown District',
+    projectManager: {
+      name: 'John Smith',
+      avatar: 'https://placehold.co/40x40.png?text=JS'
+    },
+    teamSize: 15,
+    riskLevel: 'medium' as const,
+    lastUpdate: '2 hours ago'
+  },
+  {
+    id: 'project-beta',
+    name: 'Commercial Plaza',
+    type: 'commercial' as const,
+    status: 'in-progress' as const,
+    progress: 45,
+    budget: {
+      allocated: 1200000,
+      spent: 540000,
+      currency: '$'
+    },
+    timeline: {
+      startDate: '2024-02-01',
+      endDate: '2024-08-15',
+      daysRemaining: 78
+    },
+    location: 'Business District',
+    projectManager: {
+      name: 'Maria Garcia',
+      avatar: 'https://placehold.co/40x40.png?text=MG'
+    },
+    teamSize: 22,
+    riskLevel: 'low' as const,
+    lastUpdate: '1 hour ago'
+  }
 ];
 
 const recentActivity = [
@@ -114,196 +163,101 @@ export default function DashboardPage() {
 
   return (
     <>
-      <PageTitle title="Dashboard" description="Overview of your organization's key metrics and activities." />
-      <motion.div 
-        className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+      <PageTitle title="Construction Dashboard" description="Comprehensive overview of construction projects, AI insights, and performance metrics." />
+      
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
+        className="space-y-8"
       >
-        {metrics.map((metric) => (
-          <motion.div key={metric.title} variants={itemVariants}>
-            <Card className="shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
-                {metric.icon}
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metric.value}</div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+        {/* Construction Metrics Overview */}
+        <motion.section variants={itemVariants}>
+          <ConstructionMetrics metrics={sampleConstructionMetrics} />
+        </motion.section>
+
+        {/* Main Content Tabs */}
+        <motion.section variants={itemVariants}>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
+              <TabsTrigger value="resources">Resources</TabsTrigger>
+              <TabsTrigger value="safety">Safety</TabsTrigger>
+              <TabsTrigger value="financials">Financials</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-3">
+                {/* Project Status Cards */}
+                <div className="lg:col-span-2 space-y-4">
+                  <h3 className="text-lg font-semibold">Active Projects</h3>
+                  <div className="space-y-4">
+                    {sampleProjects.map((project) => (
+                      <ProjectStatusCard 
+                        key={project.id} 
+                        project={project}
+                        onClick={() => console.log('Project clicked:', project.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* AI Insights Panel */}
+                <div className="space-y-4">
+                  <AIInsightsPanel 
+                    insights={sampleAIInsights}
+                    onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
+                    onViewAll={() => console.log('View all insights')}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="projects" className="space-y-6">
+              <ProjectTimeline 
+                phases={sampleTimelinePhases}
+                projectName="Residential Tower A"
+                onPhaseClick={(phase) => console.log('Phase clicked:', phase.id)}
+              />
+            </TabsContent>
+
+            <TabsContent value="ai-insights" className="space-y-6">
+              <AIInsightsPanel 
+                insights={sampleAIInsights}
+                onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
+                onViewAll={() => console.log('View all insights')}
+                className="max-w-none"
+              />
+            </TabsContent>
+
+            <TabsContent value="resources" className="space-y-6">
+              <ResourceAllocation 
+                resources={sampleResources}
+                onResourceClick={(resource) => console.log('Resource clicked:', resource.id)}
+              />
+            </TabsContent>
+
+            <TabsContent value="safety" className="space-y-6">
+              <SafetyDashboard 
+                incidents={sampleSafetyIncidents}
+                metrics={sampleSafetyMetrics}
+                onIncidentClick={(incident) => console.log('Incident clicked:', incident.id)}
+              />
+            </TabsContent>
+
+            <TabsContent value="financials" className="space-y-6">
+              <FinancialOverview 
+                budgets={sampleProjectBudgets}
+                metrics={sampleFinancialMetrics}
+                onProjectClick={(projectId) => console.log('Project clicked:', projectId)}
+              />
+            </TabsContent>
+          </Tabs>
+        </motion.section>
       </motion.div>
-      {/* Construction-Specific Components */}
-      <motion.div 
-        className="mt-8 space-y-6"
-        variants={sectionVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Construction Metrics */}
-        <ConstructionMetrics metrics={sampleConstructionMetrics.slice(0, 4)} />
-        
-        {/* Main Dashboard Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Project Progress Chart */}
-          <Card className="shadow-sm hover:shadow-md transition-shadow lg:col-span-2">
-            <CardHeader className="flex flex-row items-start justify-between gap-2">
-              <div>
-                <CardTitle>Overall Project Progress</CardTitle>
-                <CardDescription>Visual summary of planned vs. actual progress across all projects.</CardDescription>
-              </div>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select time range" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Data</SelectItem>
-                  <SelectItem value="last6">Last 6 Points</SelectItem>
-                  <SelectItem value="last3">Last 3 Points</SelectItem>
-                </SelectContent>
-              </Select>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={filteredChartData}
-                    margin={{
-                      top: 5,
-                      right: 10,
-                      left: -20, 
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" tickLine={false} axisLine={false} dy={10} />
-                    <YAxis tickLine={false} axisLine={false} dx={-10} />
-                    <RechartsTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent indicator="line" hideLabel />} 
-                    />
-                    <Legend content={<ChartLegendContent />} />
-                    <Line
-                      dataKey="planned"
-                      type="monotone"
-                      stroke="var(--color-planned)"
-                      strokeWidth={2}
-                      dot={true}
-                    />
-                    <Line
-                      dataKey="actual"
-                      type="monotone"
-                      stroke="var(--color-actual)"
-                      strokeWidth={2}
-                      dot={true}
-                    />
-                     <Line
-                      dataKey="budget"
-                      type="monotone"
-                      stroke="var(--color-budget)"
-                      strokeWidth={2}
-                      dot={true}
-                      name="Budget Spent (%)"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
 
-          {/* AI Insights Panel */}
-          <AIInsightsPanel 
-            insights={sampleAIInsights.slice(0, 3)}
-            onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
-            onViewAll={() => console.log('View all insights')}
-          />
-        </div>
-      </motion.div>
-      {/* Quick Actions & Navigation */}
-      <motion.div 
-        className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4"
-        variants={sectionVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-blue-100">
-                <Building2 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Construction Dashboard</h3>
-                <p className="text-sm text-muted-foreground">Detailed construction metrics</p>
-              </div>
-            </div>
-            <Button asChild className="w-full mt-4" variant="outline">
-              <Link href="/dashboard/construction">
-                View Details
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-green-100">
-                <Brain className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">AI Insights</h3>
-                <p className="text-sm text-muted-foreground">Smart recommendations</p>
-              </div>
-            </div>
-            <Button asChild className="w-full mt-4" variant="outline">
-              <Link href="/ai-insights">
-                Explore AI
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-orange-100">
-                <HardHat className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Safety Center</h3>
-                <p className="text-sm text-muted-foreground">Safety metrics & incidents</p>
-              </div>
-            </div>
-            <Button asChild className="w-full mt-4" variant="outline">
-              <Link href="/safety">
-                View Safety
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-purple-100">
-                <BarChart2 className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Analytics</h3>
-                <p className="text-sm text-muted-foreground">Performance reports</p>
-              </div>
-            </div>
-            <Button asChild className="w-full mt-4" variant="outline">
-              <Link href="/analytics">
-                View Reports
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
     </>
   );
 }
