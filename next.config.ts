@@ -37,6 +37,15 @@ const nextConfig: NextConfig = {
       'https://6000-firebase-studio-1749708322608.cluster-ejd22kqny5htuv5dfowoyipt52.cloudworkstations.dev',
     ],
   },
+
+  webpack(config, { isServer }) {
+    // Configure Webpack to handle SVG files
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+    return config;
+  },
 };
 
 // Conditionally apply the bundle analyzer

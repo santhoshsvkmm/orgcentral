@@ -2,7 +2,8 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, HardHat, Brain, Building2 } from "lucide-react";
 import { PageTitle } from "@/components/page-title";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { motion } from "framer-motion";
+import { ConstructionMetrics, sampleConstructionMetrics } from "@/components/construction/construction-metrics";
+import { AIInsightsPanel, sampleAIInsights } from "@/components/construction/ai-insights-panel";
+import { ProjectStatusCard } from "@/components/construction/project-status-card";
+import Link from "next/link";
 
 
 const metrics = [
@@ -130,147 +135,172 @@ export default function DashboardPage() {
           </motion.div>
         ))}
       </motion.div>
+      {/* Construction-Specific Components */}
       <motion.div 
-        className="mt-8 grid gap-6 md:grid-cols-3"
+        className="mt-8 space-y-6"
         variants={sectionVariants}
         initial="hidden"
         animate="visible"
       >
-        <Card className="shadow-sm hover:shadow-md transition-shadow md:col-span-2">
-          <CardHeader className="flex flex-row items-start justify-between gap-2">
-            <div>
-              <CardTitle>Overall Project Progress</CardTitle>
-              <CardDescription>Visual summary of planned vs. actual progress across all projects.</CardDescription>
-            </div>
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select time range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Data</SelectItem>
-                <SelectItem value="last6">Last 6 Points</SelectItem>
-                <SelectItem value="last3">Last 3 Points</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={filteredChartData}
-                  margin={{
-                    top: 5,
-                    right: 10,
-                    left: -20, 
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} dy={10} />
-                  <YAxis tickLine={false} axisLine={false} dx={-10} />
-                  <RechartsTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="line" hideLabel />} 
-                  />
-                  <Legend content={<ChartLegendContent />} />
-                  <Line
-                    dataKey="planned"
-                    type="monotone"
-                    stroke="var(--color-planned)"
-                    strokeWidth={2}
-                    dot={true}
-                  />
-                  <Line
-                    dataKey="actual"
-                    type="monotone"
-                    stroke="var(--color-actual)"
-                    strokeWidth={2}
-                    dot={true}
-                  />
-                   <Line
-                    dataKey="budget"
-                    type="monotone"
-                    stroke="var(--color-budget)"
-                    strokeWidth={2}
-                    dot={true}
-                    name="Budget Spent (%)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Activity className="mr-2 h-5 w-5 text-primary" />
-              Recent Activity
-            </CardTitle>
-            <CardDescription>Latest updates across your projects.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              {recentActivity.map((activity, index) => (
-                <li key={activity.id} className="flex items-start space-x-3">
-                  <Avatar className="h-8 w-8 border">
-                    <AvatarImage src={activity.avatar} alt={activity.user} data-ai-hint={activity.dataAiHint} />
-                    <AvatarFallback>{activity.user.substring(0,2).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="text-sm">
-                      <span className="font-medium text-foreground">{activity.user}</span>
-                      <span className="text-muted-foreground"> {activity.action}</span>
-                    </p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
-                  </div>
-                   {index < recentActivity.length - 1 && <Separator orientation="vertical" className="h-auto self-stretch mx-2"/>}
-                </li>
-              ))}
-            </ul>
-             <div className="mt-4 h-24 w-full bg-muted rounded-md flex items-center justify-center" data-ai-hint="activity timeline">
-              <span className="text-sm text-muted-foreground">More Detailed Activity Timeline</span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Construction Metrics */}
+        <ConstructionMetrics metrics={sampleConstructionMetrics.slice(0, 4)} />
+        
+        {/* Main Dashboard Grid */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Project Progress Chart */}
+          <Card className="shadow-sm hover:shadow-md transition-shadow lg:col-span-2">
+            <CardHeader className="flex flex-row items-start justify-between gap-2">
+              <div>
+                <CardTitle>Overall Project Progress</CardTitle>
+                <CardDescription>Visual summary of planned vs. actual progress across all projects.</CardDescription>
+              </div>
+              <Select value={timeRange} onValueChange={setTimeRange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select time range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Data</SelectItem>
+                  <SelectItem value="last6">Last 6 Points</SelectItem>
+                  <SelectItem value="last3">Last 3 Points</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={filteredChartData}
+                    margin={{
+                      top: 5,
+                      right: 10,
+                      left: -20, 
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} dy={10} />
+                    <YAxis tickLine={false} axisLine={false} dx={-10} />
+                    <RechartsTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent indicator="line" hideLabel />} 
+                    />
+                    <Legend content={<ChartLegendContent />} />
+                    <Line
+                      dataKey="planned"
+                      type="monotone"
+                      stroke="var(--color-planned)"
+                      strokeWidth={2}
+                      dot={true}
+                    />
+                    <Line
+                      dataKey="actual"
+                      type="monotone"
+                      stroke="var(--color-actual)"
+                      strokeWidth={2}
+                      dot={true}
+                    />
+                     <Line
+                      dataKey="budget"
+                      type="monotone"
+                      stroke="var(--color-budget)"
+                      strokeWidth={2}
+                      dot={true}
+                      name="Budget Spent (%)"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* AI Insights Panel */}
+          <AIInsightsPanel 
+            insights={sampleAIInsights.slice(0, 3)}
+            onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
+            onViewAll={() => console.log('View all insights')}
+          />
+        </div>
       </motion.div>
-       <motion.div 
-        className="mt-8 grid gap-4 md:grid-cols-2"
+      {/* Quick Actions & Navigation */}
+      <motion.div 
+        className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4"
         variants={sectionVariants}
         initial="hidden"
         animate="visible"
-       >
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle>Team Performance</CardTitle>
-            <CardDescription>Overview of team workload and efficiency.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{}} className="h-[200px] w-full" data-ai-hint="team performance chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed">
-                  <BarChart2 className="h-10 w-10 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">Team Performance Chart</span>
-                  <span className="text-xs text-muted-foreground">(Data and chart to be implemented)</span>
-                </div>
-              </ResponsiveContainer>
-            </ChartContainer>
+      >
+        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-blue-100">
+                <Building2 className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Construction Dashboard</h3>
+                <p className="text-sm text-muted-foreground">Detailed construction metrics</p>
+              </div>
+            </div>
+            <Button asChild className="w-full mt-4" variant="outline">
+              <Link href="/dashboard/construction">
+                View Details
+              </Link>
+            </Button>
           </CardContent>
         </Card>
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle>Budget Allocation</CardTitle>
-            <CardDescription>Breakdown of budget distribution.</CardDescription>
-          </CardHeader>
-          <CardContent>
-             <ChartContainer config={{}} className="h-[200px] w-full" data-ai-hint="budget allocation chart">
-              <ResponsiveContainer width="100%" height="100%">
-                 <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed">
-                  <PieChartIconLucide className="h-10 w-10 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">Budget Allocation Chart</span>
-                  <span className="text-xs text-muted-foreground">(Data and chart to be implemented)</span>
-                </div>
-              </ResponsiveContainer>
-            </ChartContainer>
+
+        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-green-100">
+                <Brain className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">AI Insights</h3>
+                <p className="text-sm text-muted-foreground">Smart recommendations</p>
+              </div>
+            </div>
+            <Button asChild className="w-full mt-4" variant="outline">
+              <Link href="/ai-insights">
+                Explore AI
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-orange-100">
+                <HardHat className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Safety Center</h3>
+                <p className="text-sm text-muted-foreground">Safety metrics & incidents</p>
+              </div>
+            </div>
+            <Button asChild className="w-full mt-4" variant="outline">
+              <Link href="/safety">
+                View Safety
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-purple-100">
+                <BarChart2 className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Analytics</h3>
+                <p className="text-sm text-muted-foreground">Performance reports</p>
+              </div>
+            </div>
+            <Button asChild className="w-full mt-4" variant="outline">
+              <Link href="/analytics">
+                View Reports
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </motion.div>

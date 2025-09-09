@@ -10,7 +10,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { Building, Briefcase, Users, DollarSign, Phone, FileText } from 'lucide-react';
+import { Building, Briefcase, Users, DollarSign, Phone, FileText, HardHat, Brain, BarChart3, Shield } from 'lucide-react';
 import React from 'react';
 
 const solutions = [
@@ -120,6 +120,42 @@ export function MainHeader() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ListItem
+                      title="Main Dashboard"
+                      href="/dashboard"
+                      icon={<BarChart3 className="h-4 w-4" />}
+                    >
+                      Overview of all projects and key metrics
+                    </ListItem>
+                    <ListItem
+                      title="Construction Dashboard"
+                      href="/dashboard/construction"
+                      icon={<HardHat className="h-4 w-4" />}
+                    >
+                      Construction-specific metrics and project management
+                    </ListItem>
+                    <ListItem
+                      title="AI Features"
+                      href="/ai-features"
+                      icon={<Brain className="h-4 w-4" />}
+                    >
+                      AI-powered insights and role suggestions
+                    </ListItem>
+                    <ListItem
+                      title="Safety Center"
+                      href="/safety"
+                      icon={<Shield className="h-4 w-4" />}
+                    >
+                      Safety monitoring and compliance tracking
+                    </ListItem>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link href="/products" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">

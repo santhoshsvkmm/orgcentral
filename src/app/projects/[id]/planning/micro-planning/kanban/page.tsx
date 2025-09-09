@@ -8,6 +8,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, SquareKanban } from 'lucide-react';
 
+// TODO: Import your Kanban board component here
+// import { KanbanBoard } from '@/components/projects/micro-planning/kanban-board';
+// TODO: Define or import the types for your task data
+
 // Mock function to get project name - in a real app, fetch this or pass via props
 async function getProjectNameById(id: string): Promise<string> {
   await new Promise(resolve => setTimeout(resolve, 100)); // Simulate API delay
@@ -23,7 +27,9 @@ export default function MicroPlanningKanbanPage({ params: paramsPromise }: { par
   const projectId = params.id;
   
   const projectName = use(getProjectNameById(projectId || '')); 
-
+  
+  // TODO: Fetch task data for the current project/sprint
+  // const tasks: Task[] = use(fetchTasksForSprint(projectId));
   return (
     <>
       <PageTitle

@@ -8,6 +8,21 @@ export default {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontSize: {
+      xs: ['0.6875rem', { lineHeight: '1rem' }],     // 11px
+      sm: ['0.8125rem', { lineHeight: '1.25rem' }],  // 13px
+      base: ['0.8125rem', { lineHeight: '1.375rem' }], // 13px (reduced from 16px)
+      lg: ['1rem', { lineHeight: '1.5rem' }],        // 16px
+      xl: ['1.125rem', { lineHeight: '1.75rem' }],   // 18px
+      '2xl': ['1.375rem', { lineHeight: '2rem' }],   // 22px
+      '3xl': ['1.75rem', { lineHeight: '2.25rem' }], // 28px
+      '4xl': ['2.125rem', { lineHeight: '2.5rem' }], // 34px
+      '5xl': ['2.875rem', { lineHeight: '1' }],      // 46px
+      '6xl': ['3.75rem', { lineHeight: '1' }],       // 60px
+      '7xl': ['4.5rem', { lineHeight: '1' }],        // 72px
+      '8xl': ['6rem', { lineHeight: '1' }],          // 96px
+      '9xl': ['8rem', { lineHeight: '1' }],          // 128px
+    },
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],

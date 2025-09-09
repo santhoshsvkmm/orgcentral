@@ -1,13 +1,14 @@
 'use client';
 
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -310,20 +311,26 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     setTags(tags.filter(t => t !== tag));
   };
 
-  const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    e.dataTransfer.setData("taskId", taskId);
-  };
+  const onDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+    // Dropped outside the list
+    if (!destination) {
+      return;
+    }
 
-  const handleDrop = (e: React.DragEvent, newStatus: TaskStatus) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData("taskId");
+    // If the item dropped in the same place
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const newStatus = destination.droppableId as TaskStatus;
     
     setTasks(prev => prev.map(task => {
-      if (task.id === taskId) {
+      if (task.id === draggableId) {
         return { ...task, status: newStatus, updatedAt: new Date().toISOString() };
       }
       return task;
@@ -404,14 +411,18 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-            <div 
-              key={status} 
-              className="bg-muted/40 rounded-md p-3"
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, status as TaskStatus)}
-            >
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
+              <Droppable key={status} droppableId={status}>
+                {(provided, snapshot) => (
+                  <div 
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`bg-muted/40 rounded-md p-3 transition-colors ${
+                      snapshot.isDraggingOver ? 'bg-primary/10' : ''
+                    }`}
+                  >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-medium text-sm">{status} ({statusTasks.length})</h3>
                 <Button 
@@ -434,13 +445,17 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                       No tasks
                     </div>
                   ) : (
-                    statusTasks.map(task => (
-                      <div 
-                        key={task.id} 
-                        className="bg-card p-3 rounded-md border shadow-sm cursor-move"
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, task.id)}
-                      >
+                    statusTasks.map((task, index) => (
+                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div 
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`bg-card p-3 rounded-md border shadow-sm transition-transform ${
+                              snapshot.isDragging ? 'rotate-1 shadow-lg' : ''
+                            }`}
+                          >
                         <div className="flex items-start justify-between">
                           <h4 className="font-medium text-sm">{task.name}</h4>
                           <DropdownMenu>

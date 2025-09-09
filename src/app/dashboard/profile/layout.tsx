@@ -3,7 +3,6 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { PageTitle } from '@/components/page-title';
 import { UserCircle, GraduationCap, Briefcase, FileText } from 'lucide-react';
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
@@ -16,11 +15,7 @@ const profileNavItems = [
 
 export default function ProfileLayout({ children }: { children: ReactNode }) {
   return (
-     <>
-      <PageTitle
-        title="Profile Management"
-        description="View and manage your comprehensive user profile."
-      />
+    <>
       <Menubar className="mb-6 rounded-md border bg-card shadow-sm">
         {profileNavItems.map((item) => (
           <MenubarMenu key={item.href}>
@@ -34,6 +29,6 @@ export default function ProfileLayout({ children }: { children: ReactNode }) {
         ))}
       </Menubar>
       <div>{children}</div>
-    </>
+      </>
   );
 }

@@ -1,21 +1,29 @@
-
 'use client';
-
 import { use } from 'react';
 import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart, Building } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { DataTable } from '@/components/ui/data-table';
+import AddMaterialForm from '@/components/procurement/add-material-form';
 import type { Warehouse } from '@/types/warehouse'; // Assuming you have this type
 
 // Mock data for warehouses - in a real app, this would be fetched based on projectId
 // This should match or be similar to the one in your warehouses page
 const initialMockWarehouses: Warehouse[] = [
-  { id: 'wh-1', projectId: '1', name: 'Main Site Storage A', location: 'Sector A, Bay 1', capacity: 500, notes: 'Stores primary construction materials.', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'wh-2', projectId: '1', name: 'Equipment Shed 1', location: 'Near Gate 3', capacity: 100, notes: 'Heavy machinery and tools.', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'wh-3', projectId: '2', name: 'Central Parts Hub', location: 'Building C, Floor 1', capacity: 2000, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+  {
+    id: 'wh-1', projectId: '1', name: 'Main Site Storage A', location: 'Sector A, Bay 1', capacity: 500, notes: 'Stores primary construction materials.', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    currentStock: 0
+  },
+  {
+    id: 'wh-2', projectId: '1', name: 'Equipment Shed 1', location: 'Near Gate 3', capacity: 100, notes: 'Heavy machinery and tools.', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    currentStock: 0
+  },
+  {
+    id: 'wh-3', projectId: '2', name: 'Central Parts Hub', location: 'Building C, Floor 1', capacity: 2000, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    currentStock: 0
+  },
 ];
 
 
@@ -32,6 +40,93 @@ async function getWarehouseById(warehouseId: string, projectId: string): Promise
     await new Promise(resolve => setTimeout(resolve, 50));
     return initialMockWarehouses.find(wh => wh.id === warehouseId && wh.projectId === projectId) || null;
 }
+
+const mockMaterials = [
+  {
+    id: 'mat-1',
+    name: 'Concrete Mix',
+    specifications: 'Type I, 4000 PSI',
+    quantity: 50,
+    unitOfMeasurement: 'bags',
+    supplier: 'ABC Supplies',
+    estimatedCost: 250,
+    requiredDeliveryDate: '2023-11-15',
+    priority: 'High',
+  },
+  {
+    id: 'mat-2',
+    name: 'Steel Rebar',
+    specifications: '#4, Grade 60',
+    quantity: 200,
+    unitOfMeasurement: 'feet',
+    supplier: 'XYZ Steel',
+    estimatedCost: 1200,
+    requiredDeliveryDate: '2023-11-20',
+    priority: 'Medium',
+  },
+  {
+    id: 'mat-3',
+    name: 'Wood Planks',
+    specifications: '2x4, Pine',
+    quantity: 100,
+    unitOfMeasurement: 'pieces',
+    supplier: 'Local Lumber',
+    estimatedCost: 300,
+    requiredDeliveryDate: '2023-11-18',
+    priority: 'Low',
+  },
+];
+
+const materialColumns = [
+  {
+    accessorKey: 'name',
+    header: 'Material Name',
+    cell: ({ row }) => row.name,
+  },
+  {
+    accessorKey: 'specifications',
+    header: 'Specifications',
+    cell: ({ row }) => row.specifications,
+  },
+  {
+    accessorKey: 'quantity',
+    header: 'Quantity',
+    cell: ({ row }) => row.quantity,
+  },
+  {
+    accessorKey: 'unitOfMeasurement',
+    header: 'Unit',
+    cell: ({ row }) => row.unitOfMeasurement || 'N/A',
+  },
+  {
+    accessorKey: 'supplier',
+    header: 'Supplier',
+    cell: ({ row }) => row.supplier || 'N/A',
+  },
+  {
+    accessorKey: 'estimatedCost',
+    header: 'Estimated Cost',
+    cell: ({ row }) => row.estimatedCost !== undefined ? `$${row.estimatedCost.toFixed(2)}` : 'N/A',
+  },
+  {
+    accessorKey: 'requiredDeliveryDate',
+    header: 'Required Delivery Date',
+    cell: ({ row }) => row.requiredDeliveryDate || 'N/A',
+  },
+  {
+    accessorKey: 'priority',
+    header: 'Priority',
+    cell: ({ row }) => row.priority || 'N/A',
+  },
+  // You might want to add an 'Actions' column for editing/deleting materials later
+  // {
+  //   accessorKey: 'actions',
+  //   header: 'Actions',
+  //   cell: ({ row }) => (
+  //     // Add buttons for edit/delete here
+  //   ),
+  // },
+];
 
 export default function MaterialProcurementPlanPage({ params: paramsPromise }: { params: Promise<{ id: string; warehouseId: string }> }) {
   const params = use(paramsPromise);
@@ -94,22 +189,18 @@ export default function MaterialProcurementPlanPage({ params: paramsPromise }: {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
-            <p className="font-semibold text-blue-700">Procurement Plan Features:</p>
-            <ul className="list-disc list-inside text-sm text-blue-600 mt-1 space-y-1">
-              <li>List required materials with specifications and quantities.</li>
-              <li>Track supplier quotes and selections.</li>
-              <li>Monitor order statuses (e.g., Ordered, Shipped, Delivered).</li>
-              <li>Manage delivery schedules and inventory receiving.</li>
-            </ul>
-          </div>
+      
+          {/* Replace placeholder with MaterialList component */}
+          <DataTable
+            data={mockMaterials}
+            columns={materialColumns}
+            searchableColumns={['name', 'specifications', 'supplier']}
+          />
           
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed" data-ai-hint="procurement list placeholder">
-            <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-semibold text-foreground">Material Procurement Plan Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1">Details of material orders and statuses will appear here.</p>
-          </div>
-          
+          {/* Add the AddMaterialForm component */}
+          <AddMaterialForm />
+
+
           <p className="text-sm text-muted-foreground mt-4">
             Future enhancements could include integration with inventory management, supplier databases, and automated notifications for reordering.
           </p>
