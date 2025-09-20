@@ -152,21 +152,36 @@ export function AuthenticatedPageLayout({ children }: { children: ReactNode }) {
         side="left" 
         variant="sidebar" 
         collapsible="icon" 
-        className="border-r bg-sidebar text-sidebar-foreground"
+        className="border-r bg-gradient-to-b from-slate-50 to-slate-100 text-slate-900 shadow-sm"
       >
-        <SidebarHeader className="flex h-16 items-center border-b px-4 lg:px-6">
+        <SidebarHeader className="flex h-16 items-center border-b border-slate-200/60 px-4 lg:px-6 bg-white/50">
           <Logo className="[&>span]:hidden group-data-[state=expanded]:[&>span]:inline"/>
         </SidebarHeader>
-        <SidebarContent className="p-2">
-          <AppSidebarContent /> 
+        <SidebarContent className="p-3">
+          <div className="space-y-1">
+            <AppSidebarContent /> 
+          </div>
         </SidebarContent>
-        <SidebarFooter className="border-t p-2">
-           <Button variant="ghost" className="w-full justify-start" asChild>
+        <SidebarFooter className="border-t border-slate-200/60 p-3 bg-white/30">
+          <div className="space-y-2">
+            <Button variant="ghost" className="w-full justify-start hover:bg-slate-200/50" asChild>
               <Link href="/dashboard/settings"> 
                 <Settings className="mr-2 h-4 w-4" />
                 <span className="group-data-[state=collapsed]:hidden">Settings</span>
               </Link>
             </Button>
+            <div className="group-data-[state=collapsed]:hidden">
+              <div className="px-2 py-3 text-xs text-slate-600 border-t border-slate-200/40">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium">OrgCentral v3.0</span>
+                  <span className="text-slate-500">© 2024</span>
+                </div>
+                <p className="text-slate-500 leading-relaxed">
+                  Construction management platform powered by AI
+                </p>
+              </div>
+            </div>
+          </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

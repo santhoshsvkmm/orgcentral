@@ -30,44 +30,44 @@ import { useState, useEffect } from 'react';
 const productFeatures = [
   {
     icon: <Calendar className="h-8 w-8 text-primary" />,
-    title: 'Project Planning & Scheduling',
-    description: 'Advanced Gantt charts, milestone tracking, and resource scheduling with AI-powered optimization.',
-    features: ['Interactive Gantt Charts', 'Critical Path Analysis', 'Resource Leveling', 'Milestone Tracking'],
+    title: 'Construction Scheduling & CPM',
+    description: 'Critical Path Method scheduling, look-ahead planning, and resource leveling specifically designed for construction workflows.',
+    features: ['Critical Path Method (CPM)', 'Look-Ahead Scheduling', 'Resource Leveling', 'Weather Delay Tracking'],
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     icon: <Users className="h-8 w-8 text-primary" />,
-    title: 'Team Collaboration',
-    description: 'Seamless communication tools, file sharing, and real-time collaboration across all project stakeholders.',
-    features: ['Real-time Chat', 'Document Sharing', 'Team Dashboards', 'Mobile Access'],
+    title: 'Field & Office Collaboration',
+    description: 'Connect field crews, superintendents, project managers, and stakeholders with construction-focused communication tools.',
+    features: ['Daily Field Reports', 'Punch List Management', 'Progress Photos', 'Subcontractor Portal'],
     image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     icon: <DollarSign className="h-8 w-8 text-primary" />,
-    title: 'Financial Management',
-    description: 'Complete budget tracking, cost control, invoicing, and profitability analysis in one platform.',
-    features: ['Budget Tracking', 'Cost Control', 'Invoice Management', 'Profit Analysis'],
+    title: 'Construction Financial Management',
+    description: 'Job costing, progress billing, change order tracking, and cash flow management tailored for construction accounting.',
+    features: ['Job Cost Accounting', 'Progress Billing (AIA)', 'Change Order Management', 'Subcontractor Pay Apps'],
     image: 'https://images.unsplash.com/photo-1554224155-169544351742?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     icon: <FileText className="h-8 w-8 text-primary" />,
-    title: 'Document Management',
-    description: 'Centralized document storage with version control, approval workflows, and secure access controls.',
-    features: ['Version Control', 'Approval Workflows', 'Secure Storage', 'Quick Search'],
+    title: 'Construction Document Control',
+    description: 'Manage blueprints, specifications, submittals, and construction documents with version control and distribution tracking.',
+    features: ['Blueprint Management', 'Submittal Tracking', 'Specification Control', 'Drawing Markups'],
     image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     icon: <BarChart3 className="h-8 w-8 text-primary" />,
-    title: 'Analytics & Reporting',
-    description: 'Powerful analytics dashboard with customizable reports and AI-driven insights for better decision making.',
-    features: ['Custom Dashboards', 'Automated Reports', 'KPI Tracking', 'Predictive Analytics'],
+    title: 'Construction Analytics & KPIs',
+    description: 'Track construction-specific metrics like productivity rates, cost per square foot, and schedule performance index (SPI).',
+    features: ['Productivity Tracking', 'Cost Performance Index', 'Schedule Performance Index', 'Earned Value Analysis'],
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     icon: <MessageSquare className="h-8 w-8 text-primary" />,
-    title: 'RFI & Change Management',
-    description: 'Streamlined request for information (RFI) processing and change order management with approval workflows.',
-    features: ['RFI Tracking', 'Change Orders', 'Approval Workflows', 'Audit Trails'],
+    title: 'RFI & Submittal Management',
+    description: 'Streamlined Request for Information (RFI) and submittal processes with architect/engineer approval workflows.',
+    features: ['RFI Workflow Management', 'Submittal Tracking', 'Architect Approval Process', 'Response Time Tracking'],
     image: 'https://images.unsplash.com/photo-1600585152915-d208bec867a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   }
 ];
@@ -98,25 +98,25 @@ const platformBenefits = [
 const testimonials = [
   {
     name: 'John Martinez',
-    role: 'Project Manager',
+    role: 'Senior Project Manager',
     company: 'BuildCorp Construction',
-    content: 'OrgCentral has transformed how we manage our projects. The AI insights have helped us prevent delays and stay within budget.',
+    content: 'OrgCentral\'s CPM scheduling and RFI tracking have eliminated our project delays. We\'ve reduced our average project duration by 15%.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'
   },
   {
     name: 'Sarah Williams',
-    role: 'Operations Director',
-    company: 'Metro Infrastructure',
-    content: 'The collaboration features are outstanding. Our teams are more coordinated than ever, and project visibility is incredible.',
+    role: 'Construction Operations Director',
+    company: 'Metro Infrastructure LLC',
+    content: 'The field reporting and subcontractor management features have streamlined our operations. Our superintendents love the mobile app.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'
   },
   {
     name: 'Michael Chen',
-    role: 'CEO',
-    company: 'Precision Builders',
-    content: 'ROI was evident within the first quarter. OrgCentral pays for itself through improved efficiency and reduced project overruns.',
+    role: 'General Contractor & CEO',
+    company: 'Precision Builders Inc.',
+    content: 'Job costing accuracy improved dramatically. We can now track cost per square foot in real-time and avoid budget overruns.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'
   }

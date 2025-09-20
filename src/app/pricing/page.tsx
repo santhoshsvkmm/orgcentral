@@ -24,78 +24,78 @@ import { useState, useEffect } from 'react';
 
 const pricingPlans = [
   {
-    name: 'Starter',
-    description: 'Perfect for small teams and individual contractors',
-    monthlyPrice: 29,
-    yearlyPrice: 290,
+    name: 'Small Contractor',
+    description: 'Perfect for residential contractors and small trades',
+    monthlyPrice: 49,
+    yearlyPrice: 490,
     icon: <Users className="h-8 w-8 text-primary" />,
     features: [
-      'Up to 5 users',
-      '10 active projects',
-      'Basic project planning',
-      'Task management',
-      'File storage (10GB)',
-      'Email support',
+      'Up to 10 field workers',
+      '5 active projects',
+      'Basic CPM scheduling',
+      'Daily field reports',
+      'RFI management',
+      'Blueprint storage (25GB)',
       'Mobile app access',
-      'Basic reporting'
+      'Email support',
+      'Basic job costing'
     ],
     limitations: [
-      'No advanced analytics',
-      'No custom fields',
+      'No subcontractor portal',
+      'No progress billing',
       'No API access',
-      'No white-label options'
+      'Limited integrations'
     ],
     cta: 'Start Free Trial',
     popular: false
   },
   {
-    name: 'Professional',
-    description: 'Ideal for growing construction companies',
-    monthlyPrice: 79,
-    yearlyPrice: 790,
+    name: 'General Contractor',
+    description: 'Ideal for mid-size GCs and specialty contractors',
+    monthlyPrice: 129,
+    yearlyPrice: 1290,
     icon: <Briefcase className="h-8 w-8 text-primary" />,
     features: [
-      'Up to 25 users',
+      'Up to 50 team members',
       'Unlimited projects',
-      'Advanced project planning',
-      'Gantt charts & dependencies',
-      'File storage (100GB)',
+      'Advanced CPM scheduling',
+      'Subcontractor management',
+      'Progress billing (AIA forms)',
+      'Blueprint storage (500GB)',
+      'Submittal tracking',
+      'Change order management',
+      'Job cost accounting',
+      'Safety inspections',
       'Priority support',
-      'Advanced reporting',
-      'Custom fields',
-      'Time tracking',
-      'Budget management',
-      'Client portals',
       'Mobile app access'
     ],
     limitations: [
       'No API access',
       'No white-label options',
-      'Limited integrations'
+      'Limited custom integrations'
     ],
     cta: 'Start Free Trial',
     popular: true
   },
   {
-    name: 'Enterprise',
-    description: 'For large organizations with complex needs',
-    monthlyPrice: 149,
-    yearlyPrice: 1490,
+    name: 'Enterprise Builder',
+    description: 'For large construction firms and developers',
+    monthlyPrice: 299,
+    yearlyPrice: 2990,
     icon: <Crown className="h-8 w-8 text-primary" />,
     features: [
       'Unlimited users',
       'Unlimited projects',
-      'All Professional features',
-      'Advanced analytics & AI',
-      'File storage (1TB)',
-      'Dedicated support',
-      'API access',
-      'Custom integrations',
-      'White-label options',
-      'Advanced security',
-      'SSO integration',
-      'Custom training',
-      'SLA guarantee'
+      'Multi-company management',
+      'Advanced construction analytics',
+      'Unlimited blueprint storage',
+      'Dedicated account manager',
+      'API access & integrations',
+      'Custom construction workflows',
+      'Advanced security & SSO',
+      'On-site training',
+      'SLA guarantee',
+      'Custom reporting'
     ],
     limitations: [],
     cta: 'Contact Sales',
@@ -105,51 +105,51 @@ const pricingPlans = [
 
 const addOns = [
   {
-    name: 'Additional Storage',
-    description: 'Extra file storage beyond your plan limits',
-    price: '$5/month per 10GB'
+    name: 'Additional Blueprint Storage',
+    description: 'Extra storage for construction documents and blueprints',
+    price: '$10/month per 50GB'
   },
   {
-    name: 'Advanced AI Features',
-    description: 'Predictive analytics and intelligent automation',
-    price: '$20/month per user'
+    name: 'Construction AI Analytics',
+    description: 'Predictive scheduling and cost overrun prevention',
+    price: '$25/month per user'
   },
   {
-    name: 'Premium Support',
-    description: '24/7 phone support with dedicated account manager',
-    price: '$200/month'
+    name: 'Dedicated Construction Support',
+    description: '24/7 support with construction industry specialists',
+    price: '$300/month'
   },
   {
-    name: 'Custom Integrations',
-    description: 'Connect with your existing tools and systems',
+    name: 'ERP Integrations',
+    description: 'Connect with Sage, Viewpoint, and other construction ERPs',
     price: 'Contact for pricing'
   }
 ];
 
 const faqs = [
   {
-    question: 'Is there a free trial?',
-    answer: 'Yes! We offer a 14-day free trial for all plans. No credit card required to start.'
+    question: 'Do you offer a free trial for construction companies?',
+    answer: 'Yes! We offer a 30-day free trial for all plans with full access to CPM scheduling, RFI management, and job costing. No credit card required.'
   },
   {
-    question: 'Can I change plans anytime?',
-    answer: 'Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect immediately.'
+    question: 'Can I manage multiple construction projects?',
+    answer: 'Yes. The Small Contractor plan includes 5 active projects, while General Contractor and Enterprise plans offer unlimited projects.'
   },
   {
-    question: 'What payment methods do you accept?',
-    answer: 'We accept all major credit cards, PayPal, and can arrange invoicing for Enterprise customers.'
+    question: 'Do you integrate with construction accounting software?',
+    answer: 'Yes, we integrate with QuickBooks, Sage 300 Construction, Foundation, and other popular construction accounting systems.'
   },
   {
-    question: 'Is my data secure?',
-    answer: 'Yes, we use bank-level encryption and are SOC 2 compliant. Your data is backed up daily and stored securely.'
+    question: 'Is there mobile access for field crews?',
+    answer: 'Yes, our mobile apps allow field workers to submit daily reports, track progress, manage punch lists, and access blueprints offline.'
   },
   {
-    question: 'Do you offer discounts for annual billing?',
-    answer: 'Yes! Annual billing saves you 2 months compared to monthly billing on all plans.'
+    question: 'How does subcontractor management work?',
+    answer: 'Our platform includes subcontractor portals for bid management, progress tracking, payment applications, and document sharing.'
   },
   {
-    question: 'Can I cancel anytime?',
-    answer: 'Yes, you can cancel your subscription at any time. No long-term contracts or cancellation fees.'
+    question: 'Do you provide construction-specific training?',
+    answer: 'Yes, we offer specialized training for construction workflows including CPM scheduling, RFI processes, and AIA billing forms.'
   }
 ];
 

@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, HardHat, Brain, Building2 } from "lucide-react";
+import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, HardHat, Brain, Building2, Calendar } from "lucide-react";
 import { PageTitle } from "@/components/page-title";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -162,103 +162,151 @@ export default function DashboardPage() {
   }, [timeRange]);
 
   return (
-    <>
-      <PageTitle title="Construction Dashboard" description="Comprehensive overview of construction projects, AI insights, and performance metrics." />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50">
+      <div className="bg-white border-b border-slate-200/60 shadow-sm">
+        <div className="container mx-auto px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">Construction Dashboard</h1>
+              <p className="text-slate-600">Comprehensive overview of construction projects, AI insights, and performance metrics.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" className="border-slate-300">
+                <Calendar className="h-4 w-4 mr-2" />
+                Last 30 days
+              </Button>
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                Export Report
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-8"
-      >
-        {/* Construction Metrics Overview */}
-        <motion.section variants={itemVariants}>
-          <ConstructionMetrics metrics={sampleConstructionMetrics} />
-        </motion.section>
+      <div className="container mx-auto px-6 py-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-8"
+        >
+          {/* Construction Metrics Overview */}
+          <motion.section variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-slate-200/60 p-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-slate-900 mb-2">Key Metrics</h2>
+              <p className="text-slate-600 text-sm">Real-time performance indicators across all projects</p>
+            </div>
+            <ConstructionMetrics metrics={sampleConstructionMetrics} />
+          </motion.section>
 
-        {/* Main Content Tabs */}
-        <motion.section variants={itemVariants}>
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
-              <TabsTrigger value="safety">Safety</TabsTrigger>
-              <TabsTrigger value="financials">Financials</TabsTrigger>
-            </TabsList>
+          {/* Main Content Tabs */}
+          <motion.section variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-slate-200/60">
+            <Tabs defaultValue="overview">
+              <div className="border-b border-slate-200/60 px-6 pt-6">
+                <TabsList className="grid w-full grid-cols-6 bg-slate-100/80 p-1 rounded-lg">
+                  <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Overview</TabsTrigger>
+                  <TabsTrigger value="projects" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Projects</TabsTrigger>
+                  <TabsTrigger value="ai-insights" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">AI Insights</TabsTrigger>
+                  <TabsTrigger value="resources" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Resources</TabsTrigger>
+                  <TabsTrigger value="safety" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Safety</TabsTrigger>
+                  <TabsTrigger value="financials" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Financials</TabsTrigger>
+                </TabsList>
+              </div>
 
-            <TabsContent value="overview" className="space-y-6">
-              <div className="grid gap-6 lg:grid-cols-3">
-                {/* Project Status Cards */}
-                <div className="lg:col-span-2 space-y-4">
-                  <h3 className="text-lg font-semibold">Active Projects</h3>
-                  <div className="space-y-4">
-                    {sampleProjects.map((project) => (
-                      <ProjectStatusCard 
-                        key={project.id} 
-                        project={project}
-                        onClick={() => console.log('Project clicked:', project.id)}
-                      />
-                    ))}
+              <TabsContent value="overview" className="p-6 space-y-8">
+                <div className="grid gap-8 lg:grid-cols-3">
+                  {/* Project Status Cards */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900">Active Projects</h3>
+                        <p className="text-sm text-slate-600">Monitor progress and key metrics</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        View All
+                      </Button>
+                    </div>
+                    <div className="space-y-4">
+                      {sampleProjects.map((project) => (
+                        <div key={project.id} className="bg-slate-50/50 rounded-lg p-1 hover:bg-slate-100/50 transition-colors">
+                          <ProjectStatusCard 
+                            project={project}
+                            onClick={() => console.log('Project clicked:', project.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* AI Insights Panel */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">AI Insights</h3>
+                      <p className="text-sm text-slate-600">Smart recommendations for optimization</p>
+                    </div>
+                    <AIInsightsPanel 
+                      insights={sampleAIInsights}
+                      onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
+                      onViewAll={() => console.log('View all insights')}
+                    />
                   </div>
                 </div>
+              </TabsContent>
 
-                {/* AI Insights Panel */}
-                <div className="space-y-4">
+              <TabsContent value="projects" className="p-6">
+                <div className="bg-slate-50/30 rounded-lg p-6">
+                  <ProjectTimeline 
+                    phases={sampleTimelinePhases}
+                    projectName="Residential Tower A"
+                    onPhaseClick={(phase) => console.log('Phase clicked:', phase.id)}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ai-insights" className="p-6">
+                <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/30 rounded-lg p-6">
                   <AIInsightsPanel 
                     insights={sampleAIInsights}
                     onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
                     onViewAll={() => console.log('View all insights')}
+                    className="max-w-none"
                   />
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="projects" className="space-y-6">
-              <ProjectTimeline 
-                phases={sampleTimelinePhases}
-                projectName="Residential Tower A"
-                onPhaseClick={(phase) => console.log('Phase clicked:', phase.id)}
-              />
-            </TabsContent>
+              <TabsContent value="resources" className="p-6">
+                <div className="bg-green-50/30 rounded-lg p-6">
+                  <ResourceAllocation 
+                    resources={sampleResources}
+                    onResourceClick={(resource) => console.log('Resource clicked:', resource.id)}
+                  />
+                </div>
+              </TabsContent>
 
-            <TabsContent value="ai-insights" className="space-y-6">
-              <AIInsightsPanel 
-                insights={sampleAIInsights}
-                onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
-                onViewAll={() => console.log('View all insights')}
-                className="max-w-none"
-              />
-            </TabsContent>
+              <TabsContent value="safety" className="p-6">
+                <div className="bg-orange-50/30 rounded-lg p-6">
+                  <SafetyDashboard 
+                    incidents={sampleSafetyIncidents}
+                    metrics={sampleSafetyMetrics}
+                    onIncidentClick={(incident) => console.log('Incident clicked:', incident.id)}
+                  />
+                </div>
+              </TabsContent>
 
-            <TabsContent value="resources" className="space-y-6">
-              <ResourceAllocation 
-                resources={sampleResources}
-                onResourceClick={(resource) => console.log('Resource clicked:', resource.id)}
-              />
-            </TabsContent>
-
-            <TabsContent value="safety" className="space-y-6">
-              <SafetyDashboard 
-                incidents={sampleSafetyIncidents}
-                metrics={sampleSafetyMetrics}
-                onIncidentClick={(incident) => console.log('Incident clicked:', incident.id)}
-              />
-            </TabsContent>
-
-            <TabsContent value="financials" className="space-y-6">
-              <FinancialOverview 
-                budgets={sampleProjectBudgets}
-                metrics={sampleFinancialMetrics}
-                onProjectClick={(projectId) => console.log('Project clicked:', projectId)}
-              />
-            </TabsContent>
-          </Tabs>
-        </motion.section>
-      </motion.div>
-
-    </>
+              <TabsContent value="financials" className="p-6">
+                <div className="bg-purple-50/30 rounded-lg p-6">
+                  <FinancialOverview 
+                    budgets={sampleProjectBudgets}
+                    metrics={sampleFinancialMetrics}
+                    onProjectClick={(projectId) => console.log('Project clicked:', projectId)}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </motion.section>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
