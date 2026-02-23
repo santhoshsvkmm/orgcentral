@@ -4,6 +4,7 @@ import type {NextConfig} from 'next';
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
+const path = require('path');
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -32,11 +33,7 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  experimental: {
-    allowedDevOrigins: [
-      'https://6000-firebase-studio-1749708322608.cluster-ejd22kqny5htuv5dfowoyipt52.cloudworkstations.dev',
-    ],
-  },
+  // experimental: { allowedDevOrigins: [...] } removed because it's not available in this Next.js version
 
   webpack(config, { isServer }) {
     // Configure Webpack to handle SVG files
@@ -44,6 +41,12 @@ const nextConfig: NextConfig = {
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     });
+    // Provide a small shim for motion-dom internal module that some bundlers can fail to resolve
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      'motion-dom/dist/es/utils/supports/linear-easing.mjs': path.resolve(__dirname, 'src/shims/linear-easing.mjs')
+    };
     return config;
   },
 };

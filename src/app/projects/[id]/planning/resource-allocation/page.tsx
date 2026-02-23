@@ -1,12 +1,14 @@
 
 'use client';
 
-import { use } from 'react';
+import { use, useState, useEffect } from 'react';
 import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, UsersRound } from 'lucide-react';
+
+import { ResourceAllocationComponent } from '@/components/projects/resource-allocation';
 
 // Mock function to get project name
 async function getProjectNameById(id: string): Promise<string> {
@@ -19,12 +21,24 @@ async function getProjectNameById(id: string): Promise<string> {
 export default function ResourceAllocationPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
   const projectId = params.id;
-  const projectName = use(getProjectNameById(projectId || '')); 
+
+  const [projectName, setProjectName] = useState<string>('');
+  const [isLoadingProject, setIsLoadingProject] = useState(true);
+
+  useEffect(() => {
+    if (projectId) {
+      getProjectNameById(projectId).then(name => {
+        setProjectName(name);
+        setIsLoadingProject(false);
+      });
+    }
+  }, [projectId]);
 
   return (
-    <>
+    <div className="space-y-6">
+      
       <PageTitle
-        title={`Resource Allocation: ${projectName || (projectId ? `Project ${projectId}`: 'Project')}`}
+        title={`Resource Allocation: ${projectName || (projectId ? `Project ${projectId}` : 'Project')}`}
         description="Plan and manage resource allocation for project tasks and phases."
         actions={
           <Button variant="outline" asChild disabled={!projectId}>
@@ -35,27 +49,23 @@ export default function ResourceAllocationPage({ params: paramsPromise }: { para
           </Button>
         }
       />
-      <Card className="shadow-md">
+
+      <ResourceAllocationComponent projectId={projectId} />
+
+      <Card className="shadow-sm border-dashed bg-muted/30">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <UsersRound className="mr-2 h-5 w-5 text-primary" />
-            Resource Planning & Allocation
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <UsersRound className="h-4 w-4 text-primary" />
+            Planning Insights
           </CardTitle>
-          <CardDescription>
-            This section is for managing the allocation of team members, equipment, and other resources across the project timeline.
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed" data-ai-hint="resource allocation chart">
-            <UsersRound className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-semibold text-foreground">Resource Allocation Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1">Charts and tools for assigning resources to tasks and viewing workload will be here.</p>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            Future enhancements could include capacity planning, skill matching, and integration with task scheduling.
+        <CardContent>
+          <p className="text-xs text-muted-foreground">
+            Resource allocation helps you identify bottlenecks and ensure team members are not overallocated.
+            Use the "By Resource" view to see individual workloads and the "By Task" view to see assignments per work item.
           </p>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

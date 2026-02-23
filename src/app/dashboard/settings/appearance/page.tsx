@@ -10,6 +10,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Save, Palette, Languages as LanguagesIcon, Moon, Sun, Laptop } from 'lucide-react'; // Added icons
 import { useTheme } from 'next-themes';
 
+const supportedCurrencies = [
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+];
+
 export default function AppearanceSettingsPage() {
   const { toast } = useToast();
   const { theme, setTheme, resolvedTheme } = useTheme(); // Use resolvedTheme to know the actual current theme when 'system' is selected
@@ -17,7 +26,19 @@ export default function AppearanceSettingsPage() {
   // State for theme is now managed by next-themes
   const [language, setLanguage] = useState('en'); // Placeholder for language
   const [fontSize, setFontSize] = useState('medium'); 
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [highContrast, setHighContrast] = useState(false);
+  const [layoutDensity, setLayoutDensity] = useState<'comfortable' | 'compact'>('comfortable');
   const [mounted, setMounted] = useState(false);
+  const [currency, setCurrency] = useState('USD');
+
+  // load currency from localStorage (simple persistence placeholder)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('app:currency');
+      if (saved) setCurrency(saved);
+    } catch (e) { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     setMounted(true); // Ensure component is mounted before using theme state to avoid hydration mismatch
@@ -26,7 +47,11 @@ export default function AppearanceSettingsPage() {
   const handleSaveChanges = () => {
     // Theme is already persisted by next-themes
     // In a real app, persist language and fontSize settings
-    console.log("Appearance Settings saved:", { selectedTheme: theme, language, fontSize });
+    try { localStorage.setItem('app:currency', currency); } catch (e) {}
+    try { localStorage.setItem('app:reducedMotion', JSON.stringify(reducedMotion)); } catch (e) {}
+    try { localStorage.setItem('app:highContrast', JSON.stringify(highContrast)); } catch (e) {}
+    try { localStorage.setItem('app:layoutDensity', layoutDensity); } catch (e) {}
+    console.log("Appearance Settings saved:", { selectedTheme: theme, language, fontSize, currency });
     toast({
       title: "Appearance Settings Saved",
       description: "Your appearance preferences have been updated.",
@@ -125,6 +150,61 @@ export default function AppearanceSettingsPage() {
               <SelectItem value="large">Large</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <Separator />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <Label htmlFor="currencyPreference" className="md:col-span-1 font-medium">Default Currency</Label>
+          <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger id="currencyPreference" className="md:col-span-2">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {supportedCurrencies.map((c) => (
+                <SelectItem key={c.code} value={c.code}>{c.code} — {c.name} ({c.symbol})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Separator />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <Label className="md:col-span-1 font-medium">Accessibility</Label>
+          <div className="md:col-span-2 space-y-2">
+            <div className="flex items-center justify-between p-2 border rounded-md">
+              <div>
+                <div className="font-medium">Reduce Motion</div>
+                <div className="text-xs text-muted-foreground">Respect user preference for reduced motion and disable non-essential animations.</div>
+              </div>
+              <select value={String(reducedMotion)} onChange={(e) => setReducedMotion(e.target.value === 'true')} className="px-2 py-1 border rounded-md">
+                <option value="false">Off</option>
+                <option value="true">On</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between p-2 border rounded-md">
+              <div>
+                <div className="font-medium">High Contrast Mode</div>
+                <div className="text-xs text-muted-foreground">Increase contrast and reduce decorative styling for better readability.</div>
+              </div>
+              <select value={String(highContrast)} onChange={(e) => setHighContrast(e.target.value === 'true')} className="px-2 py-1 border rounded-md">
+                <option value="false">Off</option>
+                <option value="true">On</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between p-2 border rounded-md">
+              <div>
+                <div className="font-medium">Layout Density</div>
+                <div className="text-xs text-muted-foreground">Choose between comfortable spacing or compact layouts for data-dense screens.</div>
+              </div>
+              <select value={layoutDensity} onChange={(e) => setLayoutDensity(e.target.value as any)} className="px-2 py-1 border rounded-md">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+              </select>
+            </div>
+          </div>
         </div>
         
         <div className="flex justify-end pt-4">

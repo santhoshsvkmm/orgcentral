@@ -1,24 +1,24 @@
-
 'use client';
 
-import { use } from 'react';
+import { useState, useEffect } from 'react';
 import { PageTitle } from '@/components/page-title';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, ScanLine, Building } from 'lucide-react';
+import { ArrowLeft, Building, Download, UploadCloud } from 'lucide-react';
 import type { Warehouse } from '@/types/warehouse';
+import MaterialPosInterface from '@/components/procurement/material-pos-interface';
+import { useParams } from 'next/navigation';
 
 // Mock data for warehouses (same as in warehouses page and procurement plan page for consistency)
 const initialMockWarehouses: Warehouse[] = [
-  { id: 'wh-1', projectId: '1', name: 'Main Site Storage A', location: 'Sector A, Bay 1', capacity: 500, notes: 'Stores primary construction materials.', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'wh-2', projectId: '1', name: 'Equipment Shed 1', location: 'Near Gate 3', capacity: 100, notes: 'Heavy machinery and tools.', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'wh-3', projectId: '2', name: 'Central Parts Hub', location: 'Building C, Floor 1', capacity: 2000, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'wh-1', projectId: '1', name: 'Main Site Storage A', location: 'Sector A, Bay 1', capacity: 500, notes: 'Stores primary construction materials.', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), currentStock: 320 },
+  { id: 'wh-2', projectId: '1', name: 'Equipment Shed 1', location: 'Near Gate 3', capacity: 100, notes: 'Heavy machinery and tools.', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), currentStock: 45 },
+  { id: 'wh-3', projectId: '2', name: 'Central Parts Hub', location: 'Building C, Floor 1', capacity: 2000, notes: 'Centralized hub for project beta.', createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), currentStock: 1200 },
 ];
 
 // Mock function to get project name
 async function getProjectNameById(id: string): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 50)); 
+  await new Promise(resolve => setTimeout(resolve, 50));
   if (id === "1") return "Alpha Launch";
   if (id === "2") return "Beta Platform Development";
   return `Project (ID: ${id})`;
@@ -26,91 +26,99 @@ async function getProjectNameById(id: string): Promise<string> {
 
 // Mock function to get warehouse by ID
 async function getWarehouseById(warehouseId: string, projectId: string): Promise<Warehouse | null> {
-    await new Promise(resolve => setTimeout(resolve, 50));
-    return initialMockWarehouses.find(wh => wh.id === warehouseId && wh.projectId === projectId) || null;
+  await new Promise(resolve => setTimeout(resolve, 50));
+  return initialMockWarehouses.find(wh => wh.id === warehouseId && wh.projectId === projectId) || null;
 }
 
-export default function MaterialPosPage({ params: paramsPromise }: { params: Promise<{ id: string; warehouseId: string }> }) {
-  const params = use(paramsPromise);
-  const projectId = params.id;
-  const warehouseId = params.warehouseId;
-  
-  const projectName = use(getProjectNameById(projectId));
-  const warehouse = use(getWarehouseById(warehouseId, projectId));
+export default function MaterialPosPage() {
+  const params = useParams();
+  const projectId = params?.id as string;
+  const warehouseId = params?.warehouseId as string;
+
+  const [projectName, setProjectName] = useState('Loading...');
+  const [warehouse, setWarehouse] = useState<Warehouse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (projectId && warehouseId) {
+      setIsLoading(true);
+      Promise.all([
+        getProjectNameById(projectId),
+        getWarehouseById(warehouseId, projectId)
+      ]).then(([pName, wh]) => {
+        setProjectName(pName);
+        setWarehouse(wh);
+        setIsLoading(false);
+      });
+    }
+  }, [projectId, warehouseId]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-12 text-center text-slate-500 font-medium">Initializing POS Terminal...</div>;
+  }
 
   if (!warehouse) {
     return (
-       <>
+      <div className="container mx-auto py-8 text-center">
         <PageTitle
-            title="Warehouse Not Found"
-            description={`Could not find warehouse with ID: ${warehouseId} for project ${projectName}.`}
-            actions={
+          title="Warehouse Not Found"
+          description={`Could not find warehouse with ID: ${warehouseId} for project ${projectName}.`}
+          actions={
             <Button variant="outline" asChild>
-                <Link href={`/projects/${projectId}/resources/warehouses`}>
+              <Link href={`/projects/${projectId}/resources/warehouses`}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Warehouses
-                </Link>
+              </Link>
             </Button>
-            }
+          }
         />
-        <Card>
-            <CardContent className="pt-6">
-                 <p>Please check the warehouse ID or return to the list of warehouses.</p>
-            </CardContent>
-        </Card>
-       </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="container mx-auto py-8 space-y-6">
       <PageTitle
-        title={`Material POS: ${warehouse.name}`}
-        description={`Track material inventory for ${warehouse.name} (Project: ${projectName})`}
+        title={`Terminal: ${warehouse.name}`}
+        description="Warehouse POS and real-time material logging interface."
         actions={
-          <Button variant="outline" asChild>
-            <Link href={`/projects/${projectId}/resources/warehouses`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Warehouses
-            </Link>
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" className="h-10 rounded-xl bg-white/50 backdrop-blur-sm border-white/20 whitespace-nowrap">
+              <Download className="mr-2 h-4 w-4" /> Export Ledger
+            </Button>
+            <Button variant="outline" className="h-10 rounded-xl bg-white/50 backdrop-blur-sm border-white/20 whitespace-nowrap">
+              <UploadCloud className="mr-2 h-4 w-4" /> Sync Cloud
+            </Button>
+            <Button variant="outline" asChild className="h-10 rounded-xl border-white/20 whitespace-nowrap bg-indigo-600 hover:bg-indigo-700 text-white border-none hover:text-white">
+              <Link href={`/projects/${projectId}/resources/warehouses/${warehouseId}`}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Exit Terminal
+              </Link>
+            </Button>
+          </div>
         }
       />
-      <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <ScanLine className="mr-2 h-5 w-5 text-primary" />
-            Material Point of System (POS)
-          </CardTitle>
-          <CardDescription>
-            This system is for tracking materials entering and leaving the warehouse: <strong>{warehouse.name}</strong>.
-            <br />
-            Project: <Link href={`/projects/${projectId}`} className="underline hover:text-primary"><Building className="inline-block h-4 w-4 mr-1" />{projectName}</Link>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 border-l-4 border-green-500 bg-green-50 rounded-md">
-            <p className="font-semibold text-green-700">Material POS Features would include:</p>
-            <ul className="list-disc list-inside text-sm text-green-600 mt-1 space-y-1">
-              <li>Recording material check-ins (receipts from procurement).</li>
-              <li>Tracking material check-outs (issues to site/tasks).</li>
-              <li>Real-time inventory levels for each material.</li>
-              <li>Searchable log of all material transactions.</li>
-              <li>Low stock alerts and integration with procurement plans.</li>
-            </ul>
+
+      <div className="mt-8">
+        <MaterialPosInterface warehouseName={warehouse.name} />
+      </div>
+
+      <div className="mt-8 p-6 bg-slate-900 rounded-[2.5rem] text-white flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative shadow-2xl">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="flex items-center gap-5 relative z-10">
+          <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md">
+            <Building className="h-7 w-7 text-indigo-400" />
           </div>
-          
-          <div className="mt-6 p-8 bg-muted rounded-lg flex flex-col items-center justify-center h-72 border border-dashed" data-ai-hint="pos system interface placeholder">
-            <ScanLine className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-semibold text-foreground">Material POS System Placeholder</p>
-            <p className="text-sm text-muted-foreground mt-1">Interface for material check-in/out and inventory tracking will appear here.</p>
+          <div>
+            <h4 className="text-xl font-bold">{projectName}</h4>
+            <p className="text-sm text-indigo-300">Project Engine • Live Material Tracking Active</p>
           </div>
-          
-          <p className="text-sm text-muted-foreground mt-4">
-            A full Material POS system requires backend database integration and specialized UI components for efficient material tracking.
-          </p>
-        </CardContent>
-      </Card>
-    </>
+        </div>
+        <Button asChild className="bg-white/10 hover:bg-white/20 text-white border-none rounded-2xl px-8 h-12 relative z-10 shadow-none font-bold">
+          <Link href={`/projects/${projectId}`}>
+            Return to Dashboard
+          </Link>
+        </Button>
+      </div>
+    </div>
   );
 }

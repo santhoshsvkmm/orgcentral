@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState, type FormEvent, useEffect } from "react";
 import type { Consultant, ConsultantProjectMapping, InvitationStatus } from "@/types/consultant";
-import { PlusCircle, Trash2, Send, AlertTriangle, CheckCircleIcon, ClockIcon, BanIcon, InfoIcon } from "lucide-react";
+import { PlusCircle, Trash2, Send, AlertTriangle, CheckCircle, Clock, Ban, Info } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { formatDate } from "@/lib/date-utils";
@@ -99,10 +99,10 @@ export function ConsultantForm({ triggerButton, mode, consultantData, onSave }: 
 
   const getInvitationStatusBadge = (status: InvitationStatus) => {
     switch (status) {
-      case "Not Sent": return <Badge variant="outline" className="border-dashed"><InfoIcon className="h-3 w-3 mr-1" />{status}</Badge>;
-      case "Pending": return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-700 border-yellow-500/50"><ClockIcon className="h-3 w-3 mr-1" />{status}</Badge>;
-      case "Accepted": return <Badge variant="secondary" className="bg-green-500/20 text-green-700 border-green-500/50"><CheckCircleIcon className="h-3 w-3 mr-1" />{status}</Badge>;
-      case "Declined": return <Badge variant="destructive"><BanIcon className="h-3 w-3 mr-1" />{status}</Badge>;
+  case "Not Sent": return <Badge variant="outline" className="border-dashed"><Info className="h-3 w-3 mr-1" />{status}</Badge>;
+  case "Pending": return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-700 border-yellow-500/50"><Clock className="h-3 w-3 mr-1" />{status}</Badge>;
+  case "Accepted": return <Badge variant="secondary" className="bg-green-500/20 text-green-700 border-green-500/50"><CheckCircle className="h-3 w-3 mr-1" />{status}</Badge>;
+  case "Declined": return <Badge variant="destructive"><Ban className="h-3 w-3 mr-1" />{status}</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };

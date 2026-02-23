@@ -1,20 +1,22 @@
 'use client';
 
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Edit, MoreHorizontal, Trash2, Plus, Calendar, Clock, UserCircle, Tag, TrendingUp, AlertCircle } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Plus, Calendar, Clock, UserCircle, Tag, TrendingUp, AlertCircle, Circle, CheckCircle2, Eye, ListTodo, Search, Filter, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Task, TaskStatus, TaskPriority } from "@/types/task";
+import { cn } from "@/lib/utils";
+
 
 // Enhanced mock data for tasks
 const initialTasks: Task[] = [
@@ -218,14 +220,14 @@ export function EnhancedKanbanBoard({ projectId }: EnhancedKanbanBoardProps) {
     }
 
     const newStatus = destination.droppableId as TaskStatus;
-    
+
     setTasks(prev => prev.map(task => {
       if (task.id === draggableId) {
-        return { 
-          ...task, 
-          status: newStatus, 
+        return {
+          ...task,
+          status: newStatus,
           completionPercentage: newStatus === "Done" ? 100 : task.completionPercentage,
-          updatedAt: new Date().toISOString() 
+          updatedAt: new Date().toISOString()
         };
       }
       return task;
@@ -237,44 +239,56 @@ export function EnhancedKanbanBoard({ projectId }: EnhancedKanbanBoardProps) {
     });
   };
 
+  const getStatusIcon = (status: TaskStatus) => {
+    switch (status) {
+      case "Backlog": return <ListTodo className="h-4 w-4 text-slate-500" />;
+      case "To Do": return <Circle className="h-4 w-4 text-blue-500" />;
+      case "In Progress": return <Zap className="h-4 w-4 text-amber-500" />;
+      case "Review": return <Eye className="h-4 w-4 text-purple-500" />;
+      case "Done": return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+      case "Blocked": return <AlertCircle className="h-4 w-4 text-rose-500" />;
+      default: return <Tag className="h-4 w-4" />;
+    }
+  };
+
+  const getStatusStyles = (status: TaskStatus) => {
+    switch (status) {
+      case "Backlog": return "bg-slate-500/5 border-slate-200/50";
+      case "To Do": return "bg-blue-500/5 border-blue-200/50";
+      case "In Progress": return "bg-amber-500/5 border-amber-200/50";
+      case "Review": return "bg-purple-500/5 border-purple-200/50";
+      case "Done": return "bg-emerald-500/5 border-emerald-200/50";
+      case "Blocked": return "bg-rose-500/5 border-rose-200/50";
+      default: return "bg-gray-500/5 border-gray-200/50";
+    }
+  };
+
   const getPriorityBadge = (priority: TaskPriority) => {
     switch (priority) {
       case "Critical":
-        return <Badge variant="destructive" className="text-xs"><AlertCircle className="h-3 w-3 mr-1" />{priority}</Badge>;
+        return <Badge variant="destructive">{priority}</Badge>;
       case "High":
-        return <Badge variant="secondary" className="bg-orange-500/20 text-orange-700 border-orange-500/50 text-xs"><TrendingUp className="h-3 w-3 mr-1" />{priority}</Badge>;
+        return <Badge variant="secondary" className="bg-orange-500/20 text-orange-700 border-orange-500/50">{priority}</Badge>;
       case "Medium":
-        return <Badge variant="secondary" className="bg-blue-500/20 text-blue-700 border-blue-500/50 text-xs">{priority}</Badge>;
+        return <Badge variant="secondary" className="bg-blue-500/20 text-blue-700 border-blue-500/50">{priority}</Badge>;
       case "Low":
-        return <Badge variant="outline" className="text-xs">{priority}</Badge>;
+        return <Badge variant="outline">{priority}</Badge>;
       default:
-        return <Badge variant="outline" className="text-xs">{priority}</Badge>;
+        return <Badge variant="outline">{priority}</Badge>;
     }
   };
 
-  const getStatusColor = (status: TaskStatus) => {
-    switch (status) {
-      case "Backlog": return "bg-gray-100 border-gray-300";
-      case "To Do": return "bg-blue-50 border-blue-200";
-      case "In Progress": return "bg-yellow-50 border-yellow-200";
-      case "Review": return "bg-purple-50 border-purple-200";
-      case "Done": return "bg-green-50 border-green-200";
-      case "Blocked": return "bg-red-50 border-red-200";
-      default: return "bg-gray-50 border-gray-200";
-    }
-  };
-
-  const filteredTasks = activeFilter === "all" 
-    ? tasks 
+  const filteredTasks = activeFilter === "all"
+    ? tasks
     : tasks.filter(task => {
-        if (activeFilter === "my-tasks") return task.assignee === "Alice Designer";
-        if (activeFilter === "unassigned") return !task.assignee;
-        if (activeFilter === "overdue") {
-          if (!task.dueDate) return false;
-          return new Date(task.dueDate) < new Date() && task.status !== "Done";
-        }
-        return task.tags?.includes(activeFilter);
-      });
+      if (activeFilter === "my-tasks") return task.assignee === "Alice Designer";
+      if (activeFilter === "unassigned") return !task.assignee;
+      if (activeFilter === "overdue") {
+        if (!task.dueDate) return false;
+        return new Date(task.dueDate) < new Date() && task.status !== "Done";
+      }
+      return task.tags?.includes(activeFilter);
+    });
 
   const uniqueTags = Array.from(new Set(tasks.flatMap(task => task.tags || [])));
 
@@ -287,152 +301,176 @@ export function EnhancedKanbanBoard({ projectId }: EnhancedKanbanBoardProps) {
     "Blocked": filteredTasks.filter(t => t.status === "Blocked")
   };
 
+
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="border-none shadow-none bg-transparent">
+      <CardHeader className="flex flex-row items-center justify-between px-0 pb-6">
         <div>
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 rounded-full bg-primary/10">
-              <Tag className="h-5 w-5 text-primary" />
-            </div>
-            Enhanced Kanban Board
+          <CardTitle className="flex items-center gap-3 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+            Sprint Board
           </CardTitle>
-          <CardDescription>Drag and drop tasks to manage project workflow efficiently.</CardDescription>
+          <CardDescription className="text-muted-foreground/80 font-medium">Manage and track your sprint tasks visually.</CardDescription>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-3">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Search tasks..."
+              className="pl-9 w-[240px] h-10 bg-white/50 backdrop-blur-sm border-white/20 focus:bg-white transition-all rounded-xl"
+            />
+          </div>
           <Select value={activeFilter} onValueChange={setActiveFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter tasks" />
+            <SelectTrigger className="w-[160px] h-10 bg-white/50 backdrop-blur-sm border-white/20 rounded-xl">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <SelectValue placeholder="Filter" />
+              </div>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl border-white/20 shadow-xl backdrop-blur-md">
               <SelectItem value="all">All Tasks</SelectItem>
               <SelectItem value="my-tasks">My Tasks</SelectItem>
               <SelectItem value="unassigned">Unassigned</SelectItem>
               <SelectItem value="overdue">Overdue</SelectItem>
-              {uniqueTags.length > 0 && <SelectItem value="" disabled className="font-semibold">By Tag</SelectItem>}
+              {uniqueTags.length > 0 && <SelectItem value="tag-divider" disabled className="text-[10px] uppercase font-bold text-muted-foreground/50 py-2">By Tag</SelectItem>}
               {uniqueTags.map(tag => (
                 <SelectItem key={tag} value={tag}>{tag}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => handleOpenDialog()}>
-            <Plus className="h-4 w-4 mr-2" /> Add Task
+          <Button
+            onClick={() => handleOpenDialog()}
+            className="h-10 px-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg shadow-indigo-500/20 border-none rounded-xl gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <Plus className="h-4 w-4" /> Add Task
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="p-0">
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-5 gap-4">
             {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-              <Droppable key={status} droppableId={status}>
-                {(provided, snapshot) => (
-                  <div 
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className={`rounded-lg p-4 transition-colors ${getStatusColor(status as TaskStatus)} ${
-                      snapshot.isDraggingOver ? 'ring-2 ring-primary/50' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-sm text-gray-700">
-                        {status} ({statusTasks.length})
-                      </h3>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0 hover:bg-white/50" 
-                        onClick={() => handleOpenDialog(undefined, status as TaskStatus)}
-                      >
-                        <Plus className="h-4 w-4" />
-                        <span className="sr-only">Add {status} task</span>
-                      </Button>
+              <div key={status} className="flex flex-col h-full min-w-[240px]">
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <div className="flex items-center gap-2">
+                    <div className={cn("p-1.5 rounded-lg", getStatusStyles(status as TaskStatus).split(' ')[0])}>
+                      {getStatusIcon(status as TaskStatus)}
                     </div>
-                    <ScrollArea className="h-[calc(100vh-350px)]">
-                      <div className="space-y-3 pr-2">
+                    <h3 className="font-bold text-sm text-foreground/80 tracking-tight flex items-center gap-2">
+                      {status}
+                      <span className="text-[10px] h-5 w-5 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                        {statusTasks.length}
+                      </span>
+                    </h3>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 rounded-lg hover:bg-muted"
+                    onClick={() => handleOpenDialog(undefined, status as TaskStatus)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+
+                <Droppable key={status} droppableId={status} isDropDisabled={false} isCombineEnabled={false} ignoreContainerClipping={false}>
+                  {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={cn(
+                        "flex-1 min-h-[500px] rounded-2xl p-3 transition-all duration-300 border backdrop-blur-[2px]",
+                        getStatusStyles(status as TaskStatus),
+                        snapshot.isDraggingOver ? "ring-2 ring-indigo-500/30 bg-indigo-500/5 border-indigo-500/20" : "border-transparent"
+                      )}
+                    >
+                      <div className="space-y-3">
                         {statusTasks.length === 0 ? (
-                          <div className="text-center py-8 text-muted-foreground text-sm italic">
-                            No tasks
+                          <div className="flex flex-col items-center justify-center h-32 text-muted-foreground/40 gap-2">
+                            <ListTodo className="h-8 w-8 opacity-20" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Empty</span>
                           </div>
                         ) : (
                           statusTasks.map((task, index) => (
                             <Draggable key={task.id} draggableId={task.id} index={index}>
-                              {(provided, snapshot) => (
-                                <div 
+                              {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                                <div
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className={`bg-white p-3 rounded-lg border shadow-sm transition-all duration-200 ${
-                                    snapshot.isDragging ? 'rotate-2 shadow-lg ring-2 ring-primary/30' : 'hover:shadow-md'
-                                  }`}
+                                  className={cn(
+                                    "group relative bg-white dark:bg-slate-900 p-4 rounded-xl border border-border/50 shadow-sm transition-all duration-200 select-none",
+                                    snapshot.isDragging ? "shadow-2xl ring-2 ring-indigo-500/50 scale-[1.02] z-50 rotate-1" : "hover:border-indigo-500/30 hover:shadow-md active:scale-[0.98]"
+                                  )}
                                 >
                                   <div className="flex items-start justify-between mb-2">
-                                    <h4 className="font-medium text-sm text-gray-900 line-clamp-2">{task.name}</h4>
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button aria-haspopup="true" size="icon" variant="ghost" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                          <MoreHorizontal className="h-3 w-3" />
-                                          <span className="sr-only">Toggle menu</span>
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        <DropdownMenuItem onClick={() => handleOpenDialog(task)}>
-                                          <Edit className="mr-2 h-4 w-4" />Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => handleDeleteTask(task.id)}>
-                                          <Trash2 className="mr-2 h-4 w-4" />Delete
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <h4 className="font-bold text-sm text-foreground/90 leading-snug line-clamp-2 pr-6">
+                                      {task.name}
+                                    </h4>
+                                    <div className="absolute top-3 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                          </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="rounded-xl">
+                                          <DropdownMenuItem onClick={() => handleOpenDialog(task)} className="gap-2">
+                                            <Edit className="h-4 w-4" /> Edit Task
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem className="text-destructive focus:text-destructive gap-2" onClick={() => handleDeleteTask(task.id)}>
+                                            <Trash2 className="h-4 w-4" /> Delete
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </div>
                                   </div>
-                                  
+
                                   {task.description && (
-                                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{task.description}</p>
+                                    <p className="text-[11px] text-muted-foreground/80 mb-3 line-clamp-2 leading-relaxed">
+                                      {task.description}
+                                    </p>
                                   )}
-                                  
-                                  {task.tags && task.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mb-3">
-                                      {task.tags.slice(0, 2).map(tag => (
-                                        <Badge key={tag} variant="outline" className="text-xs py-0 h-5">
-                                          {tag}
-                                        </Badge>
-                                      ))}
-                                      {task.tags.length > 2 && (
-                                        <Badge variant="outline" className="text-xs py-0 h-5">
-                                          +{task.tags.length - 2}
-                                        </Badge>
-                                      )}
-                                    </div>
-                                  )}
-                                  
-                                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                                    <div className="flex items-center">
-                                      {task.assignee ? (
-                                        <div className="flex items-center">
-                                          <UserCircle className="h-3 w-3 mr-1" />
-                                          <span className="truncate max-w-20">{task.assignee}</span>
+
+                                  <div className="flex flex-wrap gap-1.5 mb-4">
+                                    {task.tags?.slice(0, 2).map(tag => (
+                                      <Badge key={tag} variant="outline" className="text-[9px] font-bold uppercase tracking-wider py-0 px-1.5 h-5 bg-muted/30 border-none text-muted-foreground">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                    {task.tags && task.tags.length > 2 && (
+                                      <Badge variant="outline" className="text-[9px] font-bold py-0 h-5 bg-muted/30 border-none text-muted-foreground">
+                                        +{task.tags.length - 2}
+                                      </Badge>
+                                    )}
+                                  </div>
+
+                                  <div className="flex items-center justify-between border-t border-border/30 pt-3 mt-1">
+                                    <div className="flex items-center gap-3 text-[10px] font-medium text-muted-foreground/70">
+                                      <div className="flex items-center gap-1">
+                                        <UserCircle className="h-3.5 w-3.5" />
+                                        <span>{task.assignee?.split(' ')[0] || "Unassigned"}</span>
+                                      </div>
+                                      {task.dueDate && (
+                                        <div className="flex items-center gap-1">
+                                          <Calendar className="h-3.5 w-3.5" />
+                                          <span>{new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                                         </div>
-                                      ) : (
-                                        <span className="italic">Unassigned</span>
                                       )}
                                     </div>
-                                    {task.dueDate && (
-                                      <div className="flex items-center">
-                                        <Calendar className="h-3 w-3 mr-1" />
-                                        {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                      </div>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                      {task.estimatedHours && (
+                                        <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded-md">
+                                          <Clock className="h-3 w-3" />
+                                          {task.estimatedHours}h
+                                        </div>
+                                      )}
+                                      {getPriorityBadge(task.priority)}
+                                    </div>
                                   </div>
-                                  
-                                  <div className="flex items-center justify-between">
-                                    {getPriorityBadge(task.priority)}
-                                    {task.estimatedHours && (
-                                      <div className="flex items-center text-xs text-muted-foreground">
-                                        <Clock className="h-3 w-3 mr-1" />
-                                        {task.estimatedHours}h
-                                      </div>
-                                    )}
-                                  </div>
+
+                                  {/* Glass highlight on hover */}
+                                  <div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                               )}
                             </Draggable>
@@ -440,10 +478,10 @@ export function EnhancedKanbanBoard({ projectId }: EnhancedKanbanBoardProps) {
                         )}
                         {provided.placeholder}
                       </div>
-                    </ScrollArea>
-                  </div>
-                )}
-              </Droppable>
+                    </div>
+                  )}
+                </Droppable>
+              </div>
             ))}
           </div>
         </DragDropContext>

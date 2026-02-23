@@ -178,7 +178,18 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((row, index) => (
-                <TableRow key={`row-${index}-${JSON.stringify(row)}`}>{columns.map((column) => <TableCell key={String(column.accessorKey)} className={cn((String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`)}>{column.cell({ row })}</TableCell>)}</TableRow>
+                <TableRow key={`row-${index}-${JSON.stringify(row)}`}>{columns.map((column) => {
+                  // Some existing cell renderers expect a TanStack-like row object
+                  // with an `original` property (e.g. row.original.name). Provide
+                  // that shape here while still keeping the raw row available if
+                  // the renderer accesses top-level fields.
+                  const rowForCell: any = { original: row, ...((typeof row === 'object' && row) || {}) };
+                  return (
+                    <TableCell key={String(column.accessorKey)} className={cn((String(column.accessorKey).toLowerCase() === 'actions' || String(column.header).toLowerCase() === 'actions') && `text-${actionColumnAlignment}`)}>
+                      {column.cell({ row: rowForCell })}
+                    </TableCell>
+                  );
+                })}</TableRow>
               ))
             ) : (
               <TableRow>

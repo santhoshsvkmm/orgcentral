@@ -1,7 +1,7 @@
-
 'use client';
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Menubar,
   MenubarContent,
@@ -13,288 +13,315 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { 
-  FileQuestion, 
-  MessageSquare, 
-  Target, 
-  ClipboardList, 
-  CloudSun, 
+import {
+  FileQuestion,
+  MessageSquare,
+  Target,
+  ClipboardList,
+  CloudSun,
   Activity,
-  DraftingCompass, 
-  GanttChartSquare, 
-  UsersRound, 
-  FolderKanban, 
-  FileText, 
-  ListOrdered, 
-  Package, 
-  Users, 
-  Construction, 
-  Laptop, 
-  Warehouse, 
-  Landmark, 
-  PiggyBank, 
-  Receipt, 
-  FileSpreadsheet, 
-  Handshake, 
-  FileCheck2, 
-  FileSignature, 
-  FileDigit, 
-  FolderKanbanIcon, 
+  DraftingCompass,
+  GanttChartSquare,
+  UsersRound,
+  FolderKanban,
+  FileText,
+  ListOrdered,
+  Package,
+  Users,
+  Construction,
+  Laptop,
+  Warehouse,
+  Landmark,
+  PiggyBank,
+  Receipt,
+  FileSpreadsheet,
+  Handshake,
+  FileCheck2,
+  FileSignature,
+  FileDigit,
   LayoutDashboard,
-  FileSearch, 
+  FileSearch,
   FilePlus2,
   SquareKanban,
   LayoutGrid,
-  Box, // Icon for 3D Model Viewer
-  Image // Icon for 2D Drawings
+  Box,
+  Image,
+  ChevronDown,
+  GitCommit
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProjectMenubarProps {
   projectId: string;
 }
 
 export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
+  const pathname = usePathname();
+
+  const isActive = (path: string) => {
+    if (!pathname) return false;
+    if (path.endsWith(projectId)) {
+      return pathname === path;
+    }
+    return pathname.startsWith(path);
+  };
+
+  const getTriggerClass = (active: boolean) => cn(
+    "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer",
+    active
+      ? "bg-primary/10 text-primary border border-primary/20"
+      : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent"
+  );
+
   return (
-    <Menubar className="mb-6 rounded-md border bg-card shadow-sm flex-wrap justify-start p-2 md:p-2">
+    <Menubar className="mb-8 h-auto p-1.5 rounded-xl border border-border/60 bg-card/50 backdrop-blur-sm shadow-sm flex-wrap gap-1">
+      {/* Dashboard */}
       <MenubarMenu>
-        <MenubarTrigger asChild className="cursor-pointer">
+        <MenubarTrigger asChild className={getTriggerClass(isActive(`/projects/${projectId}`))}>
           <Link href={`/projects/${projectId}`}>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
+            <LayoutDashboard className="h-4 w-4" />
+            <span>Dashboard</span>
           </Link>
         </MenubarTrigger>
       </MenubarMenu>
+
+      {/* Planning */}
       <MenubarMenu>
-        <MenubarTrigger>
-          <DraftingCompass className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Planning</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/planning`))}>
+          <DraftingCompass className="h-4 w-4" />
+          <span>Planning</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/planning/gantt`}>
-              <GanttChartSquare className="mr-2 h-4 w-4" /> Gantt Chart (Overall)
+        <MenubarContent className="min-w-[200px] p-1.5 rounded-xl">
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname.includes('/planning/gantt') && !pathname.includes('/micro-planning') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/planning/gantt`} className="flex items-center gap-2 w-full p-2">
+              <GanttChartSquare className="h-4 w-4 text-indigo-500" />
+              <span>Gantt Chart (Overall)</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/planning/milestones`}>
-              <Target className="mr-2 h-4 w-4" /> Milestones
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname.includes('/planning/milestones') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/planning/milestones`} className="flex items-center gap-2 w-full p-2">
+              <Target className="h-4 w-4 text-rose-500" />
+              <span>Milestones</span>
             </Link>
           </MenubarItem>
-          <MenubarSeparator />
+          <MenubarSeparator className="my-1" />
           <MenubarSub>
-            <MenubarSubTrigger>
-              <LayoutGrid className="mr-2 h-4 w-4" /> Micro Scheduling
+            <MenubarSubTrigger className={cn("rounded-lg mb-1 p-2", pathname.includes('/micro-planning') && "bg-muted")}>
+              <div className="flex items-center gap-2">
+                <LayoutGrid className="h-4 w-4 text-amber-500" />
+                <span>Micro Scheduling</span>
+              </div>
             </MenubarSubTrigger>
-            <MenubarSubContent>
- <MenubarItem asChild>
- <Link href={`/projects/${projectId}/planning/micro-planning`}>
- <LayoutGrid className="mr-2 h-4 w-4" /> Overview
- </Link>
- </MenubarItem>
- <MenubarSeparator />
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/planning/micro-planning/kanban`}>
-                  <SquareKanban className="mr-2 h-4 w-4" /> Kanban Board
+            <MenubarSubContent className="min-w-[180px] p-1.5 rounded-xl">
+              <MenubarItem asChild className={cn("rounded-lg mb-1", pathname.endsWith('/micro-planning') && "bg-muted")}>
+                <Link href={`/projects/${projectId}/planning/micro-planning`} className="flex items-center gap-2 w-full p-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  <span>Sprint Planning</span>
                 </Link>
               </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/planning/micro-planning/gantt`}>
-                  <GanttChartSquare className="mr-2 h-4 w-4" /> Gantt Chart (Sprint)
+              <MenubarItem asChild className={cn("rounded-lg mb-1", pathname.includes('/micro-planning/kanban') && "bg-muted")}>
+                <Link href={`/projects/${projectId}/planning/micro-planning/kanban`} className="flex items-center gap-2 w-full p-2">
+                  <SquareKanban className="h-4 w-4" />
+                  <span>Kanban Board</span>
+                </Link>
+              </MenubarItem>
+              <MenubarItem asChild className={cn("rounded-lg", pathname.includes('/micro-planning/gantt') && "bg-muted")}>
+                <Link href={`/projects/${projectId}/planning/micro-planning/gantt`} className="flex items-center gap-2 w-full p-2">
+                  <GanttChartSquare className="h-4 w-4" />
+                  <span>Sprint Gantt</span>
                 </Link>
               </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>
-          <MenubarSeparator />
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/planning/resource-allocation`}>
-              <UsersRound className="mr-2 h-4 w-4" /> Resource Allocation
+          <MenubarSeparator className="my-1" />
+          <MenubarItem asChild className={cn("rounded-lg", pathname.includes('/planning/resource-allocation') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/planning/resource-allocation`} className="flex items-center gap-2 w-full p-2">
+              <UsersRound className="h-4 w-4 text-emerald-500" />
+              <span>Resource Allocation</span>
             </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Documents */}
       <MenubarMenu>
-        <MenubarTrigger>
-          <FolderKanban className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Documents</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/documents`))}>
+          <FolderKanban className="h-4 w-4" />
+          <span>Documents</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/documents/project-brief`}>
-              <FileText className="mr-2 h-4 w-4" /> Project Brief
+        <MenubarContent className="min-w-[200px] p-1.5 rounded-xl">
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/documents/project-brief') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/documents/project-brief`} className="flex items-center gap-2 w-full p-2">
+              <FileText className="h-4 w-4 text-indigo-500" /> <span>Project Brief</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/documents/specifications`}>
-              <ListOrdered className="mr-2 h-4 w-4" /> Specifications
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/documents/specifications') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/documents/specifications`} className="flex items-center gap-2 w-full p-2">
+              <ListOrdered className="h-4 w-4 text-cyan-500" /> <span>Specifications</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/documents/meeting-notes`}>
-              <ClipboardList className="mr-2 h-4 w-4" /> Meeting Notes
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/documents/variations') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/documents/variations`} className="flex items-center gap-2 w-full p-2">
+              <GitCommit className="h-4 w-4 text-emerald-500" /> <span>Variations</span>
             </Link>
           </MenubarItem>
-          <MenubarSeparator />
+          <MenubarSeparator className="my-1" />
           <MenubarSub>
-            <MenubarSubTrigger>
-              <Image className="mr-2 h-4 w-4" /> 2D Drawings
+            <MenubarSubTrigger className="rounded-lg mb-1 p-2">
+              <div className="flex items-center gap-2">
+                <Image className="h-4 w-4" /> <span>2D Drawings</span>
+              </div>
             </MenubarSubTrigger>
-            <MenubarSubContent>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=architectural`}>Architectural</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=structural`}>Structural</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=mechanical`}>Mechanical</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=electrical`}>Electrical</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=plumbing`}>Plumbing</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=shop-drawings`}>Shop Drawings</Link>
-              </MenubarItem>
-               <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=detail-drawings`}>Detail Drawings</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=isometric-axonometric`}>Isometric/Axonometric</Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=presentation-drawings`}>Presentation Drawings</Link>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/documents/drawings?type=as-built`}>As-Built Drawings</Link>
-              </MenubarItem>
+            <MenubarSubContent className="min-w-[180px] p-1.5 rounded-xl max-h-[400px] overflow-y-auto">
+              {[
+                { label: 'Architectural', type: 'architectural' },
+                { label: 'Structural', type: 'structural' },
+                { label: 'Mechanical', type: 'mechanical' },
+                { label: 'Electrical', type: 'electrical' },
+                { label: 'Plumbing', type: 'plumbing' },
+                { label: 'Shop Drawings', type: 'shop-drawings' },
+                { label: 'Detail Drawings', type: 'detail-drawings' }
+              ].map(item => (
+                <MenubarItem key={item.type} asChild className="rounded-lg mb-1">
+                  <Link href={`/projects/${projectId}/documents/drawings?type=${item.type}`} className="p-2 w-full block">{item.label}</Link>
+                </MenubarItem>
+              ))}
             </MenubarSubContent>
           </MenubarSub>
-           <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/documents/drawings/3d-model-viewer`}>
-               <Box className="mr-2 h-4 w-4" /> 3D Model Viewer/Editor
+          <MenubarItem asChild className="rounded-lg">
+            <Link href={`/projects/${projectId}/documents/drawings/3d-model-viewer`} className="flex items-center gap-2 w-full p-2">
+              <Box className="h-4 w-4 text-blue-500" /> <span>3D Viewer</span>
             </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Resources */}
       <MenubarMenu>
-        <MenubarTrigger className="flex items-center">
-          <Package className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Resources</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/resources`))}>
+          <Package className="h-4 w-4" />
+          <span>Resources</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/resources/team-members`}>
-              <Users className="mr-2 h-4 w-4" /> Team Members
+        <MenubarContent className="min-w-[180px] p-1.5 rounded-xl">
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/resources/team-members') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/resources/team-members`} className="flex items-center gap-2 w-full p-2">
+              <Users className="h-4 w-4 text-indigo-500" /> <span>Team Members</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/resources/equipment`}>
-              <Construction className="mr-2 h-4 w-4" /> Equipment
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/resources/labour') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/resources/labour`} className="flex items-center gap-2 w-full p-2">
+              <Construction className="h-4 w-4 text-amber-500" /> <span>Labours</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/resources/software`}>
-              <Laptop className="mr-2 h-4 w-4" /> Software
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/resources/equipment') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/resources/equipment`} className="flex items-center gap-2 w-full p-2">
+              <Construction className="h-4 w-4 text-amber-500" /> <span>Equipment</span>
             </Link>
           </MenubarItem>
-           <MenubarSeparator />
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/resources/warehouses`}>
-              <Warehouse className="mr-2 h-4 w-4" /> Warehouse Mgmt
+          <MenubarSeparator className="my-1" />
+          <MenubarItem asChild className={cn("rounded-lg", pathname.includes('/resources/warehouses') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/resources/warehouses`} className="flex items-center gap-2 w-full p-2">
+              <Warehouse className="h-4 w-4 text-emerald-500" /> <span>Warehouse</span>
             </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Contracts */}
       <MenubarMenu>
-        <MenubarTrigger>
-          <Landmark className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Financial</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/contracts`))}>
+          <FileSignature className="h-4 w-4" />
+          <span>Contracts</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/financial/budget`}>
-              <PiggyBank className="mr-2 h-4 w-4" /> Budget
+        <MenubarContent className="min-w-[180px] p-1.5 rounded-xl">
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/contracts/client-agreement') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/contracts/client-agreement`} className="flex items-center gap-2 w-full p-2">
+              <FileCheck2 className="h-4 w-4 text-indigo-500" /> <span>Client Agreement</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/financial/expenses`}>
-              <Receipt className="mr-2 h-4 w-4" /> Expenses
+          <MenubarItem asChild className={cn("rounded-lg mb-1", pathname?.includes('/contracts/vendor-contracts') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/contracts/vendor-contracts`} className="flex items-center gap-2 w-full p-2">
+              <FileSignature className="h-4 w-4 text-cyan-500" /> <span>Vendor Contracts</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/financial/invoices`}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" /> Invoices
+          <MenubarSeparator className="my-1" />
+          <MenubarItem asChild className={cn("rounded-lg", pathname?.includes('/contracts/tenders') && "bg-muted")}>
+            <Link href={`/projects/${projectId}/contracts/tenders`} className="flex items-center gap-2 w-full p-2">
+              <FileSearch className="h-4 w-4 text-emerald-500" /> <span>Tenders</span>
             </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Financial */}
       <MenubarMenu>
-        <MenubarTrigger>
-          <Handshake className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Contracts</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/financial`))}>
+          <Landmark className="h-4 w-4" />
+          <span>Financial</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/contracts/client-agreement`}>
-              <FileCheck2 className="mr-2 h-4 w-4" /> Client Agreement
+        <MenubarContent className="min-w-[180px] p-1.5 rounded-xl">
+          <MenubarItem asChild className="rounded-lg mb-1">
+            <Link href={`/projects/${projectId}/financial/budget`} className="flex items-center gap-2 w-full p-2">
+              <PiggyBank className="h-4 w-4 text-emerald-500" /> <span>Budget</span>
             </Link>
           </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/contracts/vendor-contracts`}>
-              <FileSignature className="mr-2 h-4 w-4" /> Vendor Contracts
+          <MenubarItem asChild className="rounded-lg mb-1">
+            <Link href={`/projects/${projectId}/financial/expenses`} className="flex items-center gap-2 w-full p-2">
+              <Receipt className="h-4 w-4 text-rose-500" /> <span>Expenses</span>
+            </Link>
+          </MenubarItem>
+          <MenubarItem asChild className="rounded-lg">
+            <Link href={`/projects/${projectId}/financial/invoices`} className="flex items-center gap-2 w-full p-2">
+              <FileSpreadsheet className="h-4 w-4 text-blue-500" /> <span>Invoices</span>
             </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Communication */}
       <MenubarMenu>
-        <MenubarTrigger>
-          <FileDigit className="mr-2 h-4 w-4 md:mr-0 md:h-5 md:w-5" /> <span className="hidden md:inline ml-2">Quotation</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/communication`))}>
+          <MessageSquare className="h-4 w-4" />
+          <span>Comm.</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/quotation/view`}>
-              <FileSearch className="mr-2 h-4 w-4" /> View Quotation
-            </Link>
-          </MenubarItem>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/quotation/generate`}>
-              <FilePlus2 className="mr-2 h-4 w-4" /> Generate New
-            </Link>
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>
-          <MessageSquare className="mr-1 h-4 w-4 md:mr-0 md:h-5 md:w-5" />
-          <span className="hidden md:inline ml-2">Communication</span>
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem asChild>
-            <Link href={`/projects/${projectId}/communication/rfi`}>
-              <FileQuestion className="mr-2 h-4 w-4" /> RFIs
+        <MenubarContent className="min-w-[150px] p-1.5 rounded-xl">
+          <MenubarItem asChild className="rounded-lg">
+            <Link href={`/projects/${projectId}/communication/rfi`} className="flex items-center gap-2 w-full p-2">
+              <FileQuestion className="h-4 w-4" /> <span>RFIs</span>
             </Link>
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Reports */}
       <MenubarMenu>
-        <MenubarTrigger>
-            <ClipboardList className="mr-1 h-4 w-4 md:mr-0 md:h-5 md:w-5" />
-            <span className="hidden md:inline ml-2">Reports</span>
+        <MenubarTrigger className={getTriggerClass(isActive(`/projects/${projectId}/reports`))}>
+          <ClipboardList className="h-4 w-4" />
+          <span>Reports</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </MenubarTrigger>
-        <MenubarContent>
-            <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/reports/task-reports`}>
-                    <ClipboardList className="mr-2 h-4 w-4" /> Task Reports
-                </Link>
-            </MenubarItem>
-            <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/reports/weather-reports`}>
-                    <CloudSun className="mr-2 h-4 w-4" /> Weather Reports
-                </Link>
-            </MenubarItem>
-            <MenubarItem asChild>
-                <Link href={`/projects/${projectId}/reports/daily-monitoring`}>
-                    <Activity className="mr-2 h-4 w-4" /> Daily Monitoring
-                </Link>
-            </MenubarItem>
+        <MenubarContent className="min-w-[180px] p-1.5 rounded-xl">
+          <MenubarItem asChild className="rounded-lg mb-1">
+            <Link href={`/projects/${projectId}/reports/task-reports`} className="flex items-center gap-2 w-full p-2">
+              <ClipboardList className="h-4 w-4" /> <span>Task Reports</span>
+            </Link>
+          </MenubarItem>
+          <MenubarItem asChild className="rounded-lg mb-1">
+            <Link href={`/projects/${projectId}/reports/weather-reports`} className="flex items-center gap-2 w-full p-2">
+              <CloudSun className="h-4 w-4" /> <span>Weather</span>
+            </Link>
+          </MenubarItem>
+          <MenubarItem asChild className="rounded-lg">
+            <Link href={`/projects/${projectId}/reports/daily-monitoring`} className="flex items-center gap-2 w-full p-2">
+              <Activity className="h-4 w-4" /> <span>Monitoring</span>
+            </Link>
+          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
     </Menubar>

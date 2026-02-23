@@ -1,13 +1,13 @@
 
-'use client';
-
-import { use } from 'react';
+// Server component: fetch project name on the server and render client-only
+// parts (claims) via a dedicated client component.
 import { PageTitle } from '@/components/page-title';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import BudgetClaimsClient from '@/components/projects/budget-claims-client';
 import Link from 'next/link';
 import { ArrowLeft, DollarSign, TrendingUp, TrendingDown, AlertTriangle, Calculator, FileText, PieChart } from 'lucide-react';
 
@@ -42,13 +42,29 @@ const changeOrders = [
   { id: 'CO-003', description: 'Extra Electrical Outlets', amount: 15000, status: 'Approved', date: '2024-01-25' }
 ];
 
-export default function ProjectBudgetPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
-  const params = use(paramsPromise);
+export default async function ProjectBudgetPage({ params }: { params: { id: string } }) {
   const projectId = params.id;
-  const projectName = use(getProjectNameById(projectId));
+  const projectName = await getProjectNameById(projectId);
 
   const spentPercentage = (budgetData.actualSpent / budgetData.totalBudget) * 100;
   const remainingPercentage = (budgetData.remaining / budgetData.totalBudget) * 100;
+
+  // Mock milestones and tasks for claim creation (would come from API in a real app)
+  const sampleMilestones = [
+    { id: 'm1', name: 'Foundation' },
+    { id: 'm2', name: 'Structure' },
+    { id: 'm3', name: 'Finishes' },
+  ];
+
+  const sampleTasks = [
+    { id: 't1', title: 'Excavation', milestoneId: 'm1' },
+    { id: 't2', title: 'Concrete Pour', milestoneId: 'm1' },
+    { id: 't3', title: 'Steel Frame', milestoneId: 'm2' },
+    { id: 't4', title: 'Roofing', milestoneId: 'm3' },
+  ];
+
+  // Claims are handled in a client component below so we keep this page
+  // a server component (can use async/await and server-side data fetching).
 
   return (
     <>
@@ -266,6 +282,19 @@ export default function ProjectBudgetPage({ params: paramsPromise }: { params: P
           </Card>
         </TabsContent>
 
+        <TabsContent value="claims">
+          <Card>
+            <CardHeader>
+              <CardTitle>Claims & Variations</CardTitle>
+              <CardDescription>Raise claims against milestones or specific tasks.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Use a client component to manage claims (stateful) */}
+              <BudgetClaimsClient milestones={sampleMilestones} tasks={sampleTasks} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="reports">
           <Card>
             <CardHeader>
@@ -296,10 +325,7 @@ export default function ProjectBudgetPage({ params: paramsPromise }: { params: P
                   <AlertTriangle className="h-6 w-6 mb-2" />
                   <span>Risk Assessment</span>
                 </Button>
-                <Button variant="outline" className="h-20 flex flex-col">
-                  <DollarSign className="h-6 w-6 mb-2" />
-                  <span>Payment Schedule</span>
-                </Button>
+                {/* Payment Schedule removed. Use Claims tab to raise claims and manage payments against milestones/tasks. */}
               </div>
             </CardContent>
           </Card>

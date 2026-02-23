@@ -1,260 +1,265 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useRef } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
-
-// Import your viewer initialization functions
-import { initThreeDViewer } from '@/lib/threeDViewer';
-// Assume you have a type for your drawing data (replace with your actual type)
-interface DrawingData {
-  type: '2D' | '3D';
-  fileUrl: string;
-  // other relevant properties
-}
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  ZoomIn,
+  ZoomOut,
+  Hand,
+  Rotate3d,
+  Ruler,
+  Layers,
+  Info,
+  Maximize,
+  ChevronRight,
+  ChevronLeft,
+  Settings,
+  Download,
+  Share2,
+  Clock
+} from 'lucide-react';
+import { initTwoDViewer } from '@/lib/twoDViewer';
+import { cn } from '@/lib/utils';
+import { DrawingVersion, DrawingData } from '@/types/cad';
 
 interface CadViewerProps {
   projectId: string;
-  drawingData: DrawingData | null; // Data for the drawing/model to display
+  selectedVersion: DrawingVersion | null;
+  drawingData?: DrawingData | null;
+  onVersionChange?: (version: DrawingVersion) => void;
 }
 
-const CadViewer: React.FC<CadViewerProps> = ({ projectId, drawingData }) => {
+const CadViewer: React.FC<CadViewerProps> = ({ projectId, selectedVersion, drawingData, onVersionChange }) => {
   const twoDViewerRef = useRef<HTMLDivElement>(null);
   const threeDViewerRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<'properties' | 'layers' | 'versions'>('properties');
 
-  // State to hold the viewer instances
-  const [currentTwoDViewerInstance, setCurrentTwoDViewerInstance] = useState<ReturnType<typeof initTwoDViewer> | null>(null);
-  const [currentThreeDViewerInstance, setCurrentThreeDViewerInstance] = useState<ReturnType<typeof initThreeDViewer> | null>(null);
+  const [currentTwoDViewerInstance, setCurrentTwoDViewerInstance] = useState<any>(null);
+  const [currentThreeDViewerInstance, setCurrentThreeDViewerInstance] = useState<any>(null);
 
-
-  // State for managing active tools, layers, selected objects, etc.
-  const [activeTool, setActiveTool] = useState<string | null>(null);
-  const [visibleLayers, setVisibleLayers] = useState<string[]>([]);
+  const [activeTool, setActiveTool] = useState<string>('select');
   const [selectedObject, setSelectedObject] = useState<any>(null);
 
-
-  // Callback for handling object selection from viewers
-  const handleObjectSelected = useCallback((obj: any) => {
-    setSelectedObject(obj);
-  }, []);
-
   useEffect(() => {
-    if (!drawingData) {
-      setIsLoading(false);
-      setError(null); // Clear any previous errors
-      // Dispose of any existing viewers if no drawing data is provided
-      currentTwoDViewerInstance?.dispose();
-      setCurrentTwoDViewerInstance(null);
-      currentThreeDViewerInstance?.dispose();
-      setCurrentThreeDViewerInstance(null);
-      return;
-    }
+    if (!selectedVersion) return;
 
     setIsLoading(true);
-    setError(null);
+    // Simulation of loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
 
-    // Cleanup function for this effect run
-    let cleanupFunctions: (() => void)[] = [];
+    return () => clearTimeout(timer);
+  }, [selectedVersion]);
 
-    if (twoDViewerRef.current && drawingData.type === '2D') {
-      // --- Initialize DXF Viewer for 2D Panel ---
-      // 1. Ensure you have imported YourDxfViewer from your npm package above.
-      // 2. Get the reference to the 2D viewer div: twoDViewerRef.current
-      // 3. Initialize the DXF viewer. The initialization method depends on the package.
-      // Example (conceptual, replace with actual API):
-      // currentViewerInstance = new YourDxfViewer(twoDViewerRef.current, { options: {} });
-      // -------------------------------------------
-    // const threeDViewer = initThreeDViewer(threeDViewerRef.current, { options });
-    // Or for a unified viewer:
-    // const viewer = initForgeViewer(twoDViewerRef.current, { options }); // Use one ref for combined view
-    }
-
-    // Add event listeners for viewer events (e.g., selection, loaded)
-    // viewer.addEventListener('selectionChanged', (event) => {
-    //   setSelectedObject(event.selection);
-    // });
-    // ---------------------------------------------
-
-    // --- Placeholder for Loading Data ---
-    // Load the drawing data into the initialized viewer(s) here.
-    // This will depend on how your chosen library handles data loading.
-    // It might involve providing a file URL or a specific data format.
-    // Example (conceptual):
-    if (twoDViewerRef.current && drawingData.type === '2D') {
-      // --- Load DXF File into 2D Viewer ---
-      // Use the API of your DXF viewer instance to load the file.
-      // This might involve a URL or the file content itself... Or not.
-      // Example (conceptual, replace with actual API):
-      // currentViewerInstance.loadDrawing(drawingData.fileUrl);
-    // } else if (drawingData.type === '3D') {
-    //   threeDViewer.loadModel(drawingData.fileUrl);
-    // }
-    // Or for a unified viewer (e.g., Forge, loading a translated model):
-    // viewer.loadDocumentNode(drawingData.documentNode);
-
-    // Handle loading success and errors
-    // viewer.addEventListener('geometryLoaded', () => setIsLoading(false));
-    // viewer.addEventListener('loadingError', (err) => {
-    //   setError('Failed to load drawing: ' + err.message);
-    //   setIsLoading(false);
-    // });
-
-    // ------------------------------------
-
-    // --- Placeholder for Cleanup ---
-    // Return a cleanup function to dispose of the viewer instances when the component unmounts.
-    // This is crucial to prevent memory leaks, especially for canvas/WebGL based viewers.
-    // return () => {
-    //   twoDViewerInstance?.dispose(); // Call dispose method on your 2D viewer instance
-    //   // threeDViewerInstance?.dispose(); // Dispose of 3D viewer if it exists
-    // };
-    // Or for a unified viewer:
-    // return () => { /* unified viewer cleanup */
-    //   viewer.finish();
-    // };
-    // -------------------------------
-
-  }}, [drawingData, handleObjectSelected]); // Depend on drawingData and the memoized callback
-
-  // --- Toolbar and Controls ---
-  // Render buttons, sliders, etc. here to control the viewer.
-  // These will call methods on your viewer instance(s).
-  const renderToolbar = () => (
-    <div className="bg-gray-100 p-2 flex space-x-2">
-      {drawingData?.type === '3D' && (
-        <>
-          <Button onClick={() => {
-            // Example: Call a method on the 3D viewer instance for zooming
-            if (currentThreeDViewerInstance) {
-              currentThreeDViewerInstance.camera.zoom *= 1.2;
-              currentThreeDViewerInstance.camera.updateProjectionMatrix();
-              currentThreeDViewerInstance.renderer.render(currentThreeDViewerInstance.scene, currentThreeDViewerInstance.camera);
-            }
-          }} size="sm">Zoom In (3D)</Button>
-          <Button onClick={() => {
-            if (currentThreeDViewerInstance) {
-              currentThreeDViewerInstance.camera.zoom /= 1.2;
-              currentThreeDViewerInstance.camera.updateProjectionMatrix();
-              currentThreeDViewerInstance.renderer.render(currentThreeDViewerInstance.scene, currentThreeDViewerInstance.camera);
-            }
-          }} size="sm">Zoom Out (3D)</Button>
-          <Button onClick={() => { /* activate pan tool */ setActiveTool('pan'); }} size="sm">Pan</Button>
-          <Button onClick={() => { /* activate orbit tool */ setActiveTool('orbit'); }} size="sm">Orbit</Button>
-        </>
-      )}
-      {drawingData?.type === '2D' && (
-         <>
-          <Button onClick={() => {
-            // Implement 2D zoom logic here using currentTwoDViewerInstance API
-            console.log("2D Zoom In clicked");
-          }} size="sm">Zoom In (2D)</Button>
-          <Button onClick={() => {
-            // Implement 2D zoom logic here using currentTwoDViewerInstance API
-            console.log("2D Zoom Out clicked");
-          }} size="sm">Zoom Out (2D)</Button>
-          <Button onClick={() => { /* activate 2D pan tool */ setActiveTool('2d-pan'); }} size="sm">Pan (2D)</Button>
-         </>
-      )}
-      <Button onClick={() => { /* call zoom out on viewer */ }} size="sm">Zoom Out</Button>
-      <Button onClick={() => { /* activate pan tool */ setActiveTool('pan'); }} size="sm">Pan</Button>
-      <Button onClick={() => { /* activate orbit tool */ setActiveTool('orbit'); }} size="sm">Orbit</Button>
-      {/* Add more tools: Measure, Annotate, Select, Layer toggle, Sectioning, etc. */}
-    </div>
-  );
-  // -------------------------------------------
-
-  // --- Placeholder for Information/Properties Panel ---
-  // Display details of the selected object here.
-  const renderInfoPanel = () => (
-    <Card className="mt-4">
-      <CardHeader>
-        <CardTitle>Object Properties</CardTitle>
-        <CardDescription>Details of the selected drawing element or model component.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {selectedObject ? (
-          <div>
-            {/* Display properties from selectedObject */}
-            <p>ID: {selectedObject.id || 'N/A'}</p>
-            <p>Name: {selectedObject.name || 'N/A'}</p>
-            <p>Type: {selectedObject.type || 'N/A'}</p>
-            {/* For Three.js, selectedObject is a THREE.Object3D */}
-            {selectedObject.position && (
-              <p>Position: X:{selectedObject.position.x.toFixed(2)}, Y:{selectedObject.position.y.toFixed(2)}, Z:{selectedObject.position.z.toFixed(2)}</p>
-            )}
-            {/* For DXF entities, properties would be different */}
-            {selectedObject.start && selectedObject.end && (
-              <p>Line from ({selectedObject.start.x.toFixed(2)}, {selectedObject.start.y.toFixed(2)}) to ({selectedObject.end.x.toFixed(2)}, {selectedObject.end.y.toFixed(2)})</p>
-            )}
-            {/* Add more properties as needed */}
-            <pre>{JSON.stringify(selectedObject, null, 2)}</pre>
-          </div>
-        ) : (
-          <p className="text-muted-foreground">Select an object in the viewer to see its properties.</p>
-        )}
-      </CardContent>
-    </Card>
-  );
-  // ---------------------------------------------------
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <Card className="shadow-md h-[calc(100vh-200px)] flex flex-col"> {/* Adjust height as needed */}
-      <CardHeader>
-        <CardTitle>{drawingData ? `Viewing: ${drawingData.fileUrl.split('/').pop()}` : 'CAD Viewer'}</CardTitle>
-        <CardDescription>Interactive viewer for 2D drawings and 3D models.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow flex flex-col p-4">
-         {/* Toolbar Area */}
-         {renderToolbar()}
-
-        {isLoading && (
-          <div className="flex-grow flex items-center justify-center">
-            <p>Loading drawing...</p> {/* Replace with a spinner if you have one */}
+    <div className="relative w-full h-[700px] bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col group">
+      {/* Header / Top Bar */}
+      <div className="absolute top-0 inset-x-0 h-14 bg-slate-900/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 z-30 transition-all group-hover:bg-slate-900">
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-indigo-500/20 rounded-lg">
+            <Maximize className="h-4 w-4 text-indigo-400" />
           </div>
-        )}
-
-        {error && (
-          <div className="flex-grow flex items-center justify-center text-red-600">
-            <p>{error}</p>
+          <div>
+            <h3 className="text-sm font-bold text-white tracking-tight leading-none mb-1">
+              {selectedVersion?.fileName || 'No File Selected'}
+            </h3>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-[10px] h-4 py-0 px-1 border-slate-700 bg-slate-800 text-slate-400">
+                V{selectedVersion?.version || '0.0'}
+              </Badge>
+              <span className="text-[10px] text-slate-500 font-medium">
+                {selectedVersion ? `Updated ${new Date(selectedVersion.uploadedAt).toLocaleDateString()}` : '--'}
+              </span>
+            </div>
           </div>
-        )}
+        </div>
 
-        {/* Main Viewer Area - Split Panel */}
-        {(!isLoading && !error) && (
-           <PanelGroup direction="horizontal" className="flex-grow"> {/* Adjust defaultSize based on desired split */}
-             <Panel defaultSize={drawingData?.type === '2D' ? 100 : 50} minSize={20}>
-               <div ref={twoDViewerRef} className="w-full h-full bg-gray-200 relative">
-                 {/* The 2D CAD viewer will render inside this div */}
-                 {(!drawingData || drawingData.type !== '2D') && (
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                      2D Viewer Placeholder (Load a 2D drawing)
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10">
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10">
+            <Download className="h-4 w-4" />
+          </Button>
+          <div className="h-6 w-[1px] bg-white/10 mx-2" />
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10">
+            <Settings className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex relative mt-14">
+        {/* Left Toolbar - High End Floating Style */}
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-2 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl z-40 shadow-2xl">
+          <div className="flex flex-col gap-1 border-b border-white/10 pb-2">
+            <ToolbarButton icon={<Hand className="h-4 w-4" />} active={activeTool === 'pan'} onClick={() => setActiveTool('pan')} label="Pan" />
+            <ToolbarButton icon={<Rotate3d className="h-4 w-4" />} active={activeTool === 'orbit'} onClick={() => setActiveTool('orbit')} label="Orbit" />
+            <ToolbarButton icon={<Maximize className="h-4 w-4" />} active={activeTool === 'select'} onClick={() => setActiveTool('select')} label="Select" />
+          </div>
+          <div className="flex flex-col gap-1 border-b border-white/10 py-2">
+            <ToolbarButton icon={<ZoomIn className="h-4 w-4" />} onClick={() => { }} label="Zoom In" />
+            <ToolbarButton icon={<ZoomOut className="h-4 w-4" />} onClick={() => { }} label="Zoom Out" />
+          </div>
+          <div className="flex flex-col gap-1 pt-2">
+            <ToolbarButton icon={<Ruler className="h-4 w-4" />} active={activeTool === 'measure'} onClick={() => setActiveTool('measure')} label="Measure" />
+            <ToolbarButton icon={<Layers className="h-4 w-4" />} active={activeTab === 'layers'} onClick={() => { setActiveTab('layers'); setIsSidebarOpen(true); }} label="Layers" />
+          </div>
+        </div>
+
+        {/* Viewport */}
+        <div className="flex-1 relative bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900 to-slate-950">
+          {isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/50 backdrop-blur-sm z-20">
+              <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4" />
+              <p className="text-indigo-400 font-bold text-xs uppercase tracking-[0.2em]">Initializing Engine</p>
+            </div>
+          )}
+
+          <div ref={drawingData?.type === '3D' ? threeDViewerRef : twoDViewerRef} className="w-full h-full" />
+
+          {/* Viewport Overlay Controls */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-4 py-2 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-full z-10 shadow-xl">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 border-r border-white/10">3D Visualization</span>
+            <div className="flex items-center gap-4 text-[10px] font-medium text-slate-300">
+              <span>FPS: 60</span>
+              <span>MEM: 124MB</span>
+              <span>VER: 4.2.0</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Sidebar - Retractable Info Panel */}
+        <div
+          className={cn(
+            "h-full bg-slate-900 border-l border-white/10 transition-all duration-300 relative z-30",
+            isSidebarOpen ? "w-80" : "w-0 overflow-hidden"
+          )}
+        >
+          <div className="w-80 h-full flex flex-col pt-4">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full h-full flex flex-col">
+              <div className="px-4 mb-4">
+                <TabsList className="bg-slate-800 border border-white/5 w-full h-8 p-1">
+                  <TabsTrigger value="properties" className="flex-1 text-[10px] uppercase font-bold tracking-wider data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Properties</TabsTrigger>
+                  <TabsTrigger value="layers" className="flex-1 text-[10px] uppercase font-bold tracking-wider data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Layers</TabsTrigger>
+                  <TabsTrigger value="versions" className="flex-1 text-[10px] uppercase font-bold tracking-wider data-[state=active]:bg-indigo-600 data-[state=active]:text-white">History</TabsTrigger>
+                </TabsList>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
+                <TabsContent value="properties" className="m-0 space-y-4">
+                  <div className="space-y-4">
+                    <PropertySection title="General Information">
+                      <PropertyItem label="Object ID" value={selectedObject?.id || "OC-92842"} />
+                      <PropertyItem label="Status" value="Verified" status="success" />
+                      <PropertyItem label="Type" value={drawingData?.type || "2D Component"} />
+                      <PropertyItem label="Material" value="S355 Steel" />
+                    </PropertySection>
+
+                    <PropertySection title="Measurements">
+                      <PropertyItem label="Width" value="1,240 mm" />
+                      <PropertyItem label="Height" value="2,800 mm" />
+                      <PropertyItem label="Depth" value="450 mm" />
+                      <PropertyItem label="Volume" value="1.56 m³" />
+                    </PropertySection>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="layers" className="m-0 space-y-2">
+                  {['Dimensions', 'Annotation', 'Primary Mesh', 'Collision', 'Wireframe'].map(layer => (
+                    <div key={layer} className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50 border border-white/5 group hover:bg-slate-800 transition-colors">
+                      <span className="text-xs font-medium text-slate-300">{layer}</span>
+                      <div className="w-8 h-4 bg-indigo-600 rounded-full cursor-pointer relative">
+                        <div className="absolute right-1 top-1 w-2 h-2 bg-white rounded-full" />
+                      </div>
                     </div>
-                 )}
-               </div>
-             </Panel>
-             <PanelResizeHandle className="w-2 bg-gray-300 hover:bg-gray-400 transition-colors cursor-ew-resize" /> {/* Resizer handle */}
-             <Panel defaultSize={drawingData?.type === '3D' ? 100 : 50} minSize={20}>
-               <div ref={threeDViewerRef} className="w-full h-full bg-gray-300 relative">
-                 {/* The 3D CAD viewer will render inside this div */}
-                 {!drawingData || drawingData.type !== '3D' && (
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                      3D Viewer Placeholder (Load a 3D model)
+                  ))}
+                </TabsContent>
+
+                <TabsContent value="versions" className="m-0 space-y-3">
+                  {drawingData?.versions.map((v, i) => (
+                    <div
+                      key={v.version}
+                      onClick={() => onVersionChange?.(v)}
+                      className={cn(
+                        "p-3 rounded-xl border transition-all cursor-pointer group",
+                        selectedVersion?.version === v.version
+                          ? "bg-indigo-600/10 border-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.1)]"
+                          : "bg-slate-800/30 border-white/5 hover:border-slate-600"
+                      )}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={cn("text-xs font-bold uppercase tracking-wider", selectedVersion?.version === v.version ? "text-indigo-400" : "text-slate-400")}>
+                          Version {v.version}
+                        </span>
+                        {i === 0 && <Badge className="text-[9px] bg-emerald-500/20 text-emerald-400 border-none">Current</Badge>}
+                      </div>
+                      <p className="text-[11px] text-slate-300 font-medium truncate mb-2">{v.fileName}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                        <Clock className="h-3 w-3" />
+                        <span>{new Date(v.uploadedAt).toLocaleString()}</span>
+                      </div>
                     </div>
-                 )}
-               </div>
-             </Panel>
-           </PanelGroup>
-        )}
+                  ))}
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
+        </div>
 
-        {/* Information/Properties Panel Area */}
-        {renderInfoPanel()}
-
-      </CardContent>
-    </Card>
+        {/* Sidebar Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-6 h-12 bg-slate-900 border border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-colors z-40 group/btn shadow-xl"
+        >
+          {isSidebarOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          <div className="absolute inset-0 bg-indigo-600 opacity-0 group-hover/btn:opacity-10 rounded-full transition-opacity" />
+        </button>
+      </div>
+    </div>
   );
 };
+
+const ToolbarButton = ({ icon, active, onClick, label }: { icon: React.ReactNode, active?: boolean, onClick: () => void, label: string }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "w-10 h-10 flex items-center justify-center rounded-xl transition-all relative group/item",
+      active ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/40" : "text-slate-400 hover:bg-white/10 hover:text-white"
+    )}
+  >
+    {icon}
+    <div className="absolute left-14 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all whitespace-nowrap z-50 shadow-xl border border-white/10">
+      {label}
+    </div>
+  </button>
+);
+
+const PropertySection = ({ title, children }: { title: string, children: React.ReactNode }) => (
+  <div className="space-y-2">
+    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] px-1">{title}</h4>
+    <div className="bg-slate-800/40 border border-white/5 rounded-xl overflow-hidden">
+      {children}
+    </div>
+  </div>
+);
+
+const PropertyItem = ({ label, value, status }: { label: string, value: string, status?: 'success' | 'warning' | 'error' }) => (
+  <div className="flex items-center justify-between p-3 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
+    <span className="text-[11px] text-slate-400 font-medium">{label}</span>
+    <div className="flex items-center gap-2">
+      {status === 'success' && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />}
+      <span className="text-[11px] text-white font-bold">{value}</span>
+    </div>
+  </div>
+);
 
 export default CadViewer;

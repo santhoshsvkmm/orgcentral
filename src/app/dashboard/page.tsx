@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, HardHat, Brain, Building2, Calendar } from "lucide-react";
+import { Briefcase, DollarSign, Users, Activity, TrendingUp, AlertTriangle, XOctagon, BarChart2, PieChart as PieChartIconLucide, ListChecks, CheckCircle, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, HardHat, Brain, Building2, Calendar, Plus } from "lucide-react";
 import { PageTitle } from "@/components/page-title";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -90,10 +90,10 @@ const sampleProjects = [
 ];
 
 const recentActivity = [
-  { id: 1, user: "Alice Wonderland", action: "updated task 'Design Mockups'", time: "2m ago", avatar: "https://placehold.co/40x40.png?text=AW", dataAiHint:"user avatar" },
-  { id: 2, user: "Bob The Builder", action: "commented on 'Beta Platform Development'", time: "15m ago", avatar: "https://placehold.co/40x40.png?text=BB", dataAiHint:"user avatar" },
-  { id: 3, user: "System", action: "Project 'Alpha Launch' marked as 'Completed'", time: "1h ago", avatar: "https://placehold.co/40x40.png?text=SYS", dataAiHint:"system icon" },
-  { id: 4, user: "Charlie Brown", action: "added a new task 'User Testing Feedback'", time: "3h ago", avatar: "https://placehold.co/40x40.png?text=CB", dataAiHint:"user avatar" },
+  { id: 1, user: "Alice Wonderland", action: "updated task 'Design Mockups'", time: "2m ago", avatar: "https://placehold.co/40x40.png?text=AW" },
+  { id: 2, user: "Bob The Builder", action: "commented on 'Beta Platform Development'", time: "15m ago", avatar: "https://placehold.co/40x40.png?text=BB" },
+  { id: 3, user: "System", action: "Project 'Alpha Launch' marked as 'Completed'", time: "1h ago", avatar: "https://placehold.co/40x40.png?text=SYS" },
+  { id: 4, user: "Charlie Brown", action: "added a new task 'User Testing Feedback'", time: "3h ago", avatar: "https://placehold.co/40x40.png?text=CB" },
 ];
 
 const allChartDataPoints = [
@@ -199,6 +199,29 @@ export default function DashboardPage() {
             <ConstructionMetrics metrics={sampleConstructionMetrics} />
           </motion.section>
 
+          {/* Quick Actions */}
+          <motion.section variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-slate-200/60 p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
+                <p className="text-sm text-slate-600">Common actions to speed up project operations</p>
+              </div>
+              <div className="text-sm text-muted-foreground">Shortcut</div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button className="flex items-center justify-center gap-2" onClick={() => window.location.href = '/safety/management'}>
+                <Plus className="h-4 w-4" /> Report Incident
+              </Button>
+              <Button className="flex items-center justify-center gap-2" variant="outline" onClick={() => window.location.href = '/projects'}>
+                <Briefcase className="h-4 w-4" /> Create Tender
+              </Button>
+              <Button className="flex items-center justify-center gap-2" variant="ghost" onClick={() => window.location.href = '/financials'}>
+                <DollarSign className="h-4 w-4" /> Add Expense
+              </Button>
+            </div>
+          </motion.section>
+
           {/* Main Content Tabs */}
           <motion.section variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-slate-200/60">
             <Tabs defaultValue="overview">
@@ -249,6 +272,29 @@ export default function DashboardPage() {
                       onInsightClick={(insight) => console.log('Insight clicked:', insight.id)}
                       onViewAll={() => console.log('View all insights')}
                     />
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Recent Activity</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {recentActivity.map((act) => (
+                            <div key={act.id} className="flex items-center gap-3">
+                              <Avatar>
+                                <AvatarImage src={act.avatar} alt={act.user} />
+                                <AvatarFallback>{act.user.split(' ').map(n=>n[0]).join('').slice(0,2)}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 text-sm">
+                                <div className="font-medium">{act.user}</div>
+                                <div className="text-muted-foreground">{act.action}</div>
+                              </div>
+                              <div className="text-xs text-muted-foreground">{act.time}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </TabsContent>

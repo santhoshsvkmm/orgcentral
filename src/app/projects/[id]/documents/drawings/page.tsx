@@ -8,32 +8,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Image as ImageIconLucide, UploadCloud, FileText, Download } from 'lucide-react'; // Renamed Image to ImageIconLucide, added icons for drawing tools
+import { ArrowLeft, Image as ImageIconLucide, UploadCloud, FileText, Download, Clock } from 'lucide-react'; // Renamed Image to ImageIconLucide, added icons for drawing tools
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image'; // Imported Next.js Image
+import { cn } from '@/lib/utils';
+import CadViewer from '@/components/cad-viewer/cad-viewer';
+import { DrawingVersion, DrawingData as Drawing } from '@/types/cad';
 
-interface DrawingVersion {
-  version: string;
-  fileUrl: string; // In a real app, this might be a signed URL
-  fileType: 'pdf' | 'png' | 'jpg' | 'svg' | 'dxf' | 'dwg'; // Added file type
-  fileName: string;
-  uploadedAt: string; // ISO Date string
-}
 
-interface Drawing {
-  id: string;
-  name: string;
-  versions: DrawingVersion[];
-}
 
-type DrawingType = 
-  | 'architectural' 
-  | 'structural' 
-  | 'mechanical' 
-  | 'electrical' 
-  | 'plumbing' 
-  | 'shop-drawings' 
+type DrawingType =
+  | 'architectural'
+  | 'structural'
+  | 'mechanical'
+  | 'electrical'
+  | 'plumbing'
+  | 'shop-drawings'
   | 'detail-drawings'
   | 'isometric-axonometric'
   | 'presentation-drawings'
@@ -56,30 +47,116 @@ const drawingTypeLabels: Record<DrawingType, string> = {
 // Placeholder data for drawings
 const placeholderDrawingsData: Record<DrawingType, Drawing[]> = {
   architectural: [
-    { id: 'arch-001', name: 'Floor Plan - Ground Floor', versions: [{ version: '1.1', fileUrl: '#', fileName: 'arch-001-v1.1.pdf', uploadedAt: new Date().toISOString() }] },
-    { id: 'arch-002', name: 'Elevations - North and South', versions: [{ version: '1.0', fileUrl: '#', fileName: 'arch-002-v1.0.pdf', uploadedAt: new Date().toISOString(), fileType: 'pdf' }] },
+    {
+      id: 'arch-001',
+      name: 'Anteen Floor Plan',
+      type: '2D',
+      versions: [{
+        version: '1.0',
+        fileUrl: '/anteen.dwg',
+        fileName: 'anteen.dwg',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'dwg'
+      }]
+    },
+    {
+      id: 'arch-002',
+      name: 'Elevations - North and South',
+      type: '2D',
+      versions: [{
+        version: '1.0',
+        fileUrl: '#',
+        fileName: 'arch-002-v1.0.pdf',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'pdf'
+      }]
+    },
   ],
   structural: [
-    { id: 'stru-001', name: 'Foundation Plan', versions: [{ version: '1.2', fileUrl: '#', fileName: 'stru-001-v1.2.pdf', uploadedAt: new Date().toISOString(), fileType: 'pdf' }] },
+    {
+      id: 'stru-001',
+      name: 'Foundation Plan',
+      type: '2D',
+      versions: [{
+        version: '1.2',
+        fileUrl: '#',
+        fileName: 'stru-001-v1.2.pdf',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'pdf'
+      }]
+    },
   ],
   mechanical: [],
   electrical: [],
   plumbing: [],
   'shop-drawings': [],
-  'detail-drawings': [{id: 'detail-001', name: 'Window Detail Section A', versions: [{version: '1.0', fileUrl: '#', fileName: 'window-detail-A-v1.pdf', uploadedAt: new Date().toISOString()}]}],
-  'isometric-axonometric': [{id: 'iso-001', name: 'Overall Building Axo', versions: [{version: 'Draft 2', fileUrl: '#', fileName: 'building-axo-draft2.png', uploadedAt: new Date().toISOString()}]}],
-  'presentation-drawings': [{id: 'pres-001', name: 'Site Plan Render', versions: [{version: 'Final', fileUrl: '#', fileName: 'site-plan-render.jpg', uploadedAt: new Date().toISOString(), fileType: 'jpg'}]}],
-  'as-built': [{id: 'asbuilt-001', name: 'Plumbing Riser Diagram', versions: [{version: '1.0', fileUrl: '#', fileName: 'plumbing-riser-asbuilt.dxf', uploadedAt: new Date().toISOString(), fileType: 'dxf'}]}],
+  'detail-drawings': [
+    {
+      id: 'detail-001',
+      name: 'Window Detail Section A',
+      type: '2D',
+      versions: [{
+        version: '1.0',
+        fileUrl: '#',
+        fileName: 'window-detail-A-v1.pdf',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'pdf'
+      }]
+    }
+  ],
+  'isometric-axonometric': [
+    {
+      id: 'iso-001',
+      name: 'Overall Building Axo',
+      type: '2D',
+      versions: [{
+        version: 'Draft 2',
+        fileUrl: '#',
+        fileName: 'building-axo-draft2.png',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'png'
+      }]
+    }
+  ],
+  'presentation-drawings': [
+    {
+      id: 'pres-001',
+      name: 'Site Plan Render',
+      type: '2D',
+      versions: [{
+        version: 'Final',
+        fileUrl: '#',
+        fileName: 'site-plan-render.jpg',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'jpg'
+      }]
+    }
+  ],
+  'as-built': [
+    {
+      id: 'asbuilt-001',
+      name: 'Plumbing Riser Diagram',
+      type: '2D',
+      versions: [{
+        version: '1.0',
+        fileUrl: '#',
+        fileName: 'plumbing-riser-asbuilt.dxf',
+        uploadedAt: new Date().toISOString(),
+        fileType: 'dxf'
+      }]
+    }
+  ],
 };
 
+
+
+// Mock function to get project name
 async function getProjectNameById(id: string): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 100)); 
+  await new Promise(resolve => setTimeout(resolve, 100));
   if (id === "1") return "Alpha Launch";
   if (id === "2") return "Beta Platform Development";
   return `Project (ID: ${id})`;
 }
-
-import CadViewer from '@/components/cad-viewer/cad-viewer'; // Import the CadViewer component
 
 export default function DrawingsPage() {
   const params = useParams();
@@ -92,11 +169,12 @@ export default function DrawingsPage() {
 
   const [drawings, setDrawings] = useState<Drawing[]>(placeholderDrawingsData[drawingType] || []);
   const [newDrawingName, setNewDrawingName] = useState('');
-  const [selectedDrawingVersion, setSelectedDrawingVersion] = useState<DrawingVersion | null>(null); // State to hold the selected drawing version for viewing
+  const [selectedDrawing, setSelectedDrawing] = useState<Drawing | null>(drawings[0] || null);
+  const [selectedVersion, setSelectedVersion] = useState<DrawingVersion | null>(drawings[0]?.versions[0] || null);
+
   const [newDrawingFile, setNewDrawingFile] = useState<File | null>(null);
   const [newVersionFile, setNewVersionFile] = useState<File | null>(null);
   const [uploadingDrawingId, setUploadingDrawingId] = useState<string | null>(null);
-
 
   useEffect(() => {
     if (projectId) {
@@ -109,9 +187,14 @@ export default function DrawingsPage() {
   }, [projectId]);
 
   useEffect(() => {
-    setDrawings(placeholderDrawingsData[drawingType] || []);
+    const list = placeholderDrawingsData[drawingType] || [];
+    setDrawings(list);
     setNewDrawingName('');
     setNewDrawingFile(null);
+    if (list.length > 0) {
+      setSelectedDrawing(list[0]);
+      setSelectedVersion(list[0].versions[0]);
+    }
   }, [drawingType]);
 
 
@@ -120,20 +203,32 @@ export default function DrawingsPage() {
       alert('Please select a file for the new version.');
       return;
     }
-    console.log(`Uploading new version for drawing ${drawingId}:`, newVersionFile.name);
+
     // Simulate upload and update
     setDrawings(prevDrawings => prevDrawings.map(d => {
       if (d.id === drawingId) {
         const newVersionNumber = (parseFloat(d.versions[0]?.version || '0') + 0.1).toFixed(1);
-        return {
-          ...d,
-          versions: [{ version: newVersionNumber, fileUrl: URL.createObjectURL(newVersionFile), fileName: newVersionFile.name, uploadedAt: new Date().toISOString(), fileType: newVersionFile.name.split('.').pop()?.toLowerCase() as DrawingVersion['fileType'] || 'pdf' }, ...d.versions]
+        const newVer: DrawingVersion = {
+          version: newVersionNumber,
+          fileUrl: URL.createObjectURL(newVersionFile),
+          fileName: newVersionFile.name,
+          uploadedAt: new Date().toISOString(),
+          fileType: newVersionFile.name.split('.').pop()?.toLowerCase() as DrawingVersion['fileType'] || 'pdf'
         };
+        const updated = {
+          ...d,
+          versions: [newVer, ...d.versions]
+        };
+        if (selectedDrawing?.id === drawingId) {
+          setSelectedDrawing(updated);
+          setSelectedVersion(newVer);
+        }
+        return updated;
       }
       return d;
     }));
     setNewVersionFile(null);
-    setUploadingDrawingId(null); 
+    setUploadingDrawingId(null);
   };
 
   const handleUploadNewDrawing = () => {
@@ -141,10 +236,13 @@ export default function DrawingsPage() {
       const newDrawing: Drawing = {
         id: `${drawingType}-${Date.now()}`,
         name: newDrawingName,
+        type: '2D',
         versions: [{ version: '1.0', fileUrl: URL.createObjectURL(newDrawingFile), fileName: newDrawingFile.name, uploadedAt: new Date().toISOString(), fileType: newDrawingFile.name.split('.').pop()?.toLowerCase() as DrawingVersion['fileType'] || 'pdf' }]
       };
       setDrawings(prev => [newDrawing, ...prev]);
-      // Update the main placeholder data (for demo purposes)
+      setSelectedDrawing(newDrawing);
+      setSelectedVersion(newDrawing.versions[0]);
+
       if (!placeholderDrawingsData[drawingType]) {
         placeholderDrawingsData[drawingType] = [];
       }
@@ -153,136 +251,120 @@ export default function DrawingsPage() {
       setNewDrawingName('');
       setNewDrawingFile(null);
     } else {
-        alert('Please provide a drawing name and select a file.');
+      alert('Please provide a drawing name and select a file.');
     }
   };
 
-  const handleViewDrawingVersion = (version: DrawingVersion) => {
-    setSelectedDrawingVersion(version);
-    // Scroll to the viewer section if needed
+  const handleViewDrawingVersion = (drawing: Drawing, version: DrawingVersion) => {
+    setSelectedDrawing(drawing);
+    setSelectedVersion(version);
   };
 
   if (isLoadingProjectName) {
     return (
-        <div className="container mx-auto py-8">
-            <Skeleton className="h-10 w-3/4 mb-6" />
-            <Skeleton className="h-40 w-full mb-6" />
-            <Skeleton className="h-20 w-full mb-6" />
-            <Skeleton className="h-64 w-full" />
-        </div>
+      <div className="container mx-auto py-8">
+        <Skeleton className="h-10 w-3/4 mb-6" />
+        <Skeleton className="h-40 w-full mb-6" />
+        <Skeleton className="h-20 w-full mb-6" />
+        <Skeleton className="h-64 w-full" />
+      </div>
     );
   }
 
   const currentDrawingTypeLabel = drawingTypeLabels[drawingType] || 'Drawings';
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="space-y-6 container mx-auto py-8 pb-12">
+
       <PageTitle
         title={`${currentDrawingTypeLabel}: ${projectName}`}
-        description={`View, annotate, and manage ${currentDrawingTypeLabel.toLowerCase()} for this project.`}
+        description={`View, annotate, and manage ${currentDrawingTypeLabel.toLowerCase()} iterations and revisions.`}
         actions={
           <Button variant="outline" asChild>
             <Link href={`/projects/${projectId}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Project Details
+              Back to Project
             </Link>
           </Button>
         }
       />
 
-      <Card className="mb-8 shadow-md">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <ImageIconLucide className="mr-2 h-5 w-5 text-primary" />
-            2D Drawing Space & Annotation
-          </CardTitle>
-          <CardDescription>
-            This area is designated for viewing, managing, annotating, and potentially editing 2D drawings (e.g., blueprints, schematics).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Integrate the CadViewer component */}
-          <div className="relative mt-6 p-0 bg-muted rounded-lg flex flex-col items-center justify-center min-h-[600px] border overflow-hidden">
-            {/* The CadViewer component will handle rendering 2D/3D and tools */}
-            <CadViewer projectId={projectId} selectedDrawingVersion={selectedDrawingVersion} />
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <Card className="lg:col-span-3 border-none bg-transparent shadow-none">
+          <CadViewer
+            projectId={projectId}
+            selectedVersion={selectedVersion}
+            drawingData={selectedDrawing ? { ...selectedDrawing, type: '2D' } : null}
+            onVersionChange={(v) => setSelectedVersion(v)}
+          />
+        </Card>
 
-          
-          <p className="text-sm text-muted-foreground mt-4">
-            Future enhancements could include layer management, measurement tools, collaborative annotations, version comparison, and robust annotation tools.
-          </p>
-        </CardContent>
-      </Card>
-
-
-      <Card className="mb-6 shadow-md">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <UploadCloud className="mr-2 h-5 w-5 text-primary" />
-            Upload New {currentDrawingTypeLabel.replace(' Drawings',' Drawing')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3 items-end">
-            <div className="grid gap-1.5">
-              <Label htmlFor="drawingName">Drawing Name/Title</Label>
-              <Input id="drawingName" value={newDrawingName} onChange={(e) => setNewDrawingName(e.target.value)} placeholder="e.g., Ground Floor Plan"/>
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="drawingFile">Drawing File</Label>
-              <Input id="drawingFile" type="file" onChange={(e) => setNewDrawingFile(e.target.files ? e.target.files[0] : null)} />
-            </div>
-            <Button onClick={handleUploadNewDrawing} disabled={!newDrawingName || !newDrawingFile} className="w-full sm:w-auto">
-                <UploadCloud className="mr-2 h-4 w-4"/> Upload Drawing
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {drawings.length === 0 ? (
-          <Card className="md:col-span-2">
-            <CardContent className="pt-6 text-center text-muted-foreground">
-                No {currentDrawingTypeLabel.toLowerCase()} found for this project.
-            </CardContent>
-          </Card>
-        ) : (
-          drawings.map((drawing) => (
-            <Card key={drawing.id} className="shadow-sm">
-              <CardHeader>
-                <CardTitle>{drawing.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <h3 className="text-md font-semibold mb-2 text-muted-foreground">Versions:</h3>
-                <ul className="space-y-2 mb-4">
-                  {drawing.versions.map((version) => (
-                    <li key={version.version} className={`flex justify-between items-center p-2 border rounded-md hover:bg-muted/30 cursor-pointer ${selectedDrawingVersion?.version === version.version && selectedDrawingVersion?.fileName === version.fileName ? 'bg-primary/10 border-primary' : ''}`} onClick={() => handleViewDrawingVersion(version)}>
-                      <div className="flex items-center">
-                        <FileText className="h-4 w-4 mr-2 text-primary" />
-                        <div>
-                            <span className="font-medium">Version {version.version}</span> - {version.fileName}
-                            <p className="text-xs text-muted-foreground">Uploaded: {new Date(version.uploadedAt).toLocaleDateString()}</p>
-                         </div>
-                      </div>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={version.fileUrl} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-3 w-3 mr-1.5"/> View/Download
-                        </a>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="grid gap-2">
-                  <Label htmlFor={`newVersion-${drawing.id}`} className="text-sm font-medium">Upload New Version:</Label>
-                  <div className="flex gap-2 items-center">
-                    <Input id={`newVersion-${drawing.id}`} type="file" className="flex-grow" onChange={(e) => { setNewVersionFile(e.target.files ? e.target.files[0] : null); setUploadingDrawingId(drawing.id); }} />
-                    <Button onClick={() => handleUploadNewVersion(drawing.id)} disabled={!newVersionFile || uploadingDrawingId !== drawing.id} size="sm">Upload</Button>
+        <div className="space-y-6">
+          <Card className="shadow-lg border-white/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-sm font-bold flex items-center gap-2 italic">
+                <Clock className="h-4 w-4 text-indigo-500" />
+                Version Control
+              </CardTitle>
+              <CardDescription className="text-xs">Quickly switch between saved revisions.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {selectedDrawing ? (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Selected: {selectedDrawing.name}</p>
+                  <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
+                    {selectedDrawing.versions.map((v) => (
+                      <button
+                        key={v.version}
+                        onClick={() => setSelectedVersion(v)}
+                        className={cn(
+                          "w-full text-left px-3 py-2 rounded-lg text-xs transition-all border",
+                          selectedVersion?.version === v.version
+                            ? "bg-indigo-600/10 border-indigo-500/50 text-indigo-700 font-bold"
+                            : "bg-muted/50 border-transparent hover:border-muted-foreground/20 text-muted-foreground"
+                        )}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span>Version {v.version}</span>
+                          <span className="text-[9px] opacity-60">{new Date(v.uploadedAt).toLocaleDateString()}</span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
+              ) : (
+                <div className="text-center py-4 text-xs text-muted-foreground italic">Select a drawing to see versions</div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-white/10 bg-indigo-600/5">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <UploadCloud className="h-4 w-4 text-indigo-600" />
+                Upload Revision
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground" htmlFor="up-file">Select File</Label>
+                <Input
+                  id="up-file"
+                  type="file"
+                  className="h-8 text-xs bg-white"
+                  onChange={(e) => { setNewVersionFile(e.target.files ? e.target.files[0] : null); setUploadingDrawingId(selectedDrawing?.id || null); }}
+                />
+              </div>
+              <Button
+                onClick={() => handleUploadNewVersion(selectedDrawing?.id || '')}
+                disabled={!newVersionFile || !selectedDrawing}
+                className="w-full h-8 bg-indigo-600 text-xs font-bold"
+              >
+                Push Version {selectedDrawing ? (parseFloat(selectedDrawing.versions[0].version) + 0.1).toFixed(1) : ''}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

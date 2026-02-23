@@ -6,11 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Calendar, 
-  BarChart3, 
-  Kanban, 
-  Timer, 
+import {
+  Calendar,
+  BarChart3,
+  Kanban,
+  Timer,
   TrendingUp,
   Users,
   Target,
@@ -344,7 +344,7 @@ export default function ComprehensivePlanningPage({ params }: ComprehensivePlann
                       Development progress is meeting planned milestones
                     </p>
                   </div>
-                  
+
                   <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
                     <div className="flex items-center gap-2 text-yellow-800 mb-2">
                       <Clock className="h-4 w-4" />
@@ -374,7 +374,7 @@ export default function ComprehensivePlanningPage({ params }: ComprehensivePlann
           </TabsContent>
 
           <TabsContent value="kanban">
-            <EnhancedKanbanBoard />
+            <EnhancedKanbanBoard projectId={project.id} />
           </TabsContent>
 
           <TabsContent value="micro-scheduling">

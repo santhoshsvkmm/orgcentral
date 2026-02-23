@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Edit, MoreHorizontal, Trash2, Handshake } from "lucide-react"; // Changed icon
+import Link from 'next/link';
 import { useToast } from "@/hooks/use-toast";
 import type { Client } from "@/types/client";
 import { ClientForm } from "./client-form"; 
@@ -78,7 +79,13 @@ export function ClientList({ clients, onUpdateClient, onDeleteClient }: ClientLi
           <ClientForm
             mode="edit"
             clientData={row}
-            onSave={onUpdateClient}
+            onSave={(client: Client | Omit<Client, "id" | "createdAt" | "updatedAt">) => {
+              // ClientForm onSave accepts either a full Client (edit) or a create payload (without id/createdAt/updatedAt).
+              // In this edit usage we only expect a full Client; narrow/cast to satisfy the handler type.
+              if ('id' in client) {
+                onUpdateClient(client as Client);
+              }
+            }}
             triggerButton={
               <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8 p-0">
                 <Edit className="h-4 w-4" />
@@ -95,6 +102,11 @@ export function ClientList({ clients, onUpdateClient, onDeleteClient }: ClientLi
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link href={`/clients/agreements?clientId=${row.id}`} className="w-full flex items-center">
+                  <span className="mr-2">📄</span> View Agreements
+                </Link>
+              </DropdownMenuItem>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem

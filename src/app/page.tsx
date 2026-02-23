@@ -6,6 +6,7 @@ import { Brain, UserCheck, AlertTriangle, TrendingUp, Building, Twitter, Faceboo
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { MotionDiv } from '@/components/ui/motion';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -149,6 +150,23 @@ export default function AiInConstructionPage() {
     <div className="flex flex-col">
       <MainHeader />
       <Carousel />
+      {/* Prominent CTA band */}
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white"> 
+        <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="max-w-2xl">
+            <h3 className="text-2xl md:text-3xl font-bold">Build smarter projects — faster.</h3>
+            <p className="mt-2 text-white/90">Start a free trial, schedule a demo, or explore our feature walkthroughs. OrgCentral helps teams deliver on time and under budget.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button size="lg" asChild className="bg-white text-indigo-700 hover:opacity-95">
+              <Link href="/register">Start Free Trial</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/features-detailed">See features</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
       <main className="flex-1 overflow-auto">
         {/* The rest of your sections, now inside the main content area */}
         {/* AI-Powered Features Section */}
@@ -168,7 +186,7 @@ export default function AiInConstructionPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {aiFeaturesData.map((feature, index) => (
-                <motion.div key={index} variants={itemVariants} whileHover={{ y: -5, transition: { duration: 0.2 } }}>
+                <MotionDiv key={index} className="rounded-lg" {...{ style: { willChange: 'transform, opacity' } }}>
                   <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
                     <CardHeader>
                       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
@@ -180,7 +198,7 @@ export default function AiInConstructionPage() {
                       <p className="text-muted-foreground">{feature.description}</p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </MotionDiv>
               ))}
             </div>
           </div>
@@ -238,7 +256,8 @@ export default function AiInConstructionPage() {
         >
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-10 items-center">
-              <motion.div variants={itemVariants}>
+              <MotionDiv className="p-2 rounded-lg">
+                <motion.div variants={itemVariants}>
                 <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl font-headline mb-4">The Future of Construction is Intelligent</h2>
                 <p className="text-lg text-muted-foreground mb-6">
                   OrgCentral is committed to integrating cutting-edge AI to solve real-world construction challenges. Our goal is to empower you with tools that not only manage projects but actively contribute to their success by anticipating needs, optimizing processes, and providing deeper insights than ever before.
@@ -272,6 +291,7 @@ export default function AiInConstructionPage() {
                    data-ai-hint="AI construction technology" 
                  />
               </motion.div>
+              </MotionDiv>
             </div>
           </div>
         </motion.section>

@@ -1,399 +1,196 @@
-// src/lib/twoDViewer.ts
-import * as DXFParser from 'dxf-parser';
+import DXFParser from 'dxf-parser';
 
 interface TwoDViewerInstance {
-  loadDrawing: (url: string) => Promise<void>;
-  dispose: () => void;
-  zoomIn: () => void; // Conceptual zoom in
-  zoomOut: () => void; // Conceptual zoom out
-  pan: (dx: number, dy: number) => void; // Conceptual pan
-  // Add methods for zoom, pan, layer toggling etc.
-  onSelectionChanged?: (object: any | null) => void;
+    loadDrawing: (url: string) => Promise<void>;
+    dispose: () => void;
+    zoomIn: () => void;
+    zoomOut: () => void;
+    pan: (dx: number, dy: number) => void;
+    onSelectionChanged?: (object: any | null) => void;
 }
 
 export const initTwoDViewer = (container: HTMLDivElement, options?: any): TwoDViewerInstance => {
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
+    const canvas = document.createElement('canvas');
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
 
-  if (!ctx) {
-    throw new Error('Failed to get 2D rendering context for canvas');
-  }
-
-  let panX = 0;
-  let panY = 0;
-  let zoom = 1;
-
-  const resizeCanvas = () => {
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear on resize
-  };
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas(); // Initial resize
-
-  let dxfData: any = null; // Store parsed DXF data
-  let selectionCallback: ((object: any | null) => void) | undefined;
-
-  const renderDxf = () => {
-    if (!ctx || !dxfData) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 1;
-    ctx.save(); // Save current state
-
-    // Apply pan and zoom transformations
-    ctx.translate(canvas.width / 2 + panX, canvas.height / 2 + panY);
-    ctx.scale(zoom, zoom);
-    // Conceptual rendering logic for DXF entities
-    // NOTE: This rendering is highly simplified. A robust DXF viewer requires handling many more entity types, layers, colors, line types, blocks, text styles, dimensions, etc. Consider using a dedicated library for production use.
-    // This is a simplified example and would need significant expansion
-    // to handle all DXF entity types, layers, colors, line types, etc.
-    dxfData.entities.forEach((entity: any) => {
-      switch (entity.type) {
-        case 'LINE':
-          ctx.beginPath();
-          ctx.moveTo(entity.start.x, entity.start.y);
-          ctx.lineTo(entity.end.x, entity.end.y);
-          ctx.stroke();
-          break;
-        case 'CIRCLE':
-          ctx.beginPath();
-          ctx.arc(entity.x, entity.y, entity.r, 0, 2 * Math.PI);
-          ctx.stroke();
-          break;
-        // Add more entity types (ARC, LWPOLYLINE, TEXT, etc.)
-        default:
-          // console.warn('Unsupported DXF entity type:', entity.type);
-          break;
-      }
-    });
-
-    // Basic transformation to fit drawing to canvas
-    // This would involve calculating bounding box and scaling
-    // For simplicity, this example assumes content fits or scales automatically.
-  };
-
-
-  // --- Event handling for selection (conceptual) ---
-  const onCanvasClick = (event: MouseEvent) => {
-      if (!dxfData) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      // Conceptual hit-testing: iterate through entities and check if click is within bounds
-      // This is complex for actual CAD and would likely be handled by a proper library
-      const clickedEntity = dxfData.entities.find((entity: any) => {
-        // Very basic example: check if click is near a line segment
-        if (entity.type === 'LINE') {
-            const dist = Math.abs((entity.end.y - entity.start.y) * x - (entity.end.x - entity.start.x) * y + entity.end.x * entity.start.y - entity.end.y * entity.start.x) /
-                         Math.sqrt(Math.pow(entity.end.y - entity.start.y, 2) + Math.pow(entity.end.x - entity.start.x, 2));
-            return dist < 5; // Within 5 pixels of the line
-        }
-        return false;
-      });
-
-      if (selectionCallback) {
-          selectionCallback(clickedEntity || null);
-      }
-  };
-  canvas.addEventListener('click', onCanvasClick);
-
-
-  return {
-    loadDrawing: async (url: string) => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const dxfContent = await response.text();
-        const parser = new DXFParser();
-        dxfData = parser.parse(dxfContent);
-        console.log('Parsed DXF data:', dxfData);
-        renderDxf(); // Render after parsing
-      } catch (error) {
-        console.error('Error loading or parsing DXF:', error);
-        throw error;
-      }
-    },
-    dispose: () => {
-      window.removeEventListener('resize', resizeCanvas);
-      canvas.removeEventListener('click', onCanvasClick);
-      if (canvas.parentNode) {
-        canvas.parentNode.removeChild(canvas);
-      }
-      console.log('2D viewer disposed.');
-    },
-    set onSelectionChanged(callback: ((object: any | null) => void) | undefined) {
-      selectionCallback = callback;
+    if (!ctx) {
+        throw new Error('Failed to get 2D rendering context for canvas');
     }
-  };
-};
-import * as DXFParser from 'dxf-parser';
 
-interface TwoDViewerInstance {
-  loadDrawing: (url: string) => Promise<void>;
-  dispose: () => void;
-  // Add methods for zoom, pan, layer toggling etc.
-  onSelectionChanged?: (object: any | null) => void;
-}
+    let panX = 0;
+    let panY = 0;
+    let zoom = 1;
 
-export const initTwoDViewer = (container: HTMLDivElement, options?: any): TwoDViewerInstance => {
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
+    let dxfData: any = null;
+    let imageFallback: HTMLImageElement | null = null;
+    let selectionCallback: ((object: any | null) => void) | undefined;
 
-  if (!ctx) {
-    throw new Error('Failed to get 2D rendering context for canvas');
-  }
+    const resizeCanvas = () => {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        renderFrame();
+    };
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas(); // Initial resize
 
-  const resizeCanvas = () => {
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear on resize
-  };
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas(); // Initial resize
+    const renderFrame = () => {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let dxfData: any = null; // Store parsed DXF data
-  let selectionCallback: ((object: any | null) => void) | undefined;
+        ctx.save();
+        ctx.translate(canvas.width / 2 + panX, canvas.height / 2 + panY);
+        ctx.scale(zoom, zoom);
 
-  const renderDxf = () => {
-    if (!ctx || !dxfData) return;
+        if (imageFallback) {
+            const imgWidth = imageFallback.width;
+            const imgHeight = imageFallback.height;
+            const scaleToFitX = canvas.width / imgWidth;
+            const scaleToFitY = canvas.height / imgHeight;
+            const fitScale = Math.min(scaleToFitX, scaleToFitY) * 0.9;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 1;
+            ctx.scale(fitScale, fitScale);
+            ctx.drawImage(imageFallback, -imgWidth / 2, -imgHeight / 2);
+        } else if (dxfData) {
+            ctx.strokeStyle = '#cbd5e1'; // slate-300
+            ctx.lineWidth = 1 / zoom;
 
-    // Conceptual rendering logic for DXF entities
-    // This is a simplified example and would need significant expansion
-    // to handle all DXF entity types, layers, colors, line types, etc.
-    dxfData.entities.forEach((entity: any) => {
-      switch (entity.type) {
-        case 'LINE':
-          ctx.beginPath();
-          ctx.moveTo(entity.start.x, entity.start.y);
-          ctx.lineTo(entity.end.x, entity.end.y);
-          ctx.stroke();
-          break;
-        case 'CIRCLE':
-          ctx.beginPath();
-          ctx.arc(entity.x, entity.y, entity.r, 0, 2 * Math.PI);
-          ctx.stroke();
-          break;
-        // Add more entity types (ARC, LWPOLYLINE, TEXT, etc.)
-        default:
-          // console.warn('Unsupported DXF entity type:', entity.type);
-          break;
-      }
-    });
-
-    // Basic transformation to fit drawing to canvas
-    // This would involve calculating bounding box and scaling
-    // For simplicity, this example assumes content fits or scales automatically.
-  };
-
-
-  // --- Event handling for selection (conceptual) ---
-  const onCanvasClick = (event: MouseEvent) => {
-      if (!dxfData) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      // Conceptual hit-testing: iterate through entities and check if click is within bounds
-      // This is complex for actual CAD and would likely be handled by a proper library
-      const clickedEntity = dxfData.entities.find((entity: any) => {
-        // Very basic example: check if click is near a line segment
-        if (entity.type === 'LINE') {
-            const dist = Math.abs((entity.end.y - entity.start.y) * x - (entity.end.x - entity.start.x) * y + entity.end.x * entity.start.y - entity.end.y * entity.start.x) /
-                         Math.sqrt(Math.pow(entity.end.y - entity.start.y, 2) + Math.pow(entity.end.x - entity.start.x, 2));
-            return dist < 5; // Within 5 pixels of the line
+            dxfData.entities.forEach((entity: any) => {
+                switch (entity.type) {
+                    case 'LINE':
+                        ctx.beginPath();
+                        ctx.moveTo(entity.start.x, -entity.start.y);
+                        ctx.lineTo(entity.end.x, -entity.end.y);
+                        ctx.stroke();
+                        break;
+                    case 'CIRCLE':
+                        ctx.beginPath();
+                        ctx.arc(entity.x, -entity.y, entity.r, 0, 2 * Math.PI);
+                        ctx.stroke();
+                        break;
+                    default:
+                        break;
+                }
+            });
+        } else {
+            ctx.fillStyle = '#64748b';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Loading Viewer...', 0, 0);
         }
-        return false;
-      });
 
-      if (selectionCallback) {
-          selectionCallback(clickedEntity || null);
-      }
-  };
-  canvas.addEventListener('click', onCanvasClick);
-
-
-  return {
-    loadDrawing: async (url: string) => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const dxfContent = await response.text();
-        const parser = new DXFParser();
-        dxfData = parser.parse(dxfContent);
-        console.log('Parsed DXF data:', dxfData);
-        renderDxf(); // Render after parsing
-      } catch (error) {
-        console.error('Error loading or parsing DXF:', error);
-        throw error;
-      }
-    },
-    dispose: () => {
-      window.removeEventListener('resize', resizeCanvas);
-      canvas.removeEventListener('click', onCanvasClick);
-      if (canvas.parentNode) {
-        canvas.parentNode.removeChild(canvas);
-      }
-      console.log('2D viewer disposed.');
-    },
-    set onSelectionChanged(callback: ((object: any | null) => void) | undefined) {
-      selectionCallback = callback;
-    }
-  };
-};
-
-import * as DXFParser from 'dxf-parser';
-
-interface TwoDViewerInstance {
-  loadDrawing: (url: string) => Promise<void>;
-  dispose: () => void;
-  // Add methods for zoom, pan, layer toggling etc.
-  onSelectionChanged?: (object: any | null) => void;
-}
-
-export const initTwoDViewer = (container: HTMLDivElement, options?: any): TwoDViewerInstance => {
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    throw new Error('Failed to get 2D rendering context for canvas');
-  }
-
-  const resizeCanvas = () => {
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear on resize
-  };
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas(); // Initial resize
-
-  let dxfData: any = null; // Store parsed DXF data
-  let selectionCallback: ((object: any | null) => void) | undefined;
-
-  const renderDxf = () => {
-    if (!ctx || !dxfData) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 1;
-
-    // Conceptual rendering logic for DXF entities
-    // This is a simplified example and would need significant expansion
-    // to handle all DXF entity types, layers, colors, line types, etc.
-    dxfData.entities.forEach((entity: any) => {
-      switch (entity.type) {
-        case 'LINE':
-          ctx.beginPath();
-          ctx.moveTo(entity.start.x, entity.start.y);
-          ctx.lineTo(entity.end.x, entity.end.y);
-          ctx.stroke();
-          break;
-        case 'CIRCLE':
-          ctx.beginPath();
-          ctx.arc(entity.x, entity.y, entity.r, 0, 2 * Math.PI);
-          ctx.stroke();
-          break;
-        // Add more entity types (ARC, LWPOLYLINE, TEXT, etc.)
-        default:
-          // console.warn('Unsupported DXF entity type:', entity.type);
-          break;
-      }
-    });
-    ctx.restore(); // Restore to original state
-
+        ctx.restore();
     };
 
+    const onCanvasClick = (event: MouseEvent) => {
+        if (!dxfData || imageFallback) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (event.clientX - rect.left - (canvas.width / 2 + panX)) / zoom;
+        const y = (event.clientY - rect.top - (canvas.height / 2 + panY)) / zoom;
 
-  // --- Event handling for selection (conceptual) ---
-  const onCanvasClick = (event: MouseEvent) => {
-      if (!dxfData) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+        const clickedEntity = dxfData.entities.find((entity: any) => {
+            if (entity.type === 'LINE') {
+                const startY = -entity.start.y;
+                const endY = -entity.end.y;
+                const dist = Math.abs((endY - startY) * x - (entity.end.x - entity.start.x) * y + entity.end.x * startY - endY * entity.start.x) /
+                    Math.sqrt(Math.pow(endY - startY, 2) + Math.pow(entity.end.x - entity.start.x, 2));
+                return dist < (5 / zoom);
+            }
+            return false;
+        });
 
-      // Conceptual hit-testing: iterate through entities and check if click is within bounds
-      // NOTE: Hit-testing for complex DXF entities in canvas is non-trivial. A production-ready viewer would need a more sophisticated approach, possibly involving rendering to an offscreen buffer or using a spatial index.
-
-      // This is complex for actual CAD and would likely be handled by a proper library
-      const clickedEntity = dxfData.entities.find((entity: any) => {
-        // Very basic example: check if click is near a line segment
-        if (entity.type === 'LINE') {
-            const dist = Math.abs((entity.end.y - entity.start.y) * x - (entity.end.x - entity.start.x) * y + entity.end.x * entity.start.y - entity.end.y * entity.start.x) /
-                         Math.sqrt(Math.pow(entity.end.y - entity.start.y, 2) + Math.pow(entity.end.x - entity.start.x, 2));
-            return dist < 5; // Within 5 pixels of the line
+        if (selectionCallback) {
+            selectionCallback(clickedEntity || null);
         }
-        return false;
-      });
+    };
+    canvas.addEventListener('click', onCanvasClick);
 
-      if (selectionCallback) {
-          selectionCallback(clickedEntity || null);
-      }
-  };
-  canvas.addEventListener('click', onCanvasClick);
+    const zoomIn = () => {
+        zoom *= 1.2;
+        renderFrame();
+    };
 
-  // Conceptual Zoom and Pan methods
-  const zoomIn = () => {
-    zoom *= 1.1; // Increase zoom by 10%
-    renderDxf();
-  };
+    const zoomOut = () => {
+        zoom /= 1.2;
+        renderFrame();
+    };
 
-  const zoomOut = () => {
-    zoom /= 1.1; // Decrease zoom by 10%
-    renderDxf();
-  };
+    const pan = (dx: number, dy: number) => {
+        panX += dx;
+        panY += dy;
+        renderFrame();
+    };
 
-  // dx and dy are in canvas coordinates
-  const pan = (dx: number, dy: number) => {
-      // Adjust pan based on current zoom level
-    panX += dx / zoom;
-    panY += dy / zoom;
-    renderDxf();
-  };
+    const loadImageFallback = (url: string) => {
+        return new Promise<void>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                imageFallback = img;
+                dxfData = null;
+                panX = 0; panY = 0; zoom = 1;
+                renderFrame();
+                resolve();
+            };
+            img.onerror = () => reject(new Error('Failed to load drawing fallback image.'));
+            img.src = url;
+        });
+    };
 
+    return {
+        loadDrawing: async (url: string) => {
+            try {
+                imageFallback = null;
+                dxfData = null;
+                panX = 0; panY = 0; zoom = 1;
+                renderFrame();
 
-  return {
-    loadDrawing: async (url: string) => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+                if (url.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i)) {
+                    await loadImageFallback(url);
+                    return;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                if (url.endsWith('.dwg')) {
+                    console.warn('Native DWG requires conversion. Simulating rasterized view.');
+                    await loadImageFallback('https://images.unsplash.com/photo-1541888086925-0c1bd6f44140?q=80&w=2000&auto=format&fit=crop'); // Blueprint generic image
+                    return;
+                }
+
+                const dxfContent = await response.text();
+                const parser = new DXFParser();
+                dxfData = parser.parseSync(dxfContent);
+
+                renderFrame();
+            } catch (error) {
+                console.error('Error loading or parsing CAD:', error);
+                imageFallback = null;
+                dxfData = null;
+
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Failed to view file layout natively.', canvas.width / 2, canvas.height / 2);
+                }
+                throw error;
+            }
+        },
+        dispose: () => {
+            window.removeEventListener('resize', resizeCanvas);
+            canvas.removeEventListener('click', onCanvasClick);
+            if (canvas.parentNode) {
+                canvas.parentNode.removeChild(canvas);
+            }
+        },
+        zoomIn,
+        zoomOut,
+        pan,
+        set onSelectionChanged(callback: ((object: any | null) => void) | undefined) {
+            selectionCallback = callback;
         }
-        const dxfContent = await response.text();
-        const parser = new DXFParser();
-        dxfData = parser.parse(dxfContent);
-        console.log('Parsed DXF data:', dxfData);
-        renderDxf(); // Render after parsing
-      } catch (error) {
-        console.error('Error loading or parsing DXF:', error);
-        throw error;
-      }
-    },
-    dispose: () => {
-      window.removeEventListener('resize', resizeCanvas);
-      canvas.removeEventListener('click', onCanvasClick);
-      if (canvas.parentNode) {
-        canvas.parentNode.removeChild(canvas);
-      }
-      console.log('2D viewer disposed.');
-    },
-    zoomIn,
-    zoomOut,
-    pan,
-    set onSelectionChanged(callback: ((object: any | null) => void) | undefined) {
-      selectionCallback = callback;
-    }
-  };
+    };
 };

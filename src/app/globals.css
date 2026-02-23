@@ -1,77 +1,137 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 40 30% 97%; /* Very Light Ivory */
-    --foreground: 240 10% 3.9%; /* Dark Gray/Almost Black for text */
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%; /* White */
-    --popover-foreground: 240 10% 3.9%;
-          --primary: 280 70% 50%; /* A shade of purple */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 0 0% 92%; /* Slightly darker gray for secondary elements */
-    --secondary-foreground: 240 10% 3.9%;
-    --muted: 0 0% 88%; /* Lighter gray for muted text/elements */
-    --muted-foreground: 240 5% 45.1%;
-    --accent: 36 100% 50%; /* #FFA000 Orange */
-    --accent-foreground: 0 0% 100%; /* White */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%; /* Gray for borders */
-    --input: 0 0% 89.8%; /* Gray for input borders */
-          --ring: 280 70% 50%; /* Primary color for focus rings */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    /* === LIGHT THEME — Premium Indigo/Slate === */
+    --background: 220 25% 97%;
+    /* #F4F6FA — soft blue-gray */
+    --foreground: 222 47% 11%;
+    /* #0F172A — deep navy */
 
-    /* Sidebar specific colors - Light Theme Updated */
-    --sidebar-background: 210 16% 98%; /* #F8F9FA - Very light cool gray */
-    --sidebar-foreground: 210 20% 20%; /* #262D33 - Dark cool gray for text */
-    --sidebar-primary: 280 70% 50%; /* Primary purple for active item icon/text */
-    --sidebar-primary-foreground: 0 0% 100%; /* White text on primary (if primary is bg) */
-    --sidebar-accent: 210 16% 90%; /* #E0E5EB - Light gray for hover background */
-    --sidebar-accent-foreground: 280 60% 40%; /* Darker Primary purple for hover text */
-    --sidebar-border: 210 16% 88%; /* #DDE1E6 - Slightly darker gray border */
-    --sidebar-ring: 217 89% 61%; /* Existing primary for focus */
+    --card: 0 0% 100%;
+    /* White cards */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 243 75% 59%;
+    /* #5B5EF4 — vivid indigo */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 93%;
+    /* #E8ECF4 — soft blue-gray */
+    --secondary-foreground: 222 47% 20%;
+
+    --muted: 220 18% 91%;
+    /* Light muted */
+    --muted-foreground: 220 15% 50%;
+
+    --accent: 258 84% 65%;
+    /* #9B59F8 — violet accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 20% 88%;
+    --input: 220 20% 91%;
+    --ring: 243 75% 59%;
+
+    /* Chart colors — vibrant, harmonious */
+    --chart-1: 243 75% 59%;
+    /* indigo */
+    --chart-2: 172 66% 40%;
+    /* teal */
+    --chart-3: 38 92% 55%;
+    /* amber */
+    --chart-4: 316 73% 55%;
+    /* pink */
+    --chart-5: 142 71% 45%;
+    /* green */
+
+    --radius: 0.75rem;
+
+    /* === SIDEBAR — Light mode: clean white sidebar === */
+    --sidebar-background: 0 0% 100%;
+    /* White */
+    --sidebar-foreground: 222 47% 18%;
+    /* Deep navy text */
+    --sidebar-primary: 243 75% 55%;
+    /* Indigo */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 94%;
+    /* Soft hover bg */
+    --sidebar-accent-foreground: 222 47% 12%;
+    /* Dark text on hover */
+    --sidebar-border: 220 20% 89%;
+    /* Light border */
+    --sidebar-ring: 243 75% 59%;
+
+    /* Gradient tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(243 75% 59%), hsl(258 84% 65%));
+    --gradient-sidebar: linear-gradient(180deg, hsl(230 47% 14%) 0%, hsl(222 47% 11%) 100%);
   }
 
   .dark {
-    --background: 210 15% 12%; /* Deep Cool Charcoal */
-    --foreground: 0 0% 98%;
-    --card: 210 15% 18%; /* Dark Cool Slate */
-    --card-foreground: 0 0% 98%;
-    --popover: 210 15% 18%; /* Dark Cool Slate */
-    --popover-foreground: 0 0% 98%;
-    --primary: 280 70% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 4% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 4% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 36 100% 50%; /* Orange */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 14.9%;
-    --input: 240 4% 14.9%;
-    --ring: 280 70% 50%;
+    /* === DARK THEME — Deep Navy/Slate === */
+    --background: 222 47% 7%;
+    /* #080D1A — near-black navy */
+    --foreground: 210 40% 95%;
 
-    /* Dark Sidebar specific colors - Updated */
-    --sidebar-background: 220 15% 15%; /* #212529 - Very dark slate/charcoal */
-    --sidebar-foreground: 210 15% 85%; /* #CED4DA - Light gray text */
-    --sidebar-primary: 217 89% 61%; /* Existing primary blue for active item icon/text */
+    --card: 222 47% 11%;
+    /* #0F172A — dark navy card */
+    --card-foreground: 210 40% 95%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 95%;
+
+    --primary: 243 75% 65%;
+    /* Slightly lighter indigo in dark */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 40% 16%;
+    --secondary-foreground: 210 40% 80%;
+
+    --muted: 222 40% 14%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 258 84% 70%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 222 40% 16%;
+    --input: 222 40% 15%;
+    --ring: 243 75% 65%;
+
+    /* Chart */
+    --chart-1: 243 75% 65%;
+    --chart-2: 172 66% 45%;
+    --chart-3: 38 92% 60%;
+    --chart-4: 316 73% 60%;
+    --chart-5: 142 71% 50%;
+
+    /* === SIDEBAR — Dark mode: deep navy sidebar === */
+    --sidebar-background: 222 47% 9%;
+    /* Near-black navy */
+    --sidebar-foreground: 220 15% 68%;
+    /* Muted light text */
+    --sidebar-primary: 243 70% 68%;
+    /* Bright indigo */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 25%; /* #343A40 - Slightly lighter dark slate for hover */
-    --sidebar-accent-foreground: 217 89% 75%; /* Lighter primary blue for hover text */
-    --sidebar-border: 280 70% 50%;
-    --sidebar-ring: 217 89% 61%;
+    --sidebar-accent: 222 40% 15%;
+    /* Slightly lighter navy */
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 222 40% 14%;
+    /* Subtle border */
+    --sidebar-ring: 243 75% 65%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(243 75% 65%), hsl(258 84% 70%));
+    --gradient-sidebar: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(222 47% 7%) 100%);
   }
 }
 
@@ -79,7 +139,126 @@
   * {
     @apply border-border;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 99px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+@layer utilities {
+
+  /* Gradient text utility */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  /* Glassmorphism */
+  .glass {
+    background: hsl(var(--background) / 0.7);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glass-dark {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px) saturate(200%);
+    -webkit-backdrop-filter: blur(16px) saturate(200%);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15);
+  }
+
+  .glow-sm {
+    box-shadow: 0 0 12px hsl(var(--primary) / 0.25);
+  }
+
+  /* Premium card shadow */
+  .shadow-card {
+    box-shadow: 0 1px 3px hsl(var(--foreground) / 0.04),
+      0 4px 12px hsl(var(--foreground) / 0.06),
+      0 0 0 1px hsl(var(--border) / 0.5);
+  }
+
+  .shadow-card-hover {
+    box-shadow: 0 4px 16px hsl(var(--foreground) / 0.08),
+      0 8px 32px hsl(var(--primary) / 0.1),
+      0 0 0 1px hsl(var(--primary) / 0.15);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.6), 0 0 40px hsl(var(--primary) / 0.2);
+  }
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

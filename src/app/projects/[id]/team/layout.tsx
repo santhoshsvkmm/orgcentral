@@ -12,8 +12,7 @@ const TeamLayout: React.FC<TeamLayoutProps> = ({ children, params }) => {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <ProjectMenubar projectId={projectId} />
-      <main className="flex flex-1 flex-col p-4 md:gap-8 md:p-8">
+            <main className="flex flex-1 flex-col p-4 md:gap-8 md:p-8">
         {children}
       </main>
     </div>
