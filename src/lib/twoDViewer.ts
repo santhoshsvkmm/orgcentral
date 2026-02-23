@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import DXFParser from 'dxf-parser';
 
 interface TwoDViewerInstance {
@@ -9,7 +10,7 @@ interface TwoDViewerInstance {
     onSelectionChanged?: (object: any | null) => void;
 }
 
-export const initTwoDViewer = (container: HTMLDivElement, options?: any): TwoDViewerInstance => {
+export const initTwoDViewer = (container: HTMLDivElement, _options?: any): TwoDViewerInstance => {
     const canvas = document.createElement('canvas');
     container.appendChild(canvas);
     const ctx = canvas.getContext('2d');

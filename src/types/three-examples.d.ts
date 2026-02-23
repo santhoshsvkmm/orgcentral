@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'three/examples/jsm/loaders/GLTFLoader' {
   import { Loader } from 'three'
   // Minimal typing to satisfy imports; users can install @types/three if needed

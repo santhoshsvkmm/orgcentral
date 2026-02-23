@@ -45,7 +45,7 @@ import {
   SquareKanban,
   LayoutGrid,
   Box,
-  Image,
+  Image as ImageIcon,
   ChevronDown,
   GitCommit
 } from "lucide-react";
@@ -169,9 +169,9 @@ export function ProjectMenubar({ projectId }: ProjectMenubarProps) {
           </MenubarItem>
           <MenubarSeparator className="my-1" />
           <MenubarSub>
-            <MenubarSubTrigger className="rounded-lg mb-1 p-2">
+                <MenubarSubTrigger className="rounded-lg mb-1 p-2">
               <div className="flex items-center gap-2">
-                <Image className="h-4 w-4" /> <span>2D Drawings</span>
+                <ImageIcon className="h-4 w-4" /> <span>2D Drawings</span>
               </div>
             </MenubarSubTrigger>
             <MenubarSubContent className="min-w-[180px] p-1.5 rounded-xl max-h-[400px] overflow-y-auto">

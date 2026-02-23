@@ -1,5 +1,6 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { motion, useReducedMotion, MotionProps } from "framer-motion"
 import * as React from "react"
 

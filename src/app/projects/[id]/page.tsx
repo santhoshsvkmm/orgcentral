@@ -22,6 +22,21 @@ type CriticalIssue = {
   relatedTaskIds?: string[];
 };
 
+type AnalyzeProjectIssuesInput = {
+  projectName: string;
+  projectDescription?: string;
+  projectStatus?: string;
+  projectStartDate?: string;
+  projectDueDate?: string;
+  tasks?: {
+    id: string;
+    name: string;
+    assignee?: string;
+    status?: string;
+    dueDate?: string;
+  }[];
+};
+
 type AnalyzeProjectIssuesOutput = {
   criticalIssues: CriticalIssue[];
   summary?: string;
@@ -119,21 +134,11 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
       setProject(fetchedProject);
       setLoading(false);
     };
+    // fetch project on mount / when projectId changes
     fetchProject();
   }, [projectId]);
 
-
-  const filteredProjectChartData = useMemo(() => {
-    if (chartTimeRange === "last3") {
-      return projectAllChartDataPoints.slice(-3);
-    }
-    if (chartTimeRange === "last6") {
-      return projectAllChartDataPoints.slice(-6);
-    }
-    return projectAllChartDataPoints;
-  }, [chartTimeRange]);
-
-
+  // Trigger AI analysis by calling the server API route (server-side flow)
   const handleAIAnalysis = async () => {
     if (!project) return;
     setIsAIAnalyzing(true);
@@ -155,15 +160,15 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
       const results: AnalyzeProjectIssuesOutput = await res.json();
       setAIAnalysisResults(results);
       toast({
-        title: "AI Analysis Complete",
-        description: results.criticalIssues.length > 0 ? `Found ${results.criticalIssues.length} potential issues.` : "No critical issues found by AI.",
+        title: 'AI Analysis Complete',
+        description: results.criticalIssues.length > 0 ? `Found ${results.criticalIssues.length} potential issues.` : 'No critical issues found by AI.',
       });
     } catch (error) {
-      console.error("AI Analysis failed:", error);
+      console.error('AI Analysis failed:', error);
       toast({
-        title: "AI Analysis Failed",
-        description: "Could not analyze project issues. Please try again.",
-        variant: "destructive",
+        title: 'AI Analysis Failed',
+        description: 'Could not analyze project issues. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsAIAnalyzing(false);
@@ -335,7 +340,7 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
           <ChartContainer config={projectChartConfig} className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={filteredProjectChartData}
+                data={chartTimeRange === "all" ? projectAllChartDataPoints : chartTimeRange === "last6" ? projectAllChartDataPoints.slice(-6) : projectAllChartDataPoints.slice(-3)}
                 margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />

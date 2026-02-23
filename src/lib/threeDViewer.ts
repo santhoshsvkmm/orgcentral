@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -16,7 +17,7 @@ export interface ThreeDViewerInstance {
   setOnSelectionChanged: (callback?: (object: THREE.Object3D | null) => void) => void;
 }
 
-export const initThreeDViewer = (container: HTMLDivElement, options?: any): ThreeDViewerInstance => {
+export const initThreeDViewer = (container: HTMLDivElement, _options?: any): ThreeDViewerInstance => {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf0f0f0);
 
@@ -31,14 +32,14 @@ export const initThreeDViewer = (container: HTMLDivElement, options?: any): Thre
   controls.enableDamping = true;
   controls.dampingFactor = 0.25;
   // Some OrbitControls properties may be missing from ambient typings for the examples package
-  // Use ts-ignore where necessary to avoid spurious type errors while keeping runtime behavior.
-  // @ts-ignore
+  // Use ts-expect-error where necessary to avoid spurious type errors while keeping runtime behavior.
+  // @ts-expect-error - example typings for OrbitControls may lack some runtime props
   controls.screenSpacePanning = false;
-  // @ts-ignore
+  // @ts-expect-error - property missing in ambient typedefs
   controls.minDistance = 1;
-  // @ts-ignore
+  // @ts-expect-error - property missing in ambient typedefs
   controls.maxDistance = 500;
-  // @ts-ignore
+  // @ts-expect-error - property missing in ambient typedefs
   controls.maxPolarAngle = Math.PI / 2;
 
   const ambientLight = new THREE.AmbientLight(0x404040);
@@ -50,7 +51,7 @@ export const initThreeDViewer = (container: HTMLDivElement, options?: any): Thre
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
-  // @ts-ignore
+  // @ts-expect-error - loader typing may not expose setDRACOLoader in this env
   loader.setDRACOLoader?.(dracoLoader);
 
   let animationFrameId = 0;
@@ -110,7 +111,6 @@ export const initThreeDViewer = (container: HTMLDivElement, options?: any): Thre
           let cameraZ = Math.abs((maxDim / 2) / Math.tan(fov / 2));
           cameraZ *= 1.5;
           camera.position.set(center.x, center.y, center.z + cameraZ);
-          // @ts-ignore
           controls.target.copy(center);
           controls.update();
           resolve();
