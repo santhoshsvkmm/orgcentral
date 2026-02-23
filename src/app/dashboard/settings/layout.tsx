@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { PageTitle } from '@/components/page-title';
 // import { AuthenticatedPageLayout } from '@/components/layout/authenticated-page-layout';
-import { Bell, Palette, Briefcase as SettingsBriefcaseIcon, Image as ImageIcon, ListChecks, DollarSign, Users } from 'lucide-react'; // added icons
+import { Bell, Palette, Briefcase as SettingsBriefcaseIcon, Image as ImageIcon, ListChecks, DollarSign, Users, ShieldCheck } from 'lucide-react'; // added icons
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
 const settingsNavItems = [

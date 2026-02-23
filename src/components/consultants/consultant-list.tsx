@@ -15,7 +15,7 @@ import React from "react";
 
 interface ConsultantListProps {
   consultants: Consultant[];
-  onUpdateConsultant: (consultant: Consultant) => void;
+  onUpdateConsultant: (consultant: Consultant | Omit<Consultant, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onDeleteConsultant: (consultantId: string) => void;
 }
 

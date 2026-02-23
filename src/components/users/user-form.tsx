@@ -1,12 +1,11 @@
 
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { suggestUserRole } from "@/ai/flows/suggest-user-role";
 import { useState, type FormEvent, useEffect } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -71,9 +70,15 @@ export function UserForm({ triggerButton, mode, userData, onSave }: UserFormProp
       return;
     }
     setIsLoadingSuggestions(true);
-    setAiSuggestedRoles([]); 
+    setAiSuggestedRoles([]);
     try {
-      const result = await suggestUserRole({ jobDescription });
+      // Call server API route instead of importing server-only genkit directly
+      const res = await fetch('/api/ai/suggest-user-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobDescription }),
+      });
+      const result = await res.json();
       setAiSuggestedRoles(result.suggestedRoles || []);
       if (!result.suggestedRoles || result.suggestedRoles.length === 0) {
         toast({ title: "No Suggestions", description: "AI could not suggest roles for this description." });

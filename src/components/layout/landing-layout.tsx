@@ -4,6 +4,7 @@ import { MainHeader } from '@/components/layout/main-header';
 import { Building2, Twitter, Facebook, Linkedin, Github } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { MotionProvider } from '@/components/ui/motion-provider';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -60,11 +61,12 @@ export function LandingLayout({ children }: LandingLayoutProps) {
   useEffect(() => { setCurrentYear(new Date().getFullYear()); }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <MainHeader />
-      <main className="flex-1">
-        {children}
-      </main>
+    <MotionProvider>
+      <div className="flex flex-col min-h-screen">
+        <MainHeader />
+        <main className="flex-1">
+          {children}
+        </main>
 
       {/* Footer */}
       <footer className="border-t border-border/60 bg-muted/30">
@@ -152,6 +154,7 @@ export function LandingLayout({ children }: LandingLayoutProps) {
           </motion.div>
         </div>
       </footer>
-    </div>
+      </div>
+    </MotionProvider>
   );
 }

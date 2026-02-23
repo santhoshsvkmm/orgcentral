@@ -29,26 +29,45 @@ const initialUsers = [
   { id: "12", name: "Laura Jones", email: "laura@example.com", role: "Analyst", avatar: "https://placehold.co/40x40.png?text=LJ", jobDescription: "Analyzes project data and performance metrics." },
 ];
 
-type User = typeof initialUsers[0];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+  jobDescription?: string;
+}
 
 
 export function UserList() {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const { toast } = useToast();
   
-  const handleAddUser = (newUser: Omit<User, 'id' | 'avatar'> & { avatar?: string }) => {
+  const handleAddUser = (newUser: User | (Omit<User, 'id' | 'avatar'> & { avatar?: string })) => {
+    // Support being called with either a full User (rare) or the create-shape
+    if ('id' in newUser && newUser.id) {
+      // If a full user is passed, treat as update
+      setUsers(prevUsers => prevUsers.map(u => u.id === newUser.id ? newUser as User : u));
+      return;
+    }
+
+    const createShape = newUser as Omit<User, 'id' | 'avatar'> & { avatar?: string };
     const userWithId: User = {
-        ...newUser,
-        id: `user-${Date.now()}-${Math.random().toString(16).slice(2,8)}`,
-        avatar: newUser.avatar || `https://placehold.co/40x40.png?text=${newUser.name.substring(0,2).toUpperCase()}`
+      ...createShape,
+      id: `user-${Date.now()}-${Math.random().toString(16).slice(2,8)}`,
+      avatar: createShape.avatar || `https://placehold.co/40x40.png?text=${createShape.name.substring(0,2).toUpperCase()}`
     };
     setUsers(prevUsers => [userWithId, ...prevUsers]);
   };
 
-  const handleUpdateUser = (updatedUser: User) => {
-    setUsers(prevUsers => 
-      prevUsers.map(u => u.id === updatedUser.id ? updatedUser : u)
-    );
+  const handleUpdateUser = (updatedUser: User | (Omit<User, 'id' | 'avatar'> & { avatar?: string })) => {
+    // If we get a partial/create shape without id, ignore as update
+    if (!('id' in updatedUser) || !updatedUser.id) {
+      // nothing to update
+      return;
+    }
+    const user = updatedUser as User;
+    setUsers(prevUsers => prevUsers.map(u => u.id === user.id ? user : u));
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {

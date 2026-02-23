@@ -1,5 +1,5 @@
 
-'use server';
+"use server";
 /**
  * @fileOverview An AI agent for analyzing project and task data to find critical issues.
  *
@@ -8,8 +8,7 @@
  * - AnalyzeProjectIssuesOutput - The return type for the analyzeProjectIssues function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { z } from 'zod';
 
 // Define the structure for a single task
 const TaskSchema = z.object({
@@ -48,14 +47,22 @@ export type AnalyzeProjectIssuesOutput = z.infer<typeof AnalyzeProjectIssuesOutp
 
 
 export async function analyzeProjectIssues(input: AnalyzeProjectIssuesInput): Promise<AnalyzeProjectIssuesOutput> {
-  return analyzeProjectIssuesFlow(input);
-}
+  // Dynamically import genkit and define the prompt at runtime so the
+  // build does not attempt to resolve heavy server-side-only dependencies
+  // unless explicitly executed at runtime.
+  const { genkit } = await import('genkit');
+  const { googleAI } = await import('@genkit-ai/googleai');
 
-const prompt = ai.definePrompt({
-  name: 'analyzeProjectIssuesPrompt',
-  input: {schema: AnalyzeProjectIssuesInputSchema},
-  output: {schema: AnalyzeProjectIssuesOutputSchema},
-  prompt: `You are an expert project management analyst AI. Your task is to identify critical issues, risks, and bottlenecks in the provided project and its tasks.
+  const ai = genkit({
+    plugins: [googleAI()],
+    model: 'googleai/gemini-2.0-flash',
+  });
+
+  const prompt = ai.definePrompt({
+    name: 'analyzeProjectIssuesPrompt',
+    input: { schema: AnalyzeProjectIssuesInputSchema },
+    output: { schema: AnalyzeProjectIssuesOutputSchema },
+    prompt: `You are an expert project management analyst AI. Your task is to identify critical issues, risks, and bottlenecks in the provided project and its tasks.
 
 Project Details:
 - Name: {{{projectName}}}
@@ -94,18 +101,10 @@ Consider factors like:
 Provide a brief overall summary of the project's health based on your analysis. If no critical issues are found, state that the project appears to be on track based on the provided information.
 Focus on actionable insights.
 `,
-});
+  });
 
-const analyzeProjectIssuesFlow = ai.defineFlow(
-  {
-    name: 'analyzeProjectIssuesFlow',
-    inputSchema: AnalyzeProjectIssuesInputSchema,
-    outputSchema: AnalyzeProjectIssuesOutputSchema,
-  },
-  async (input) => {
-    const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const {output} = await prompt({...input, currentDate});
-    return output!;
-  }
-);
+  const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const { output } = await prompt({ ...input, currentDate });
+  return output!;
+}
 

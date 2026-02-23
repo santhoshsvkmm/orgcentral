@@ -15,7 +15,7 @@ import React from "react";
 
 interface SubcontractorListProps {
   subcontractors: Subcontractor[];
-  onUpdateSubcontractor: (subcontractor: Subcontractor) => void;
+  onUpdateSubcontractor: (subcontractor: Subcontractor | Omit<Subcontractor, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onDeleteSubcontractor: (subcontractorId: string) => void;
 }
 
@@ -35,36 +35,36 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
       accessorKey: "name",
       header: "Company Name",
       enableSorting: true,
-      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+  cell: ({ row }: any) => <span className="font-medium">{row.original.name}</span>,
     },
     {
       accessorKey: "trade",
       header: "Trade/Specialty",
       enableSorting: true,
-      cell: ({ row }) => <Badge variant="secondary">{row.original.trade}</Badge>,
+  cell: ({ row }: any) => <Badge variant="secondary">{row.original.trade}</Badge>,
     },
     {
       accessorKey: "contactPerson",
       header: "Contact Person",
       enableSorting: true,
-      cell: ({ row }) => <>{row.original.contactPerson}</>,
+  cell: ({ row }: any) => <>{row.original.contactPerson}</>,
     },
     {
       accessorKey: "email",
       header: "Email",
       enableSorting: true,
-      cell: ({ row }) => <>{row.original.email}</>,
+  cell: ({ row }: any) => <>{row.original.email}</>,
     },
     {
       accessorKey: "phone",
       header: "Phone",
-      cell: ({ row }) => <>{row.original.phone || 'N/A'}</>,
+  cell: ({ row }: any) => <>{row.original.phone || 'N/A'}</>,
     },
     {
       accessorKey: "mappedProjectsCount",
       header: "Mapped Projects",
       enableSorting: true,
-      cell: ({ row }) => (
+      cell: ({ row }: any) => (
         <Badge variant="outline">
           {row.original.mappedProjects.length} Project{row.original.mappedProjects.length === 1 ? "" : "s"}
         </Badge>
@@ -73,7 +73,7 @@ export function SubcontractorList({ subcontractors, onUpdateSubcontractor, onDel
     {
       accessorKey: "actions",
       header: "Actions",
-      cell: ({ row }) => (
+      cell: ({ row }: any) => (
         <div className="flex items-center justify-end">
           <SubcontractorForm
             mode="edit"

@@ -1,5 +1,5 @@
 
-'use client';
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, CalendarDays, Users, Info, MapPin, ToggleLeft, ToggleRight, Briefcase, Brain, AlertTriangle, CheckCircle, Clock, Orbit, AlertCircleIcon as AlertCircleLucide, CalendarClock, ShieldAlert, ListChecks } from "lucide-react";
@@ -11,7 +11,21 @@ import { calculateWorkingDays, formatDate } from "@/lib/date-utils";
 import { useState, useEffect, use, useMemo } from "react";
 import type { Project } from "@/components/projects/project-form";
  
-import { analyzeProjectIssues, AnalyzeProjectIssuesInput, AnalyzeProjectIssuesOutput, CriticalIssue } from "@/ai/flows/analyze-project-issues-flow";
+// NOTE: We no longer import the server-side AI flow directly from the client
+// bundle because that pulls server-only dependencies (genkit) into the client
+// build. Instead we call the server API route '/api/ai/analyze-project-issues'.
+
+type CriticalIssue = {
+  issue: string;
+  recommendation?: string;
+  severity: 'High' | 'Medium' | 'Low';
+  relatedTaskIds?: string[];
+};
+
+type AnalyzeProjectIssuesOutput = {
+  criticalIssues: CriticalIssue[];
+  summary?: string;
+};
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -133,7 +147,12 @@ export default function ProjectDetailsPage({ params: paramsPromise }: { params: 
         projectDueDate: project.dueDate,
         tasks: mockTasksForAI,
       };
-      const results = await analyzeProjectIssues(input);
+      const res = await fetch('/api/ai/analyze-project-issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      const results: AnalyzeProjectIssuesOutput = await res.json();
       setAIAnalysisResults(results);
       toast({
         title: "AI Analysis Complete",
