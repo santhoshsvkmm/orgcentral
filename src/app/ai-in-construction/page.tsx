@@ -50,9 +50,18 @@ const benefitsData = [
 ];
 
 const carouselImages = [
-  { src: "https://images.unsplash.com/photo-1549924513-b54c86a079c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0MTUwMjZ8MHwxfHNlYXJjaHw3fHxjb25zdHJ1Y3Rpb24lMjBhaXxlbnwwfHx8fDE3MjM2OTU4NTF8MA&ixlib=rb-4.0.3&q=80&w=1080", alt: "AI-powered construction site" },
-  { src: "https://images.unsplash.com/photo-1549924513-b54c86a079c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0MTUwMjZ8MHwxfHNlYXJjaHw3fHxjb25zdHJ1Y3Rpb24lMjBhaXxlbnwwfHx8fDE3MjM2OTU4NTF8MA&ixlib=rb-4.0.3&q=80&w=1080", alt: "Data analytics for construction projects" },
-  { src: "https://images.unsplash.com/photo-1549924513-b54c86a079c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0MTUwMjZ8MHwxfHNlYXJjaHw3fHxjb25zdHJ1Y3Rpb24lMjBhaXxlbnwwfHx8fDE3MjM2OTU4NTF8MA&ixlib=rb-4.0.3&q=80&w=1080", alt: "Team using AI for planning" }
+  { 
+    src: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=1080", 
+    alt: "AI-powered construction site" 
+  },
+  { 
+    src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1080", 
+    alt: "Data analytics for construction projects" 
+  },
+  { 
+    src: "https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&q=80&w=1080", 
+    alt: "Team using AI for planning" 
+  }
 ];
 
 const sectionVariants = {
